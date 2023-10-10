@@ -1,9 +1,15 @@
 # scrypt
 > CS32 fall project #1
+> scrypt/01 - Calculator.md
+> https://github.com/ucsb-cs32/f23/blob/master/scrypt/01%20-%20Calculator.md
 
 ## GitHub Rules
 - Do not push to the master branch directly. Always create a PR.
+- Always run `make clean` before commiting and pushing.
 - Code review comments must be meaningful.
+- C++ files with main() functions should go directly inside src.
+- All other C++ files (including headers) should go inside src/lib.
+- Make an announcement to all group members before you edit the Makefile
 
 ## Class Links
 
