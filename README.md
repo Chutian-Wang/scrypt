@@ -5,6 +5,7 @@
 
 ## GitHub Rules
 - Do not push to the master branch directly. Always create a PR.
+- Always run `make clean` before commiting and pushing.
 - Code review comments must be meaningful.
 - C++ files with main() functions should go directly inside src.
 - All other C++ files (including headers) should go inside src/lib.
