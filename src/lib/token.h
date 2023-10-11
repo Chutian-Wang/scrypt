@@ -7,7 +7,7 @@ enum class TokenType {
     Lparen,     // (
     Rparen,     // )
     END,        
-    Errror      // Any other 
+    Error      // Any other 
 };
 
 class Token{
