@@ -11,6 +11,48 @@
 - All other C++ files (including headers) should go inside src/lib.
 - Make an announcement to all group members before you edit the Makefile
 
+## Build Instructions
+- Make a build folder under the repo folder using `mkdir`.
+- Run `make` or `make all` to make, executables are now
+generated in the build folder.
+- Run `make <module>` to make a specific lib module or
+executable.
+
+## File Structure
+
+scrypt
+    |- README.md
+    |- Makefile
+    |- LICENSE
+    |- **src**
+    |   |- main.cpp
+    |   |- **lib**
+    |       |- lexer.h
+    |       |- lexer.cpp
+    |       |- token.h
+    |       |- AST.h
+    |       |- AST.cpp
+    |       |- Nodes.h
+    |       |- Nodes.cpp
+    |       etc.
+    |- **build**
+    |   |- main
+    |   |- lexer.o
+    |   |- AST.o
+    |   etc.
+
+## General Workflow
+We work in two thread usually. Both threads fetch from the
+master branch for the last checkpoint. Thread A works on the
+files and make some commits. When thread A is satisfied with
+their work, they submit a PR to be reviewed by thread B. Thread
+B will pull from thread A's branch and review the code to make
+constructive comments. Thread A will then review thread B's
+comments and make changes accordingly and make new commits.
+**
+When both threads are satisfied, thread B will merge the PR.
+**
+
 ## Class Links
 
 - GitHub for the syllabus, the schedule, and the assignments:
@@ -34,4 +76,3 @@
     https://xavierholt.github.io/cheatsheets/gdb.html
 - Makefile Tutorial To save you a lot of typing:
     https://makefiletutorial.com/
-
