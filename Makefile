@@ -8,7 +8,7 @@ BUILDDIR = build
 EXEC = main
 
 # Put dependent object builds here.
-OBJS = 	$(BUILDDIR)/demo_lib.o	\
+OBJS = 	$(BUILDDIR)/lexer.o	\
 
 .PHONY: clean
 

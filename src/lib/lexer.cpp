@@ -5,19 +5,25 @@
 #include <string>
 #include <cctype>
 
-Lexer::Lexer(std::string &input): text(input){
+Lexer::Lexer() {
     currRow = 1;
     currCol = 0;
+}
+
+Lexer::Lexer(const std::string &input) {
+    currRow = 1;
+    currCol = 0;
+    this->tokenize(input);
 }
 
 void Lexer::addToken(TokenType type, const std::string &token){
     tokens.push_back(Token(type, token, currRow, currCol));
 }
 
-void Lexer::tokenize(){
+void Lexer::tokenize(const std::string& expr){
     std::string num;
 
-    for (auto &token : text){
+    for (auto &token : expr){
         currCol ++;
 
         if (std::isspace(token)){}
@@ -39,10 +45,10 @@ void Lexer::tokenize(){
         else if (token == '/'){
             addToken(TokenType::Operator, "/");
         }
-        else if (std::isdigit(token) || ((token == '.') && (std::isdigit(text[currCol])))){
+        else if (std::isdigit(token) || ((token == '.') && (std::isdigit(expr[currCol])))){
             num += token;
         }
-        else if (std::isdigit(token) || ((token == '.') && (!std::isdigit(text[currCol])))){
+        else if (std::isdigit(token) || ((token == '.') && (!std::isdigit(expr[currCol])))){
             num += token;
             addToken(TokenType::Number, num);
         }
@@ -58,7 +64,7 @@ void Lexer::tokenize(){
     addToken(TokenType::END, "END");
 }
 
-std::vector<Token> Lexer::getTokens(){
+const std::vector<Token>& Lexer::getTokens() const{
     return tokens;
 }
 
