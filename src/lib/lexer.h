@@ -3,18 +3,22 @@
 
 #include <vector>
 #include <string>
+#include "token.h"
 
 class Lexer{
     public:
-        Lexer(std::string &input);
+        Lexer(const std::string &input);
+        // Default constructor for empty instance creation
+        Lexer();
+
         // tokenize() is used to tokenize input S expression into tokens
         // Tokens are then stored in vector tokens
-        void               tokenize();
+        void tokenize(const std::string& expr);
+
         // getTokens() used to fetch the private member tokens 
-        std::vector<Token> getTokens();
+        const std::vector<Token>& getTokens();
 
     private:
-        std::string        &text;
         std::vector<Token> tokens;
         int                currRow;
         int                currCol;
