@@ -15,10 +15,10 @@ void Lexer::addToken(TokenType type, const std::string &token){
     tokens.push_back(Token(type, token, currRow, currCol));
 }
 
-void Lexer::tokenize(std::string &input){
+void Lexer::tokenize(){
     std::string num;
 
-    for (auto &token : input){
+    for (auto &token : text){
         currCol ++;
 
         if (std::isspace(token)){}
@@ -40,10 +40,10 @@ void Lexer::tokenize(std::string &input){
         else if (token == '/'){
             addToken(TokenType::Operator, "/");
         }
-        else if (std::isdigit(token) || ((token == '.') && (std::isdigit(input[currCol])))){
+        else if (std::isdigit(token) || ((token == '.') && (std::isdigit(text[currCol])))){
             num += token;
         }
-        else if (std::isdigit(token) || ((token == '.') && (!std::isdigit(input[currCol])))){
+        else if (std::isdigit(token) || ((token == '.') && (!std::isdigit(text[currCol])))){
             num += token;
             addToken(TokenType::Number, num);
         }
@@ -59,9 +59,9 @@ void Lexer::tokenize(std::string &input){
     addToken(TokenType::END, "END");
 }
 
-// void Lexer::printTokens(){
-    
-// }
+std::vector<Token> Lexer::getTokens(){
+    return tokens;
+}
 
 Token::Token(TokenType type, const std::string &text, int row, int column): chr(text){
     this->type   = type;
