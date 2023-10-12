@@ -68,3 +68,4 @@ Token::Token(TokenType type, const std::string &text, int row, int column): chr(
     this->column = column;
 }
 
+
