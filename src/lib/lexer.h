@@ -20,7 +20,7 @@ class Lexer{
         // mathematical expression 1 + 2 * 3
         void tokenize(const std::string& expr);
 
-        const std::vector<Token>& getTokens();
+        const std::vector<Token>& getTokens() const;
 
     private:
         std::vector<Token> tokens;
