@@ -8,8 +8,8 @@
 class Lexer{
     public:
         Lexer(std::string &input);
-        void tokenize(std::string &input);
-        void printTokens();
+        void tokenize();
+        std::vector<Token> getTokens();
 
     private:
         std::string &text;
