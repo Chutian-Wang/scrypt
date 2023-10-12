@@ -12,9 +12,9 @@ Lexer::Lexer() {
 }
 
 Lexer::Lexer(const std::string &input) {
-    this->tokenize(input);
     currRow = 1;
     currCol = 0;
+    this->tokenize(input);
 }
 
 void Lexer::addToken(TokenType type, const std::string &token){
@@ -65,7 +65,7 @@ void Lexer::tokenize(const std::string& expr){
     addToken(TokenType::END, "END");
 }
 
-const std::vector<Token>& Lexer::getTokens(){
+const std::vector<Token>& Lexer::getTokens() const{
     return tokens;
 }
 
