@@ -11,6 +11,7 @@ int main() {
     while(std::getline(std::cin, line)){
         if (line.size() == 0) break;
         lexer.tokenize(line);
+
     }
     
     std::vector<Token> tokens;
