@@ -45,12 +45,33 @@ void Lexer::tokenize(const std::string& expr){
         else if (token == '/'){
             addToken(TokenType::Operator, "/");
         }
-        else if (std::isdigit(token) || ((token == '.') && (std::isdigit(expr[currCol])))){
+        else if (std::isdigit(token) || (token == '.')){
             num += token;
-        }
-        else if (std::isdigit(token) || ((token == '.') && (!std::isdigit(expr[currCol])))){
-            num += token;
-            addToken(TokenType::Number, num);
+            if (std::isdigit(expr[currCol]) || (expr[currCol] == '.')){continue;}
+            else{
+                int n = std::count(num.begin(), num.end(), '.');
+                if (n == 0){
+                    addToken(TokenType::Number, num);
+                    num = "";
+                }
+                else if (n == 1){
+                    size_t idx = num.find('.');
+                    if ((idx == 0) || (idx == num.length()-1)){
+                        std::string str;
+                        str += token;
+                        throw Token(TokenType::Error, str, currRow, currCol);
+                    }
+                    else{
+                        addToken(TokenType::Number, num);
+                        num = "";
+                    }
+                }
+                else{
+                    std::string str;
+                    str += token;
+                    throw Token(TokenType::Error, str, currRow, currCol);
+                }
+            }
         }
         else if (token == '\n'){
             currRow ++;
