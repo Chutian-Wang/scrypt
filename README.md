@@ -19,7 +19,7 @@ generated in the build folder.
 executable.
 
 ## File Structure
-
+```
 scrypt
     |- README.md
     |- Makefile
@@ -27,19 +27,21 @@ scrypt
     |- **src**
     |   |- main.cpp
     |   |- **lib**
-    |       |- lexer.h
-    |       |- lexer.cpp
-    |       |- token.h
-    |       |- AST.h
-    |       |- AST.cpp
-    |       |- Nodes.h
-    |       |- Nodes.cpp
-    |       etc.
+    |   |   |- lexer.h
+    |   |   |- lexer.cpp
+    |   |   |- token.h
+    |   |   |- AST.h
+    |   |   |- AST.cpp
+    |   |   |- Nodes.h
+    |   |   |- Nodes.cpp
+    |   |_  ...
+    |
     |- **build**
     |   |- main
     |   |- lexer.o
     |   |- AST.o
-    |   etc.
+    |_  ...
+```
 
 ## General Workflow
 We work in two thread usually. Both threads fetch from the
