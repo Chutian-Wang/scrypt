@@ -1,5 +1,5 @@
-#include "token.h"
-#include "lex.h"
+#include "lib/token.h"
+#include "lib/lex.h"
 #include <iostream>
 #include <sstream>
 #include <string>

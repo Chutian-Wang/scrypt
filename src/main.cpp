@@ -2,7 +2,7 @@
 #include <iomanip>
 #include <vector>
 #include "lib/token.h"
-#include "lib/lexer.h"
+#include "lib/lex.h"
 
 int main() {
     // std::string line;
