@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <algorithm> 
 #include <cctype>
 
 Lexer::Lexer() {
