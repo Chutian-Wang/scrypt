@@ -4,7 +4,6 @@
 #include <sstream>
 #include <string>
 #include <cctype>
-using std::istringstream;
 
 Lexer::Lexer(std::string &input): text(input){
     currRow = 1;
@@ -68,3 +67,4 @@ Token::Token(TokenType type, const std::string &text, int row, int column): chr(
     this->row    = row;
     this->column = column;
 }
+
