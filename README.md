@@ -24,9 +24,9 @@ scrypt
     |- README.md
     |- Makefile
     |- LICENSE
-    |- **src**
+    |- src
     |   |- main.cpp
-    |   |- **lib**
+    |   |- lib
     |   |   |- lexer.h
     |   |   |- lexer.cpp
     |   |   |- token.h
@@ -36,7 +36,7 @@ scrypt
     |   |   |- Nodes.cpp
     |   |_  ...
     |
-    |- **build**
+    |- build
     |   |- main
     |   |- lexer.o
     |   |- AST.o
