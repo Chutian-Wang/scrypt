@@ -35,7 +35,7 @@ class Lexer{
         // Helper function
         // Used in tokenize() to add a new Token into the vector tokens 
         // each time a new token is reached
-        void addToken(TokenType type, const std::string &token);
+        void addToken(TokenType type, const std::string &token, int row, int col);
 };
 
 #endif //LEXER_H
