@@ -1,6 +1,9 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
+#include <vector>
+#include <string>
+
 enum class TokenType {
     Number, 
     Operator,
@@ -19,3 +22,5 @@ class Token{
 
         Token(TokenType type, const std::string &text, int row, int column);
 };
+
+#endif //TOKEN_H

@@ -1,18 +1,18 @@
-##ifndef LEXER_H
+#ifndef LEXER_H
 #define LEXER_H
 
 #include <iostream>
 #include <vector>
-#include "token.h"
+#include <string>
 
 class Lexer{
     public:
-        Lexer(std::istream &input);
-        std::vector<Token> tokenize();
+        Lexer(std::string &input);
+        void tokenize(std::string &input);
         void printTokens();
 
     private:
-        std::istream &input;
+        std::string &text;
         std::vector<Token> tokens;
         int currRow;
         int currCol;
@@ -20,3 +20,5 @@ class Lexer{
         // Helper function
         void addToken(TokenType type, const std::string &token);
 };
+
+#endif //LEXER_H
