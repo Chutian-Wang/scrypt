@@ -49,7 +49,7 @@ void Lexer::tokenize(const std::string& expr){
             num += token;
             if (std::isdigit(expr[currCol]) || (expr[currCol] == '.')){continue;}
             else{
-                int n = std::count(num.begin(), num.end(), '.');
+                int n = count(num.begin(), num.end(), '.');
                 if (n == 0){
                     addToken(TokenType::Number, num);
                     num = "";

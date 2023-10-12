@@ -20,7 +20,8 @@ int main() {
     // }
 
     std::string line;
-    while(std::getline(std::cin, line));
+    // while(std::getline(std::cin, line));
+    std::getline(std::cin, line);
     try{
         Lexer lexer;
         lexer.tokenize(line);
