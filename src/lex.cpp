@@ -118,7 +118,7 @@ int main() {
     
     //while(std::getline(std::cin, line));
     std::getline(std::cin, line);
-    std::cout << line << std::endl;
+    //std::cout << line << std::endl;
     try{
         Lexer lexer;
         lexer.tokenize(line);
