@@ -5,18 +5,18 @@
 #include <string>
 
 enum class TokenType {
-    Number, 
-    Operator,
+    Number,     
+    Operator,   // +, -, *, /
     Lparen,     // (
     Rparen,     // )
     END,        
-    Error      // Any other 
+    Error       // Any other 
 };
 
 class Token{
     public:
         TokenType type;
-        std::string chr;
+        std::string chr; // what the token is, e.g. '+', used later for printing
         int row;
         int column;
 
