@@ -1,6 +1,11 @@
 #include "lib/demo_lib.h"
 #include <iomanip>
 #include <vector>
+#include <algorithm>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <cctype>
 #include "lib/token.h"
 #include "lib/lex.h"
 
@@ -48,7 +53,7 @@ void Lexer::tokenize(const std::string& expr){
             num += token;
             if (std::isdigit(expr[currCol]) || (expr[currCol] == '.')){continue;}
             else{
-                int n = count(num.begin(), num.end(), '.');
+                int n = std::count(num.begin(), num.end(), '.');
                 if (n == 0){
                     addToken(TokenType::Number, num);
                     num = "";
@@ -110,8 +115,8 @@ int main() {
     // }
 
     std::string line;
-    // while(std::getline(std::cin, line));
-    std::getline(std::cin, line);
+    while(std::getline(std::cin, line));
+    //std::getline(std::cin, line);
     try{
         Lexer lexer;
         lexer.tokenize(line);
