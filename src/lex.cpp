@@ -63,7 +63,7 @@ void Lexer::tokenize(const std::string& expr){
                     if ((idx == 0) || (idx == num.length()-1)){
                         std::string str;
                         str += token;
-                        throw Token(TokenType::Error, str, currRow, currCol);
+                        throw Token(TokenType::Error, str, currRow, currCol-(num.length()-1));
                     }
                     else{
                         addToken(TokenType::Number, num, currRow, currCol-(num.length()-1));
@@ -73,7 +73,7 @@ void Lexer::tokenize(const std::string& expr){
                 else{
                     std::string str;
                     str += token;
-                    throw Token(TokenType::Error, str, currRow, currCol);
+                    throw Token(TokenType::Error, str, currRow, currCol-(num.length()-1));
                 }
             }
         }
