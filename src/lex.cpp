@@ -71,10 +71,15 @@ void Lexer::tokenize(){
                     }
                     else if (n == 1){
                         size_t idx = num.find('.');
-                        if ((idx == 0) || (idx == num.length()-1)){
+                        if (idx == 0){
                             std::string str;
                             str += token;
-                            throw Token(TokenType::Error, str, currRow, currCol);
+                            throw Token(TokenType::Error, str, currRow, currCol-(num.length()-1));
+                        }
+                        else if (idx == num.length()-1){
+                            std::string str;
+                            str += token;
+                            throw Token(TokenType::Error, str, currRow, currCol+1);
                         }
                         else{
                             addToken(TokenType::Number, num, currRow, currCol-(num.length()-1));
