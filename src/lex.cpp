@@ -57,9 +57,9 @@ void Lexer::tokenize(){
                     if (temp==0){
                         temp++;
                     }
-                    else{
-                        temp = 0;
+                    else if (temp==1){
                         period2 = currCol;
+                        temp++;
                     }
                 }
                 if (std::isdigit(line[currCol]) || (line[currCol] == '.')){continue;}
@@ -85,6 +85,7 @@ void Lexer::tokenize(){
                         std::string str;
                         str += token;
                         throw Token(TokenType::Error, str, currRow, period2);
+                        temp = 0;
                     }
                 }
             }
