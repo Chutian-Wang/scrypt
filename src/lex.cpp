@@ -87,10 +87,18 @@ void Lexer::tokenize(){
                         }
                     }
                     else{
-                        str += token;
-                        throw Token(TokenType::Error, str, currRow, period2);
-                        str = "";
-                        temp = 0;
+                        size_t idx = num.find('.');
+                        if (idx == 0){
+                            str += token;
+                            throw Token(TokenType::Error, str, currRow, currCol-(num.length()-1));
+                            str = "";
+                        }
+                        else{
+                            str += token;
+                            throw Token(TokenType::Error, str, currRow, period2);
+                            str = "";
+                            temp = 0;
+                        }
                     }
                 }
             }
