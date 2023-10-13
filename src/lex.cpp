@@ -27,6 +27,7 @@ void Lexer::addToken(TokenType type, const std::string &token, int row, int col)
 void Lexer::tokenize(){
     std::string num, line;
     std::getline(std::cin, line);
+    int period2, temp(0);
     while((line != "") || !std::cin.eof()){
         for (auto &token : line){
             currCol ++;
@@ -52,6 +53,15 @@ void Lexer::tokenize(){
             }
             else if (std::isdigit(token) || (token == '.')){
                 num += token;
+                if (token == '.'){
+                    if (temp==0){
+                        temp++;
+                    }
+                    else{
+                        temp = 0;
+                        period2 = currCol;
+                    }
+                }
                 if (std::isdigit(line[currCol]) || (line[currCol] == '.')){continue;}
                 else{
                     int n = std::count(num.begin(), num.end(), '.');
@@ -74,7 +84,7 @@ void Lexer::tokenize(){
                     else{
                         std::string str;
                         str += token;
-                        throw Token(TokenType::Error, str, currRow, currCol);
+                        throw Token(TokenType::Error, str, currRow, period2);
                     }
                 }
             }
