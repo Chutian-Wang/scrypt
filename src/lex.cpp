@@ -25,7 +25,7 @@ void Lexer::addToken(TokenType type, const std::string &token, int row, int col)
 }
 
 void Lexer::tokenize(){
-    std::string num, line;
+    std::string num, line, str;
     std::getline(std::cin, line);
     int period2, temp(0);
     while((line != "") || !std::cin.eof()){
@@ -72,14 +72,14 @@ void Lexer::tokenize(){
                     else if (n == 1){
                         size_t idx = num.find('.');
                         if (idx == 0){
-                            std::string str;
                             str += token;
                             throw Token(TokenType::Error, str, currRow, currCol-(num.length()-1));
+                            str = "";
                         }
                         else if (idx == num.length()-1){
-                            std::string str;
                             str += token;
                             throw Token(TokenType::Error, str, currRow, currCol+1);
+                            str = "";
                         }
                         else{
                             addToken(TokenType::Number, num, currRow, currCol-(num.length()-1));
@@ -87,17 +87,17 @@ void Lexer::tokenize(){
                         }
                     }
                     else{
-                        std::string str;
                         str += token;
                         throw Token(TokenType::Error, str, currRow, period2);
+                        str = "";
                         temp = 0;
                     }
                 }
             }
             else{
-                std::string str;
                 str += token;
                 throw Token(TokenType::Error, str, currRow, currCol);
+                str = "";
             }
         }
         if (std::cin.eof()){
@@ -123,26 +123,6 @@ Token::Token(TokenType type, const std::string &text, int row, int column): chr(
 }
 
 int main() {
-    // std::string line;
-    
-    // Lexer lexer;
-    
-    
-    // std::vector<Token> tokens;
-    // tokens = lexer.getTokens();
-
-    // for(auto token: tokens){
-    //     std::cout << std::setw(3) << token.row;
-    //     std::cout << std::setw(4) << token.column << "  ";
-    //     std::cout << token.chr;
-    // }
-
-    // std::string line;
-    
-    //while(std::getline(std::cin, line));
-    //std::cout << line << std::endl;
-    // std::getline(std::cin, line);
-    // std::cout << line << std::endl;
     try{
         Lexer lexer;
         lexer.tokenize();
