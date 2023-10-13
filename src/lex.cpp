@@ -28,7 +28,7 @@ void Lexer::tokenize(){
     std::string num, line, str;
     std::getline(std::cin, line);
     int period2, temp(0);
-    while((line != "") || !std::cin.eof()){
+    while(!std::cin.eof()){
         for (auto &token : line){
             currCol ++;
 
