@@ -7,7 +7,7 @@
 
 class Lexer{
     public:
-        Lexer(const std::string &input);
+        // Lexer(const std::string &input);
         
         // Default constructor for empty instance creation
         Lexer();
@@ -18,7 +18,7 @@ class Lexer{
         // e.g. {(, +, (, *, 1, 2, ), 3, )} parsed from the S-
         // expression (+ (* 1 2) 3) which evaluates to the
         // mathematical expression 1 + 2 * 3
-        void tokenize(const std::string& expr);
+        void tokenize();
 
         const std::vector<Token>& getTokens() const;
 
