@@ -14,77 +14,99 @@ Lexer::Lexer() {
     currCol = 0;
 }
 
-Lexer::Lexer(const std::string &input) {
-    currRow = 1;
-    currCol = 0;
-    this->tokenize(input);
-}
+// Lexer::Lexer(const std::string &input) {
+//     currRow = 1;
+//     currCol = 0;
+//     this->tokenize(input);
+// }
 
 void Lexer::addToken(TokenType type, const std::string &token, int row, int col){
     tokens.push_back(Token(type, token, row, col));
 }
 
-void Lexer::tokenize(const std::string& expr){
-    std::string num;
+void Lexer::tokenize(){
+    std::string num, line, str;
+    std::getline(std::cin, line);
+    int period2, temp(0);
+    while((line != "") || !std::cin.eof()){
+        for (auto &token : line){
+            currCol ++;
 
-    for (auto &token : expr){
-        currCol ++;
-
-        if (std::isspace(token)){}
-        else if (token == '('){
-            addToken(TokenType::Lparen, "(", currRow, currCol);
-        }
-        else if (token == ')'){
-            addToken(TokenType::Rparen, ")", currRow, currCol);
-        }
-        else if (token == '+'){
-            addToken(TokenType::Operator, "+", currRow, currCol);
-        }
-        else if (token == '-'){
-            addToken(TokenType::Operator, "-", currRow, currCol);
-        }
-        else if (token == '*'){
-            addToken(TokenType::Operator, "*", currRow, currCol);
-        }
-        else if (token == '/'){
-            addToken(TokenType::Operator, "/", currRow, currCol);
-        }
-        else if (std::isdigit(token) || (token == '.')){
-            num += token;
-            if (std::isdigit(expr[currCol]) || (expr[currCol] == '.')){continue;}
-            else{
-                int n = std::count(num.begin(), num.end(), '.');
-                if (n == 0){
-                    addToken(TokenType::Number, num, currRow, currCol-(num.length()-1));
-                    num = "";
-                }
-                else if (n == 1){
-                    size_t idx = num.find('.');
-                    if ((idx == 0) || (idx == num.length()-1)){
-                        std::string str;
-                        str += token;
-                        throw Token(TokenType::Error, str, currRow, currCol);
+            if (std::isspace(token)){}
+            else if (token == '('){
+                addToken(TokenType::Lparen, "(", currRow, currCol);
+            }
+            else if (token == ')'){
+                addToken(TokenType::Rparen, ")", currRow, currCol);
+            }
+            else if (token == '+'){
+                addToken(TokenType::Operator, "+", currRow, currCol);
+            }
+            else if (token == '-'){
+                addToken(TokenType::Operator, "-", currRow, currCol);
+            }
+            else if (token == '*'){
+                addToken(TokenType::Operator, "*", currRow, currCol);
+            }
+            else if (token == '/'){
+                addToken(TokenType::Operator, "/", currRow, currCol);
+            }
+            else if (std::isdigit(token) || (token == '.')){
+                num += token;
+                if (token == '.'){
+                    if (temp==0){
+                        temp++;
                     }
-                    else{
+                    else if (temp==1){
+                        period2 = currCol;
+                        temp++;
+                    }
+                }
+                if (std::isdigit(line[currCol]) || (line[currCol] == '.')){continue;}
+                else{
+                    int n = std::count(num.begin(), num.end(), '.');
+                    if (n == 0){
                         addToken(TokenType::Number, num, currRow, currCol-(num.length()-1));
                         num = "";
                     }
-                }
-                else{
-                    std::string str;
-                    str += token;
-                    throw Token(TokenType::Error, str, currRow, currCol);
+                    else if (n == 1){
+                        size_t idx = num.find('.');
+                        if (idx == 0){
+                            str += token;
+                            throw Token(TokenType::Error, str, currRow, currCol-(num.length()-1));
+                            str = "";
+                        }
+                        else if (idx == num.length()-1){
+                            str += token;
+                            throw Token(TokenType::Error, str, currRow, currCol+1);
+                            str = "";
+                        }
+                        else{
+                            addToken(TokenType::Number, num, currRow, currCol-(num.length()-1));
+                            num = "";
+                        }
+                    }
+                    else{
+                        str += token;
+                        throw Token(TokenType::Error, str, currRow, period2);
+                        str = "";
+                        temp = 0;
+                    }
                 }
             }
+            else{
+                str += token;
+                throw Token(TokenType::Error, str, currRow, currCol);
+                str = "";
+            }
         }
-        else if (token == '\n'){
-            currRow ++;
+        if (std::cin.eof()){
+            currCol++;
+            addToken(TokenType::END, "END", currRow, currCol);
         }
-        else{
-            std::string str;
-            str += token;
-            throw Token(TokenType::Error, str, currRow, currCol);
-        }
+        std::getline(std::cin, line);
+        currRow++;
+        currCol=0;
     }
     currCol++;
     addToken(TokenType::END, "END", currRow, currCol);
@@ -101,28 +123,9 @@ Token::Token(TokenType type, const std::string &text, int row, int column): chr(
 }
 
 int main() {
-    // std::string line;
-    
-    // Lexer lexer;
-    
-    
-    // std::vector<Token> tokens;
-    // tokens = lexer.getTokens();
-
-    // for(auto token: tokens){
-    //     std::cout << std::setw(3) << token.row;
-    //     std::cout << std::setw(4) << token.column << "  ";
-    //     std::cout << token.chr;
-    // }
-
-    std::string line;
-    
-    //while(std::getline(std::cin, line));
-    std::getline(std::cin, line);
-    //std::cout << line << std::endl;
     try{
         Lexer lexer;
-        lexer.tokenize(line);
+        lexer.tokenize();
 
         std::vector<Token> tokens;
         tokens = lexer.getTokens();
