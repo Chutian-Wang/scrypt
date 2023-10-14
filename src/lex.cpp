@@ -43,7 +43,7 @@ void Lexer::tokenize(){
             addToken(TokenType::END, "END", currRow, currCol);
             break;
         }
-        if (std::isspace(character)){}
+        if (std::isspace(character)){currCol++;}
         else if (character == '('){
             addToken(TokenType::Lparen, "(", currRow, currCol);
         }
@@ -65,7 +65,7 @@ void Lexer::tokenize(){
         else if (std::isdigit(character) || (character  == '.')){
             char next;
             std::cin.get(next);
-            while(next != ' '){
+            while(!std::isspace(next) && std::isdigit(next)){
                 num += next;
                 currCol++;
                 if (next == '.'){pcount++;}
