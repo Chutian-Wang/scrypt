@@ -7,7 +7,7 @@
 
 class Lexer{
     public:
-        // Lexer(const std::string &input);
+        //Lexer(const std::string &input);
         
         // Default constructor for empty instance creation
         Lexer();

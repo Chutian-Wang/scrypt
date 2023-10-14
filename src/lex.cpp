@@ -15,101 +15,108 @@ Lexer::Lexer() {
 }
 
 // Lexer::Lexer(const std::string &input) {
-//     currRow = 1;
-//     currCol = 0;
-//     this->tokenize(input);
-// }
+//    currRow = 1;
+//    currCol = 0;
+//    this->tokenize();
+//}
 
 void Lexer::addToken(TokenType type, const std::string &token, int row, int col){
     tokens.push_back(Token(type, token, row, col));
 }
 
+// I changed it to the .get() function because .getline() is going to cause 
+// some errors (the assignment hints)
+// .get() only looks at the characters one by one so for numbers, have to go 
+// through the entire loop again and have a full string before parsing through 
+// it and checking which one is valid and which one is an error. 
 void Lexer::tokenize(){
-    std::string num, line, str;
-    std::getline(std::cin, line);
-    int period2, temp(0);
-    while((line != "") || !std::cin.eof()){
-        for (auto &token : line){
-            currCol ++;
+    std::string num = ""; 
+    std::string str;
+    char character;
+    int pcount = 0;
+    //iteration part
+    while(std::cin.get(character)){
+        currCol++;
 
-            if (std::isspace(token)){}
-            else if (token == '('){
-                addToken(TokenType::Lparen, "(", currRow, currCol);
-            }
-            else if (token == ')'){
-                addToken(TokenType::Rparen, ")", currRow, currCol);
-            }
-            else if (token == '+'){
-                addToken(TokenType::Operator, "+", currRow, currCol);
-            }
-            else if (token == '-'){
-                addToken(TokenType::Operator, "-", currRow, currCol);
-            }
-            else if (token == '*'){
-                addToken(TokenType::Operator, "*", currRow, currCol);
-            }
-            else if (token == '/'){
-                addToken(TokenType::Operator, "/", currRow, currCol);
-            }
-            else if (std::isdigit(token) || (token == '.')){
-                num += token;
-                if (token == '.'){
-                    if (temp==0){
-                        temp++;
-                    }
-                    else if (temp==1){
-                        period2 = currCol;
-                        temp++;
-                    }
-                }
-                if (std::isdigit(line[currCol]) || (line[currCol] == '.')){continue;}
-                else{
-                    int n = std::count(num.begin(), num.end(), '.');
-                    if (n == 0){
-                        addToken(TokenType::Number, num, currRow, currCol-(num.length()-1));
-                        num = "";
-                    }
-                    else if (n == 1){
-                        size_t idx = num.find('.');
-                        if (idx == 0){
-                            str += token;
-                            throw Token(TokenType::Error, str, currRow, currCol-(num.length()-1));
-                            str = "";
-                        }
-                        else if (idx == num.length()-1){
-                            str += token;
-                            throw Token(TokenType::Error, str, currRow, currCol+1);
-                            str = "";
-                        }
-                        else{
-                            addToken(TokenType::Number, num, currRow, currCol-(num.length()-1));
-                            num = "";
-                        }
-                    }
-                    else{
-                        str += token;
-                        throw Token(TokenType::Error, str, currRow, period2);
-                        str = "";
-                        temp = 0;
-                    }
-                }
-            }
-            else{
-                str += token;
-                throw Token(TokenType::Error, str, currRow, currCol);
-                str = "";
-            }
-        }
-        if (std::cin.eof()){
+        if (character == EOF){
             currCol++;
             addToken(TokenType::END, "END", currRow, currCol);
+            break;
         }
-        std::getline(std::cin, line);
-        currRow++;
-        currCol=0;
+        if (std::isspace(character)){}
+        else if (character == '('){
+            addToken(TokenType::Lparen, "(", currRow, currCol);
+        }
+        else if (character == ')'){
+            addToken(TokenType::Rparen, ")", currRow, currCol);
+        }
+        else if (character == '+'){
+            addToken(TokenType::Operator, "+", currRow, currCol);
+        }
+        else if (character == '-'){
+            addToken(TokenType::Operator, "-", currRow, currCol);
+        }
+        else if (character == '*'){
+            addToken(TokenType::Operator, "*", currRow, currCol);
+        }
+        else if (character == '/'){
+            addToken(TokenType::Operator, "/", currRow, currCol);
+        }
+        else if (std::isdigit(character) || (character  == '.')){
+            char next;
+            std::cin.get(next);
+            while(next != ' '){
+                num += next;
+                currCol++;
+                if (next == '.'){pcount++;}
+            }
+            //checking if num is valid
+            if (!num.empty()){
+                if (pcount == 0){
+                addToken(TokenType::Number, num, currRow, currCol);
+                }
+            }
+            else if (pcount == 1){
+                size_t idx = num.find('.');
+                if (idx == 0){
+                    str += character;
+                    currCol = 1;
+                    throw Token(TokenType::Error, str, currRow, currCol);
+                    str = "";
+                }
+                else if (idx == num.length()-1){
+                    str += character;
+                    currCol = idx + 1;
+                    throw Token(TokenType::Error, str, currRow, currCol);
+                    str = "";
+                }
+                else{
+                    addToken(TokenType::Number, num, currRow, currCol);
+                    num = "";
+                }
+            }
+            else if (pcount >= 2){
+                int count = 0;
+                for(std::string::size_type i = 0; i < num.length(); i++){
+                    if(num[i] == '.'){
+                        count++;
+                        if (count >=2){
+                            throw Token(TokenType::Error, num, currRow, currCol);
+                        }
+                    }
+                }
+            }
+        }
+        else if (character == '\n'){
+            currRow++;
+            currCol=0;
+        }
+        else{
+            str += character ;
+            throw Token(TokenType::Error, str, currRow, currCol);
+            str = "";
+        }
     }
-    currCol++;
-    addToken(TokenType::END, "END", currRow, currCol);
 }
 
 const std::vector<Token>& Lexer::getTokens() const{
@@ -130,16 +137,18 @@ int main() {
         std::vector<Token> tokens;
         tokens = lexer.getTokens();
 
-        for(auto token: tokens){
+        for(auto &token: tokens){
             std::cout << std::setw(4) << token.row;
             std::cout << std::setw(5) << token.column << "  ";
             std::cout << token.chr << std::endl;
         }
     }
-    catch(Token error){
+    catch(const Token& error){
         std::cout << "Syntax error on line " << error.row << " column " << error.column << ".\n";
         exit(1);
     }
 
     return 0;
 }
+
+// g++ -std=c++17 -Wall -Wextra -Werror lex.cpp
