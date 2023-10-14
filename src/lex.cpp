@@ -96,18 +96,18 @@ void Lexer::tokenize(){
                     }
                 }
             }
+            if (std::cin.eof()){
+                currCol++;
+                addToken(TokenType::END, "END", currRow, currCol);
+                return;
+            }
             // else{
             //     str += token;
             //     throw Token(TokenType::Error, str, currRow, currCol);
             //     str = "";
             // }
         }
-        if (std::cin.eof()){
-            std::cout <<"test\n";
-            currCol++;
-            addToken(TokenType::END, "END", currRow, currCol);
-            return;
-        }
+        
         std::getline(std::cin, line);
         currRow++;
         currCol=0;
