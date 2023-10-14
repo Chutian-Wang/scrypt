@@ -23,11 +23,6 @@ void Lexer::tokenize(){
     int period2, temp(0);
     
     while(!std::cin.eof()){
-        if (std::cin.eof()){
-            currCol++;
-            addToken(TokenType::END, "END", currRow, currCol);
-            return;
-        }
         for (auto &token : line){
             currCol ++;
 
@@ -106,6 +101,12 @@ void Lexer::tokenize(){
             //     throw Token(TokenType::Error, str, currRow, currCol);
             //     str = "";
             // }
+        }
+        if (std::cin.eof()){
+            std::cout <<"test\n";
+            currCol++;
+            addToken(TokenType::END, "END", currRow, currCol);
+            return;
         }
         std::getline(std::cin, line);
         currRow++;
