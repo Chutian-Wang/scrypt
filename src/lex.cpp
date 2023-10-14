@@ -1,4 +1,3 @@
-#include "lib/demo_lib.h"
 #include <iomanip>
 #include <vector>
 #include <algorithm>
@@ -14,12 +13,6 @@ Lexer::Lexer() {
     currCol = 0;
 }
 
-// Lexer::Lexer(const std::string &input) {
-//     currRow = 1;
-//     currCol = 0;
-//     this->tokenize(input);
-// }
-
 void Lexer::addToken(TokenType type, const std::string &token, int row, int col){
     tokens.push_back(Token(type, token, row, col));
 }
@@ -28,6 +21,7 @@ void Lexer::tokenize(){
     std::string num, line, str;
     std::getline(std::cin, line);
     int period2, temp(0);
+    
     while(!std::cin.eof()){
         for (auto &token : line){
             currCol ++;
@@ -102,15 +96,16 @@ void Lexer::tokenize(){
                     }
                 }
             }
-            else{
-                str += token;
-                throw Token(TokenType::Error, str, currRow, currCol);
-                str = "";
-            }
+            // else{
+            //     str += token;
+            //     throw Token(TokenType::Error, str, currRow, currCol);
+            //     str = "";
+            // }
         }
         if (std::cin.eof()){
             currCol++;
             addToken(TokenType::END, "END", currRow, currCol);
+            break;
         }
         std::getline(std::cin, line);
         currRow++;
@@ -135,8 +130,7 @@ int main() {
         Lexer lexer;
         lexer.tokenize();
 
-        std::vector<Token> tokens;
-        tokens = lexer.getTokens();
+        std::vector<Token> tokens = lexer.getTokens();
 
         for(auto token: tokens){
             std::cout << std::setw(4) << token.row;
