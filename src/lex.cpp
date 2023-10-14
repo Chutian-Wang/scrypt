@@ -105,7 +105,7 @@ void Lexer::tokenize(){
         if (std::cin.eof()){
             currCol++;
             addToken(TokenType::END, "END", currRow, currCol);
-            break;
+            return;
         }
         std::getline(std::cin, line);
         currRow++;
