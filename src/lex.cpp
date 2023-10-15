@@ -73,30 +73,22 @@ void Lexer::tokenize(){
                 std::cin.get(next);
             }
             //checking if num is valid
-            if (!num.empty()){
-                if (pcount == 0){
-                addToken(TokenType::Number, num, currRow, currCol);
+            if (!num.empty()) {
+                if (pcount == 0) {
+                    addToken(TokenType::Number, num, currRow, currCol - num.size());
+                } 
+                else if (pcount == 1) {
+                    if (num.front() != '.' && num.back() != '.') {
+                        addToken(TokenType::Number, num, currRow, currCol - num.size());
+                    } 
+                else {
+                    throw Token(TokenType::Error, num, currRow, currCol - num.size());
                 }
+            } 
+            else {
+                throw Token(TokenType::Error, num, currRow, currCol - num.size());
             }
-            else if (pcount == 1){
-                size_t idx = num.find('.');
-                if (idx == 0 || idx == num.length()-1){
-                    str += character;
-                    currCol = 1;
-                    throw Token(TokenType::Error, str, currRow, currCol);
-                    str = "";
-                }
-                else{
-                    addToken(TokenType::Number, num, currRow, currCol);
-                    num = "";
-                }
-            }
-            else if (pcount > 1){
-                throw Token(TokenType::Error, num, currRow, currCol);
-            }
-            else{
-                addToken(TokenType::Number, num, currRow, currCol);
-                num = "";
+            num = "";
             }
         }
         else if (character == '\n'){
@@ -104,7 +96,7 @@ void Lexer::tokenize(){
             currCol=0;
         }
         else{
-            str += character ;
+            str += character;
             throw Token(TokenType::Error, str, currRow, currCol);
             str = "";
         }
