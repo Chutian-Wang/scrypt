@@ -26,7 +26,12 @@ void Lexer::tokenize(std::istream& input){
         input.get(token);
         currCol ++;
 
-        if (std::isspace(token)){}
+        if (token == '\n'){
+            std::cin.ignore();
+            currRow ++;
+            currCol = 0;
+        }
+        else if (std::isspace(token)){}
         else if (token == '('){
             addToken(TokenType::Lparen, "(", currRow, currCol);
         }
@@ -44,11 +49,6 @@ void Lexer::tokenize(std::istream& input){
         }
         else if (token == '/'){
             addToken(TokenType::Operator, "/", currRow, currCol);
-        }
-        else if (token == '\n'){
-            std::cout << "here\n";
-            currRow ++;
-            currCol = 0;
         }
         else if (std::isdigit(token) || (token == '.')){
             num += token;
@@ -128,7 +128,7 @@ int main() {
     //     std::cin.get(symbol);
     //     bool newline = (symbol == '\n');
     //     std::cout << "there is newline " << newline << std::endl;
-    // }while(symbol != '\n');
+    // }while(!std::cin.eof());
     try{
         Lexer lexer;
         lexer.tokenize(std::cin);
