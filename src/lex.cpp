@@ -81,7 +81,7 @@ void Lexer::tokenize(){
             //checking if num is valid
             if (!num.empty()) {
                 if (pcount == 0) {
-                    addToken(TokenType::Number, num, currRow, currCol);
+                    addToken(TokenType::Number, num, currRow, currCol - num.size());
                 } 
             }
             else if (pcount == 1) {
@@ -89,16 +89,16 @@ void Lexer::tokenize(){
                 if (idx == 0 || idx == num.length()-1){
                     str += character;
                     currCol = 1;
-                    throw Token(TokenType::Error, str, currRow, currCol);
+                    throw Token(TokenType::Error, str, currRow, currCol - num.size());
                     str = "";
                 }
                 else{
-                    addToken(TokenType::Number, num, currRow, currCol);
+                    addToken(TokenType::Number, num, currRow, currCol - num.size());
                     num = "";
                 }
             }
             else if (pcount > 1){
-                throw Token(TokenType::Error, num, currRow, currCol);
+                throw Token(TokenType::Error, num, currRow, currCol - num.size());
             }
         }
         else{
