@@ -61,7 +61,7 @@ void Lexer::tokenize(){
         else if (std::isdigit(character) || (character  == '.')){
             char next;
             std::cin.get(next);
-            while(!std::isspace(next) && std::isdigit(next) || next == '.'){
+            while((!std::isspace(next) && std::isdigit(next)) || next == '.'){
                 num += next;
                 currCol++;
                 if (next == '.'){
