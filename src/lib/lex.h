@@ -30,7 +30,7 @@ class Lexer{
         // If we must store raw text do it here
         // Each element of this vector contains a line of raw
         // text
-        std::vector<std::string> textLines;
+        // std::vector<std::string> textLines;
 
         // Helper function
         // Used in tokenize() to add a new Token into the vector tokens 

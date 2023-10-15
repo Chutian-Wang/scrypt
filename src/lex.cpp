@@ -24,11 +24,6 @@ void Lexer::addToken(TokenType type, const std::string &token, int row, int col)
     tokens.push_back(Token(type, token, row, col));
 }
 
-// I changed it to the .get() function because .getline() is going to cause 
-// some errors (the assignment hints)
-// .get() only looks at the characters one by one so for numbers, have to go 
-// through the entire loop again and have a full string before parsing through 
-// it and checking which one is valid and which one is an error. 
 void Lexer::tokenize(){
     std::string num = ""; 
     std::string str;
@@ -39,11 +34,12 @@ void Lexer::tokenize(){
         currCol++;
 
         if (character == EOF){
-            currCol++;
+            currRow++;
+            currCol = 1;
             addToken(TokenType::END, "END", currRow, currCol);
             break;
         }
-        if (std::isspace(character)){currCol++;}
+        if (std::isspace(character)){continue;}
         else if (character == '('){
             addToken(TokenType::Lparen, "(", currRow, currCol);
         }
@@ -150,5 +146,3 @@ int main() {
 
     return 0;
 }
-
-// g++ -std=c++17 -Wall -Wextra -Werror lex.cpp
