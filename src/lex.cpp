@@ -77,7 +77,7 @@ void Lexer::tokenize(){
                 if (std::cin.eof()){
                     break;
                 }
-                if (next == '/n'){
+                if (next == '\n'){
                     currRow++;
                 }
                 std::cin.get(next);
