@@ -17,16 +17,35 @@ void Lexer::addToken(TokenType type, const std::string &token, int row, int col)
     tokens.push_back(Token(type, token, row, col));
 }
 
+const std::vector<Token>& Lexer::getTokens() const{
+    return tokens;
+}
+
+Token::Token(TokenType type, const std::string &text, int row, int column): chr(text){
+    this->type   = type;
+    this->row    = row;
+    this->column = column;
+}
+
 void Lexer::tokenize(std::istream& input){
-    std::string num, str;
+    // num stores number, e.g. 8.8, 134.45
+    // str is used mainly for throwing exception since Token() 
+    // only accepts string in the 2nd parameter
+    // period2 keeps track of where the 2nd period is when there
+    // is error such as 8..9
+    // temp keeps track of how many periods we have encountered
+    // token keeps track of the current character from input
+    std::string num, str; 
     int period2, temp(0);
     char token;
     
     while (input.get(token)){
+        // For each character in the input, we check if it is one
+        // of the operators we recognize or if it is a valid number
+        // If it is not a valid number or not a operator that we 
+        // know of, we throw an error
         currCol ++;
-        // std::cout << "token= " << token << " currCol= " << currCol << std::endl;
         if (token == '\n'){
-            //std::cin.ignore();
             currRow ++;
             currCol = 0;
         }
@@ -52,6 +71,9 @@ void Lexer::tokenize(std::istream& input){
         else if (std::isdigit(token) || (token == '.')){
             num += token;
             if (token == '.'){
+                // if we encounter a period, we increment temp
+                // and store the position of 2nd period (where
+                // the error location should be) in period2
                 if (temp==0){
                     temp++;
                 }
@@ -60,14 +82,26 @@ void Lexer::tokenize(std::istream& input){
                     temp++;
                 }
             }
-            if (std::isdigit(input.peek()) || (input.peek() == '.')){continue;}
+            if (std::isdigit(input.peek()) || (input.peek() == '.')){
+                // if the next character is a number or a period
+                // we keep reading from input
+                continue;
+            }
             else{
+                // if the number is completely read, we now check if 
+                // the number is valid by counting the number of period
+                // inside the number
                 int n = std::count(num.begin(), num.end(), '.');
                 if (n == 0){
+                    // if there is no period, just add the number
                     addToken(TokenType::Number, num, currRow, currCol-(num.length()-1));
                     num = "";
                 }
                 else if (n == 1){
+                    // if there is one period, there are 2 instances when 
+                    // the number would be invalid e.g.
+                    // 1) .9, error position = 1
+                    // 2) 9., error position = 3
                     size_t idx = num.find('.');
                     if (idx == 0){
                         str += token;
@@ -85,6 +119,9 @@ void Lexer::tokenize(std::istream& input){
                     }
                 }
                 else{
+                    // if there are more than 1 periods, the number is definitely invalid
+                    // 1) ..9, error position = 1
+                    // 2) 9..9, error position = 3
                     size_t idx = num.find('.');
                     if (idx == 0){
                         str += token;
@@ -111,23 +148,7 @@ void Lexer::tokenize(std::istream& input){
     return;
 }
 
-const std::vector<Token>& Lexer::getTokens() const{
-    return tokens;
-}
-
-Token::Token(TokenType type, const std::string &text, int row, int column): chr(text){
-    this->type   = type;
-    this->row    = row;
-    this->column = column;
-}
-
 int main() {
-    // char symbol;
-    // do{
-    //     std::cin.get(symbol);
-    //     bool newline = (symbol == '\n');
-    //     std::cout << "there is newline " << newline << std::endl;
-    // }while(!std::cin.eof());
     try{
         Lexer lexer;
         lexer.tokenize(std::cin);
