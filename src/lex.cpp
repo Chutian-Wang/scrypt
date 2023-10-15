@@ -21,11 +21,10 @@ void Lexer::tokenize(std::istream& input){
     std::string num, str;
     int period2, temp(0);
     char token;
-    do
-    {
-        input.get(token);
+    
+    while (input.get(token)){
         currCol ++;
-        //std::cout << "token= " << token << " currCol= " << currCol << std::endl;
+        // std::cout << "token= " << token << " currCol= " << currCol << std::endl;
         if (token == '\n'){
             std::cin.ignore();
             currRow ++;
@@ -106,10 +105,12 @@ void Lexer::tokenize(std::istream& input){
             throw Token(TokenType::Error, str, currRow, currCol);
             str = "";
         }
-    } while (!std::cin.eof());
-    currCol++;
-    addToken(TokenType::END, "END", currRow, currCol);
-    return;
+        if (std::cin.eof()){
+            currCol++;
+            addToken(TokenType::END, "END", currRow, currCol);
+            return;
+        }
+    }
 }
 
 const std::vector<Token>& Lexer::getTokens() const{
