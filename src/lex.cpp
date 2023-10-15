@@ -66,6 +66,7 @@ void Lexer::tokenize(){
         }
         else if (std::isdigit(character) || (character  == '.')){
             num += character;
+            currCol++;
             char next;
             std::cin.get(next);
             while((!std::isspace(next) && std::isdigit(next)) || next == '.'){
@@ -86,6 +87,7 @@ void Lexer::tokenize(){
             if (!num.empty()) {
                 if (pcount == 0) {
                     addToken(TokenType::Number, num, currRow, currCol - num.size());
+                    num = "";
                 } 
             }
             else if (pcount == 1) {
