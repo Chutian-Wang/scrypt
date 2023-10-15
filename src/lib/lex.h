@@ -18,7 +18,7 @@ class Lexer{
         // e.g. {(, +, (, *, 1, 2, ), 3, )} parsed from the S-
         // expression (+ (* 1 2) 3) which evaluates to the
         // mathematical expression 1 + 2 * 3
-        void tokenize();
+        void tokenize(std::istream& input);
 
         const std::vector<Token>& getTokens() const;
 
