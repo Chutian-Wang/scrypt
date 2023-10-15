@@ -61,10 +61,16 @@ void Lexer::tokenize(){
         else if (std::isdigit(character) || (character  == '.')){
             char next;
             std::cin.get(next);
-            while(!std::isspace(next) && std::isdigit(next)){
+            while(!std::isspace(next) && std::isdigit(next) || next == '.'){
                 num += next;
                 currCol++;
-                if (next == '.'){pcount++;}
+                if (next == '.'){
+                    pcount++;
+                }
+                if (std::cin.eof()){
+                    break;
+                }
+                std::cin.get(next);
             }
             //checking if num is valid
             if (!num.empty()){
@@ -74,15 +80,9 @@ void Lexer::tokenize(){
             }
             else if (pcount == 1){
                 size_t idx = num.find('.');
-                if (idx == 0){
+                if (idx == 0 || idx == num.length()-1){
                     str += character;
                     currCol = 1;
-                    throw Token(TokenType::Error, str, currRow, currCol);
-                    str = "";
-                }
-                else if (idx == num.length()-1){
-                    str += character;
-                    currCol = idx + 1;
                     throw Token(TokenType::Error, str, currRow, currCol);
                     str = "";
                 }
@@ -91,16 +91,12 @@ void Lexer::tokenize(){
                     num = "";
                 }
             }
-            else if (pcount >= 2){
-                int count = 0;
-                for(std::string::size_type i = 0; i < num.length(); i++){
-                    if(num[i] == '.'){
-                        count++;
-                        if (count >=2){
-                            throw Token(TokenType::Error, num, currRow, currCol);
-                        }
-                    }
-                }
+            else if (pcount > 1){
+                throw Token(TokenType::Error, num, currRow, currCol);
+            }
+            else{
+                addToken(TokenType::Number, num, currRow, currCol);
+                num = "";
             }
         }
         else if (character == '\n'){
