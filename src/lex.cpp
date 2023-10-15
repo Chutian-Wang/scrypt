@@ -10,7 +10,7 @@
 
 Lexer::Lexer() {
     currRow = 1;
-    currCol = 1;
+    currCol = 0;
 }
 
 void Lexer::addToken(TokenType type, const std::string &token, int row, int col){
@@ -24,7 +24,8 @@ void Lexer::tokenize(std::istream& input){
     do
     {
         input.get(token);
-
+        currCol ++;
+        //std::cout << "token= " << token << " currCol= " << currCol << std::endl;
         if (token == '\n'){
             std::cin.ignore();
             currRow ++;
@@ -105,7 +106,6 @@ void Lexer::tokenize(std::istream& input){
             throw Token(TokenType::Error, str, currRow, currCol);
             str = "";
         }
-        currCol ++;
     } while (!std::cin.eof());
     currCol++;
     addToken(TokenType::END, "END", currRow, currCol);
