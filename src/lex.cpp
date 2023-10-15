@@ -35,11 +35,17 @@ void Lexer::tokenize(){
 
         if (character == EOF){
             currRow++;
-            currCol = 1;
+            currCol=1;
             addToken(TokenType::END, "END", currRow, currCol);
             break;
         }
-        if (std::isspace(character)){continue;}
+        if (character == '\n'){
+            currRow++;
+            currCol=0;
+        }
+        else if (std::isspace(character)){
+            continue;
+        }
         else if (character == '('){
             addToken(TokenType::Lparen, "(", currRow, currCol);
         }
@@ -75,25 +81,25 @@ void Lexer::tokenize(){
             //checking if num is valid
             if (!num.empty()) {
                 if (pcount == 0) {
-                    addToken(TokenType::Number, num, currRow, currCol - num.size());
+                    addToken(TokenType::Number, num, currRow, currCol);
                 } 
-                else if (pcount == 1) {
-                    if (num.front() != '.' && num.back() != '.') {
-                        addToken(TokenType::Number, num, currRow, currCol - num.size());
-                    } 
-                else {
-                    throw Token(TokenType::Error, num, currRow, currCol - num.size());
+            }
+            else if (pcount == 1) {
+                size_t idx = num.find('.');
+                if (idx == 0 || idx == num.length()-1){
+                    str += character;
+                    currCol = 1;
+                    throw Token(TokenType::Error, str, currRow, currCol);
+                    str = "";
                 }
-            } 
-            else {
-                throw Token(TokenType::Error, num, currRow, currCol - num.size());
+                else{
+                    addToken(TokenType::Number, num, currRow, currCol);
+                    num = "";
+                }
             }
-            num = "";
+            else if (pcount > 1){
+                throw Token(TokenType::Error, num, currRow, currCol);
             }
-        }
-        else if (character == '\n'){
-            currRow++;
-            currCol=0;
         }
         else{
             str += character;
