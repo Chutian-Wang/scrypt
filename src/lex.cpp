@@ -65,6 +65,7 @@ void Lexer::tokenize(){
             addToken(TokenType::Operator, "/", currRow, currCol);
         }
         else if (std::isdigit(character) || (character  == '.')){
+            num += character;
             char next;
             std::cin.get(next);
             while((!std::isspace(next) && std::isdigit(next)) || next == '.'){
@@ -75,6 +76,9 @@ void Lexer::tokenize(){
                 }
                 if (std::cin.eof()){
                     break;
+                }
+                if (next == '/n'){
+                    currRow++;
                 }
                 std::cin.get(next);
             }
