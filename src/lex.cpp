@@ -19,38 +19,31 @@ void Lexer::addToken(TokenType type, const std::string &token, int row, int col)
 
 void Lexer::tokenize(){
     std::string num, line, str;
-    // char last;
-    std::getline(std::cin, line);
     int period2, temp(0);
-    // bool checkPara(false), checkOp(false);
     
+    std::getline(std::cin, line);
+
     while(!std::cin.eof()){
         for (auto &token : line){
             currCol ++;
 
             if (std::isspace(token)){}
             else if (token == '('){
-                // checkPara = true;
                 addToken(TokenType::Lparen, "(", currRow, currCol);
             }
             else if (token == ')'){
-                // checkPara = true;
                 addToken(TokenType::Rparen, ")", currRow, currCol);
             }
             else if (token == '+'){
-                // checkOp = true;
                 addToken(TokenType::Operator, "+", currRow, currCol);
             }
             else if (token == '-'){
-                // checkOp = true;
                 addToken(TokenType::Operator, "-", currRow, currCol);
             }
             else if (token == '*'){
-                // checkOp = true;
                 addToken(TokenType::Operator, "*", currRow, currCol);
             }
             else if (token == '/'){
-                // checkOp = true;
                 addToken(TokenType::Operator, "/", currRow, currCol);
             }
             else if (std::isdigit(token) || (token == '.')){
@@ -109,24 +102,22 @@ void Lexer::tokenize(){
                 throw Token(TokenType::Error, str, currRow, currCol);
                 str = "";
             }
-            // last = token;
         }
-        std::getline(std::cin, line);
-        currRow++;
-        currCol=0;
+        if(std::getline(std::cin, line)){
+            currRow++;
+            currCol=0;
+        }
+        else{
+            currCol++;
+            addToken(TokenType::END, "END", currRow, currCol);
+            return;
+        }
     }
-    if (std::cin.eof()){
-        // if ((checkPara) && (!checkOp)){
-        //     str += last;
-        //     throw Token(TokenType::Error, str, currRow, currCol);
-        //     str = "";
-        // }
-        currCol++;
-        addToken(TokenType::END, "END", currRow, currCol);
-        return;
-    }
-    // currCol++;
-    // addToken(TokenType::END, "END", currRow, currCol);
+    // if (std::cin.eof()){
+    //     currCol++;
+    //     addToken(TokenType::END, "END", currRow, currCol);
+    //     return;
+    // }
 }
 
 const std::vector<Token>& Lexer::getTokens() const{
@@ -148,8 +139,8 @@ int main() {
     //     std::getline(std::cin, str);
     // }
     // if(std::cin.eof()){
-    //         std::cout << "end of file\n";
-    //     }
+    //     std::cout << "end of file\n";
+    // }
     try{
         Lexer lexer;
         lexer.tokenize();
