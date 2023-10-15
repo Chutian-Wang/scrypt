@@ -105,12 +105,9 @@ void Lexer::tokenize(std::istream& input){
             throw Token(TokenType::Error, str, currRow, currCol);
             str = "";
         }
-        if (std::cin.eof()){
-            currCol++;
-            addToken(TokenType::END, "END", currRow, currCol);
-            return;
-        }
     }
+    addToken(TokenType::END, "END", currRow, currCol);
+    return;
 }
 
 const std::vector<Token>& Lexer::getTokens() const{
