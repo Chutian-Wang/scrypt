@@ -10,7 +10,7 @@
 
 Lexer::Lexer() {
     currRow = 1;
-    currCol = 0;
+    currCol = 1;
 }
 
 void Lexer::addToken(TokenType type, const std::string &token, int row, int col){
@@ -24,12 +24,11 @@ void Lexer::tokenize(std::istream& input){
     do
     {
         input.get(token);
-        currCol ++;
 
         if (token == '\n'){
             std::cin.ignore();
             currRow ++;
-            currCol = 0;
+            currCol = 1;
         }
         else if (std::isspace(token)){}
         else if (token == '('){
@@ -106,6 +105,7 @@ void Lexer::tokenize(std::istream& input){
             throw Token(TokenType::Error, str, currRow, currCol);
             str = "";
         }
+        currCol ++;
     } while (!std::cin.eof());
     currCol++;
     addToken(TokenType::END, "END", currRow, currCol);
