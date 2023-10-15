@@ -95,9 +95,9 @@ void Lexer::tokenize(std::istream& input){
                         str += token;
                         throw Token(TokenType::Error, str, currRow, period2);
                         str = "";
-                        temp = 0;
                     }
                 }
+                temp = 0;
             }
         }
         else{
