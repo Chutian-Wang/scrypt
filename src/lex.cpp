@@ -106,6 +106,7 @@ void Lexer::tokenize(std::istream& input){
             str = "";
         }
     }
+    currCol ++;
     addToken(TokenType::END, "END", currRow, currCol);
     return;
 }
