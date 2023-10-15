@@ -26,9 +26,9 @@ void Lexer::tokenize(std::istream& input){
         currCol ++;
         // std::cout << "token= " << token << " currCol= " << currCol << std::endl;
         if (token == '\n'){
-            std::cin.ignore();
+            //std::cin.ignore();
             currRow ++;
-            currCol = 1;
+            currCol = 0;
         }
         else if (std::isspace(token)){}
         else if (token == '('){
