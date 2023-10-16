@@ -60,7 +60,15 @@ AST* AST::parse(const std::vector<Token>& tokens,
                 // when parse returns, head is set to one
                 // token past the matching RPARAN in the
                 // next cycle.
-                node_queue.push_back(parse(tokens, head));
+                try {
+                    node_queue.push_back(parse(tokens, head));
+                }
+                catch (const std::exception& err) {
+                    for (auto node: node_queue) {
+                        delete node;
+                    }
+                    throw err;
+                }
                 break;
             }
             // The only return branch
