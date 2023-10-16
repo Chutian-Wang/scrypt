@@ -12,6 +12,7 @@ int main() {
         AST* parser = AST::parse(tokens);
         std::cout << parser->get_infix() << '\n';
         std::cout << parser->eval() << std::endl;
+        delete parser;
     }
     catch(Token error){
         std::cout << "Syntax error on line " << error.row << " column " << error.column << ".\n";
