@@ -21,7 +21,7 @@ public:
     virtual const Token&        get_token() const = 0;
     virtual double              eval()      const = 0;
     virtual bool                is_legal()  const = 0;
-    virtual std::string         get_infix() const = 0;
+    virtual void get_infix(std::ostringstream& oss) const = 0;
 };
 
 #endif

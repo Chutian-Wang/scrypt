@@ -17,7 +17,7 @@ public:
     virtual const Token&    get_token() const;
     virtual double          eval()      const;
     virtual bool            is_legal()  const;
-    virtual std::string     get_infix() const;
+    virtual void get_infix(std::ostringstream& oss) const;
 };
 
 class Operator: public AST {
@@ -32,12 +32,12 @@ public:
     Operator(const Token& tok);
     virtual ~Operator();
 
-    void add_oprand(std::vector<AST*> nodes);
-    void add_oprand(AST* node);
+    void add_operand(std::vector<AST*> nodes);
+    void add_operand(AST* node);
 
     virtual const Token&    get_token() const;
     virtual double          eval()      const;
     virtual bool            is_legal()  const;
-    virtual std::string     get_infix() const;
+    virtual void get_infix(std::ostringstream& oss) const;
 };
 #endif

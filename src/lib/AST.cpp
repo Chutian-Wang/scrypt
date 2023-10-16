@@ -94,7 +94,7 @@ AST* AST::parse(const std::vector<Token>& tokens,
                 // Create and return the root
                 Operator* ret = (Operator*) node_queue[0];
                 node_queue.erase(node_queue.begin());
-                ret->add_oprand(node_queue);
+                ret->add_operand(node_queue);
                 return ret;
             }
             case (TokenType::OPERATOR): {

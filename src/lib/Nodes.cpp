@@ -1,3 +1,4 @@
+#include <sstream>
 #include "Nodes.h"
 #include "Token.h"
 #include "Errors.h"
@@ -24,8 +25,8 @@ bool Number::is_legal() const {
     return true;
 }
 
-std::string Number::get_infix() const {
-    return std::to_string(this->val);
+void Number::get_infix(std::ostringstream& oss) const {
+    oss << this->val;
 }
 
 // Operator implememtations ----------------------------------
@@ -41,13 +42,13 @@ Operator::~Operator() {
     }
 }
 
-void Operator:: add_oprand(std::vector<AST*> nodes) {
+void Operator::add_operand(std::vector<AST*> nodes) {
     for (auto node: nodes) {
-        this->add_oprand(node);
+        this->add_operand(node);
     }
 }
 
-void Operator:: add_oprand(AST* node) {
+void Operator::add_operand(AST* node) {
     this->validated = false;
     this->operands.push_back(node);
 }
@@ -115,17 +116,16 @@ bool Operator::is_legal() const {
     }
 }
 
-std::string Operator::get_infix() const {
-    std::string ret = "(";
+void Operator::get_infix(std::ostringstream& oss) const {
+    oss << "(";
     for (auto node = this->operands.begin();
         node < this->operands.end(); node++) {
-        ret += (*node)->get_infix();
+        (*node)->get_infix(oss);
         if (this->operands.end() - node > 1) {
-            ret = ret + " " + this->tok.text + " ";
+            oss << " " << (this->tok.text) << " ";
         }
         else {
-            ret += ")";
+            oss << ")";
         }
     }
-    return ret;
 }
