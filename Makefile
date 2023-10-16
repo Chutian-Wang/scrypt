@@ -5,10 +5,13 @@ CCFLAGS = -std=c++17 -Wall -Wextra -Werror
 BUILDDIR = build
 
 # Put test executables and main executable here
-EXEC = main
+EXEC = parse
 
 # Put dependent object builds here.
-OBJS = 	$(BUILDDIR)/lexer.o	\
+OBJS = 	$(BUILDDIR)/Lexer.o	\
+		$(BUILDDIR)/AST.o \
+		$(BUILDDIR)/Nodes.o \
+		$(BUILDDIR)/Token.o \
 
 .PHONY: clean
 
