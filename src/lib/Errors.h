@@ -26,7 +26,7 @@ public:
     const char* msg;
     ScryptError() {};
     virtual ~ScryptError() {};
-    virtual const char* what() const noexcept= 0;
+    virtual const char* what() const noexcept = 0;
 };
 
 class SyntaxError: public ScryptError {

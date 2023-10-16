@@ -25,6 +25,10 @@ int main() {
         std::cout << err.what();
         return UNEXP_TOK;
     }
+    catch(const std::exception& err) {
+        std::cout << err.what();
+        return -1;
+    }
     
     try {
         std::cout << parser->eval() << std::endl;
@@ -33,6 +37,10 @@ int main() {
     catch(const DivByZero& err) {
         std::cout << err.what();
         return DIV_BY_ZERO;
+    }
+    catch(const std::exception& err) {
+        std::cout << err.what();
+        return -1;
     }
 
     return 0;
