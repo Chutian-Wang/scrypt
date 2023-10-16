@@ -10,10 +10,16 @@ AST* AST::parse(const std::vector<Token> & tokens) {
     if (tokens.size() == 1 && tokens[0].type == TokenType::END) {
         unexp_tok_err(tokens[0]);
     };
-    if (tokens.size() == 2 && tokens[0].type == TokenType::NUMBER) {
-        return new Number(tokens[0]);
+    // Check if a single number is recieved
+    if (tokens[0].type == TokenType::NUMBER) {
+        if (tokens.size() == 2) {
+            return new Number(tokens[0]);
+        }
+        else {
+            unexp_tok_err(tokens[1]);
+        }
     }
-    // Check if fist token is LRAREN
+    // Check if fist token is LPRAREN
     if (tokens[0].type != TokenType::LPAREN) {
         unexp_tok_err(tokens[0]);
     }
@@ -67,6 +73,9 @@ AST* AST::parse(const std::vector<Token>& tokens,
                 }
                 // Check if number of nodes is good
                 if (node_queue.size() < 2) {
+                    for (auto node: node_queue){
+                        delete node;
+                    }
                     unexp_tok_err(*head);
                 }
                 // Check if all other nodes are legal (they should be!)
