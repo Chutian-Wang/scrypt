@@ -25,25 +25,28 @@ public:
     Token tok;
     const char* msg;
     ScryptError() {};
-    virtual ~ScryptError();
+    virtual ~ScryptError() {};
     virtual const char* what() const noexcept= 0;
 };
 
 class SyntaxError: public ScryptError {
 public:
     SyntaxError(const Token& tok);
+    virtual ~SyntaxError();
     virtual const char* what() const noexcept;
 };
 
 class UnexpTokError: public ScryptError {
 public:
     UnexpTokError(const Token& tok);
+    virtual ~UnexpTokError();
     virtual const char* what() const noexcept;
 };
 
 class DivByZero: public ScryptError {
 public:
     DivByZero();
+    virtual ~DivByZero() {};
     virtual const char* what() const noexcept;
 };
 

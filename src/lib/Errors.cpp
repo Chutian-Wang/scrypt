@@ -4,10 +4,6 @@
 #include <sstream>
 #include <cstring>
 
-ScryptError::~ScryptError() {
-    delete this->msg;
-}
-
 SyntaxError::SyntaxError(const Token& tok) {
     this->tok = tok;
     std::ostringstream oss;
@@ -16,6 +12,10 @@ SyntaxError::SyntaxError(const Token& tok) {
     size_t strlen = oss.str().size() + 1;
     this->msg = new char[strlen];
     memcpy((void*)msg, oss.str().c_str(), strlen);
+}
+
+SyntaxError::~SyntaxError() {
+    delete this->msg;
 }
 
 const char* SyntaxError::what() const noexcept {
@@ -30,6 +30,10 @@ UnexpTokError::UnexpTokError(const Token& tok) {
     size_t strlen = oss.str().size() + 1;
     this->msg = new char[strlen];
     memcpy((void*)msg, oss.str().c_str(), strlen);
+}
+
+UnexpTokError::~UnexpTokError() {
+    delete this->msg;
 }
 
 const char* UnexpTokError::what() const noexcept {
