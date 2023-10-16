@@ -18,15 +18,15 @@ int main() {
         std::cout << parser->eval() << std::endl;
         delete parser;
     }
-    catch(SyntaxError& err) {
+    catch(const SyntaxError& err) {
         std::cout << err.what();
         exit(SYNTAX_ERR);
     }
-    catch(UnexpTokError& err) {
+    catch(const UnexpTokError& err) {
         std::cout << err.what();
         exit(UNEXP_TOK);
     }
-    catch(DivByZero& err) {
+    catch(const DivByZero& err) {
         std::cout << err.what();
         exit(DIV_BY_ZERO);
     }

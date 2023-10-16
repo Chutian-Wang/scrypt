@@ -90,7 +90,7 @@ double Operator::eval() const {
             for (auto node = (this->operands).begin() + 1;
                 node < this->operands.end(); node++) {
                 if ((*node)->eval() == 0. && ret != 0.) {
-                    div_by_zero_err();
+                    throw DivByZero();
                 }
                 ret /= (*node)->eval();
             }

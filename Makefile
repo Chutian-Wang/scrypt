@@ -25,5 +25,5 @@ $(BUILDDIR)/%.o: src/lib/%.cpp
 	$(CXX) $(CCFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(BUILDDIR)/*
+	rm -r $(BUILDDIR)/*
 

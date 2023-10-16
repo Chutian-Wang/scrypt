@@ -18,6 +18,16 @@ generated in the build folder.
 - Run `make <module>` to make a specific lib module or
 executable.
 
+## Debugging
+- GDB/LLDB
+- If you are on MacOS, there is a subsitute for Valgrind,
+use `leaks --atExit -- <command and args>`. For example,
+`leaks --atExit -- ./build/parse < test.txt` will print any
+memory leaks that have occured along with other information.
+Unfortunately, it usually does not provide you with any
+information regarding the source of the leaks. `leaks` comes
+with OSX after 2020.
+
 ## File Structure
 ```
 scrypt

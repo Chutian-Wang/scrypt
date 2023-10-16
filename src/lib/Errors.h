@@ -17,32 +17,34 @@
 #define DIV_BY_ZERO 3
 
 /**
- * This custom Error class should be thrown wherever
- * exceptions occur. Do not throw a std::exception!
+ * Children of this custom Error class should be thrown
+ * wherever exceptions occur. Do not throw a std::exception!
 */
-class ScryptError {
+class ScryptError: public std::exception{
 public:
     Token tok;
+    const char* msg;
     ScryptError() {};
-    virtual std::string what() const = 0;
+    virtual ~ScryptError();
+    virtual const char* what() const noexcept= 0;
 };
 
 class SyntaxError: public ScryptError {
 public:
     SyntaxError(const Token& tok);
-    virtual std::string what() const;
+    virtual const char* what() const noexcept;
 };
 
 class UnexpTokError: public ScryptError {
 public:
     UnexpTokError(const Token& tok);
-    virtual std::string what() const;
+    virtual const char* what() const noexcept;
 };
 
 class DivByZero: public ScryptError {
 public:
-    DivByZero(const Token& tok);
-    virtual std::string what() const;
+    DivByZero();
+    virtual const char* what() const noexcept;
 };
 
 
