@@ -1,17 +1,18 @@
 CXX   	= g++
-CCFLAGS = -std=c++17 -Wall -Wextra -Werror
+CCFLAGS = -std=c++17 -Wall -Wextra -Werror -g
 
 # Build directory must be created before running make.
 BUILDDIR = build
 
 # Put test executables and main executable here
-EXEC = parse
+EXEC = parse lex
 
 # Put dependent object builds here.
 OBJS = 	$(BUILDDIR)/Lexer.o	\
 		$(BUILDDIR)/AST.o \
 		$(BUILDDIR)/Nodes.o \
 		$(BUILDDIR)/Token.o \
+		$(BUILDDIR)/Errors.o 
 
 .PHONY: clean
 

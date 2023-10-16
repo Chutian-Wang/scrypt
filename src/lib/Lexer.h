@@ -18,7 +18,7 @@ class Lexer{
         // mathematical expression 1 + 2 * 3
         void tokenize(std::istream& input);
 
-        const std::vector<Token>& getTokens() const;
+        const std::vector<Token>& get_tokens() const;
 
     private:
         std::vector<Token> tokens;
@@ -28,7 +28,7 @@ class Lexer{
         // Helper function
         // Used in tokenize() to add a new Token into the vector tokens 
         // each time a new token is reached
-        void addToken(TokenType type, const std::string &token, int row, int col);
+        void add_token(TokenType type, const std::string &token, int row, int col);
 };
 
 #endif //LEXER_H

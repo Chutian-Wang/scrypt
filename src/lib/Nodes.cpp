@@ -1,19 +1,11 @@
 #include "Nodes.h"
 #include "Token.h"
+#include "Errors.h"
 
 // Number implementations ------------------------------------
 Number::Number(const Token& tok) {
     this->tok = tok;
-    try {
-        this->val = std::stod(tok.text);
-    }
-    catch (std::exception& e) {
-        // For the code to reach here the lexer
-        // must be critically malfunctioning...
-        legal = false;
-        this->val = 0;
-    }
-    this->validated = true;
+    this->val = std::stod(tok.text);
 }
 
 Number::~Number() {
@@ -29,7 +21,7 @@ double Number::eval() const {
 }
 
 bool Number::is_legal() const {
-    return this->legal;
+    return true;
 }
 
 std::string Number::get_infix() const {
@@ -96,6 +88,9 @@ double Operator::eval() const {
             double ret = this->oprands[0]->eval();
             for (auto node = (this->oprands).begin() + 1;
                 node < this->oprands.end(); node++) {
+                if ((*node)->eval() == 0. && ret != 0.) {
+                    div_by_zero_err();
+                }
                 ret /= (*node)->eval();
             }
             return ret;
@@ -120,12 +115,12 @@ bool Operator::is_legal() const {
 }
 
 std::string Operator::get_infix() const {
-    std::string ret = "(" + this->tok.text + " ";
+    std::string ret = "(";
     for (auto node = this->oprands.begin();
         node < this->oprands.end(); node++) {
         ret += (*node)->get_infix();
         if (this->oprands.end() - node > 1) {
-            ret += " ";
+            ret = ret + " " + this->tok.text + " ";
         }
         else {
             ret += ")";

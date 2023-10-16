@@ -1,3 +1,6 @@
+#ifndef ERRORS_H
+#define ERRORS_H
+
 #include "Token.h"
 #include <iostream>
 
@@ -6,39 +9,15 @@
  * project. Please **DO NOT** inline any exit(), throw, or
  * equivalent error handling or use any error handling
  * function outside of the definitions in this header.
+ * !!! These functions are not at all elegant ways to deal
+ * with exceptions and error handling. This temporary
+ * solution will be updated with better ones in the next
+ * checkpoints !!!
 */
 
-void syntax_err(Token tok) {
-    std::cerr <<
-        "Syntax error on line " <<
-        std::to_string(tok.row) <<
-        " column " <<
-        std::to_string(tok.column) <<
-        '.' << std::endl;
-    exit(1);
-}
+void syntax_err(Token tok);
+void unexp_tok_err(Token tok);
+void exp_tok_err(Token tok);
+void div_by_zero_err();
 
-void unexp_tok_err(Token tok) {
-    std::cerr <<
-        "Unexpected token at line " <<
-        std::to_string(tok.row) <<
-        " column " <<
-        std::to_string(tok.column) <<
-        ": " << tok.text << std::endl;
-    exit(2);
-}
-
-void exp_tok_err(Token tok) {
-    std::cerr <<
-        "Expecting token at line " <<
-        std::to_string(tok.row) <<
-        " column " <<
-        std::to_string(tok.column) <<
-        ": " << tok.text << std::endl;
-    exit(2);
-}
-
-void div_by_zero_err() {
-    std::cerr << "Runtime error: division by zero." << std::endl;
-    exit(3);
-}
+#endif

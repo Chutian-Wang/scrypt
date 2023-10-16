@@ -7,8 +7,6 @@
 class Number: public AST {
 private:
     Token tok;
-    bool validated;
-    bool legal;
     
     double val;
 

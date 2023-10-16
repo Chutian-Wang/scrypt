@@ -13,11 +13,11 @@ Lexer::Lexer() {
     currCol = 0;
 }
 
-void Lexer::addToken(TokenType type, const std::string &token, int row, int col){
+void Lexer::add_token(TokenType type, const std::string &token, int row, int col){
     tokens.push_back(Token(type, token, row, col));
 }
 
-const std::vector<Token>& Lexer::getTokens() const{
+const std::vector<Token>& Lexer::get_tokens() const{
     return tokens;
 }
 
@@ -45,22 +45,22 @@ void Lexer::tokenize(std::istream& input){
         }
         else if (std::isspace(token)){}
         else if (token == '('){
-            addToken(TokenType::LPAREN, "(", currRow, currCol);
+            add_token(TokenType::LPAREN, "(", currRow, currCol);
         }
         else if (token == ')'){
-            addToken(TokenType::RPAREN, ")", currRow, currCol);
+            add_token(TokenType::RPAREN, ")", currRow, currCol);
         }
         else if (token == '+'){
-            addToken(TokenType::OPERATOR, "+", currRow, currCol);
+            add_token(TokenType::OPERATOR, "+", currRow, currCol);
         }
         else if (token == '-'){
-            addToken(TokenType::OPERATOR, "-", currRow, currCol);
+            add_token(TokenType::OPERATOR, "-", currRow, currCol);
         }
         else if (token == '*'){
-            addToken(TokenType::OPERATOR, "*", currRow, currCol);
+            add_token(TokenType::OPERATOR, "*", currRow, currCol);
         }
         else if (token == '/'){
-            addToken(TokenType::OPERATOR, "/", currRow, currCol);
+            add_token(TokenType::OPERATOR, "/", currRow, currCol);
         }
         else if (std::isdigit(token) || (token == '.')){
             num += token;
@@ -88,7 +88,7 @@ void Lexer::tokenize(std::istream& input){
                 int n = std::count(num.begin(), num.end(), '.');
                 if (n == 0){
                     // if there is no period, just add the number
-                    addToken(TokenType::NUMBER, num, currRow, currCol-(num.length()-1));
+                    add_token(TokenType::NUMBER, num, currRow, currCol-(num.length()-1));
                     num = "";
                 }
                 else if (n == 1){
@@ -108,7 +108,7 @@ void Lexer::tokenize(std::istream& input){
                         str = "";
                     }
                     else{
-                        addToken(TokenType::NUMBER, num, currRow, currCol-(num.length()-1));
+                        add_token(TokenType::NUMBER, num, currRow, currCol-(num.length()-1));
                         num = "";
                     }
                 }
@@ -138,6 +138,6 @@ void Lexer::tokenize(std::istream& input){
         }
     }
     currCol ++;
-    addToken(TokenType::END, "END", currRow, currCol);
+    add_token(TokenType::END, "END", currRow, currCol);
     return;
 }

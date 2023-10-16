@@ -8,6 +8,7 @@
 AST* AST::parse(const std::vector<Token> & tokens) {
     auto head = tokens.begin();
     auto ret = AST::parse(tokens, head);
+    head++;
     if (tokens.end() - head > 1 or (*head).type != TokenType::END) {
         if (tokens.end() - head > 1){
             delete ret;
