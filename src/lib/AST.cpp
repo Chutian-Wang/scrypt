@@ -6,17 +6,30 @@
 #include <string>
 
 AST* AST::parse(const std::vector<Token> & tokens) {
-    if (tokens.size() == 1 && tokens[0].type == TokenType::END) return nullptr;
+    // Check if given empty expression
+    if (tokens.size() == 1 && tokens[0].type == TokenType::END) {
+        unexp_tok_err(tokens[0]);
+    };
+    // Check if fist token is LRAREN
+    if (tokens[0].type != TokenType::LPAREN) {
+        unexp_tok_err(tokens[0]);
+    }
+    // Check if first node is number.
+    if (tokens[1].type == TokenType::NUMBER) {
+        unexp_tok_err(tokens[1]);
+    }
     auto head = tokens.begin();
     auto ret = AST::parse(tokens, head);
     head++;
-    if (tokens.end() - head > 1 or (*head).type != TokenType::END) {
+    // Check if END is reached and nothing is left
+    if (tokens.end() - head > 1 or (*head).type != TokenType::END) { 
+        delete ret;
+        // Something after END
         if (tokens.end() - head > 1){
-            delete ret;
-            unexp_tok_err(*(++head));
+            unexp_tok_err(*(head));
         }
+        // No END
         else {
-            delete ret;
             exp_tok_err(Token(TokenType::END ,"END", (*head).row, (*head).column + 1));
         }
     }
@@ -41,17 +54,19 @@ AST* AST::parse(const std::vector<Token>& tokens,
             }
             // The only return branch
             case (TokenType::RPAREN): {
-                // Check if first node is operator.
-                if (node_queue[0]->get_token().type !=
-                    TokenType::OPERATOR) {
-                    // Clear memory
+                // Check if first node is legal (it shouldn't be!)
+                if (node_queue[0]->is_legal()) {
                     Token err_tok = node_queue[0]->get_token();
                     for (auto node: node_queue) {
                         delete node;
                     }
                     unexp_tok_err(err_tok);
                 }
-                // Check if all nodes are legal.
+                // Check if number of nodes is good
+                if (node_queue.size() < 3) {
+                    unexp_tok_err(*head);
+                }
+                // Check if all other nodes are legal (they should be!)
                 for (auto node = node_queue.begin() + 1;
                     node != node_queue.end(); node++) {
                     // Operators must contain legal operands
@@ -61,7 +76,7 @@ AST* AST::parse(const std::vector<Token>& tokens,
                         for (auto node: node_queue) {
                             delete node;
                         }
-                        syntax_err(err_tok);
+                        unexp_tok_err(err_tok);
                     }
                 }
                 // Create and return the root

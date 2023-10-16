@@ -26,7 +26,7 @@ private:
     bool validated;
     bool legal;
 
-    std::vector<AST*> oprands;
+    std::vector<AST*> operands;
 
 public:
     Operator(const Token& tok);

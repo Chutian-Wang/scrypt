@@ -36,7 +36,7 @@ Operator::Operator(const Token& tok) {
 }
 
 Operator::~Operator() {
-    for (auto node: this->oprands) {
+    for (auto node: this->operands) {
         delete node;
     }
 }
@@ -49,7 +49,7 @@ void Operator:: add_oprand(std::vector<AST*> nodes) {
 
 void Operator:: add_oprand(AST* node) {
     this->validated = false;
-    this->oprands.push_back(node);
+    this->operands.push_back(node);
 }
 
 const Token& Operator::get_token() const {
@@ -61,16 +61,16 @@ double Operator::eval() const {
     {
         case ('+'): {
             double ret = 0;
-            for (auto node: this->oprands) {
+            for (auto node: this->operands) {
                 ret += node->eval();
             }
             return ret;
             break;
         }
         case ('-'): {
-            double ret = this->oprands[0]->eval();
-            for (auto node = (this->oprands).begin() + 1;
-                node < this->oprands.end(); node++) {
+            double ret = this->operands[0]->eval();
+            for (auto node = (this->operands).begin() + 1;
+                node < this->operands.end(); node++) {
                 ret -= (*node)->eval();
             }
             return ret;
@@ -78,16 +78,16 @@ double Operator::eval() const {
         }
         case ('*'): {
             double ret = 1;
-            for (auto node: this->oprands) {
+            for (auto node: this->operands) {
                 ret *= node->eval();
             }
             return ret;
             break;
         }
         case ('/'): {
-            double ret = this->oprands[0]->eval();
-            for (auto node = (this->oprands).begin() + 1;
-                node < this->oprands.end(); node++) {
+            double ret = this->operands[0]->eval();
+            for (auto node = (this->operands).begin() + 1;
+                node < this->operands.end(); node++) {
                 if ((*node)->eval() == 0. && ret != 0.) {
                     div_by_zero_err();
                 }
@@ -107,7 +107,8 @@ double Operator::eval() const {
 bool Operator::is_legal() const {
     if (this->validated) return this->legal;
     else {
-        for (auto node: this->oprands) {
+        if (this->operands.size() < 2) return false;
+        for (auto node: this->operands) {
             if (!(node->is_legal())) return false;
         }
         return true;
@@ -116,10 +117,10 @@ bool Operator::is_legal() const {
 
 std::string Operator::get_infix() const {
     std::string ret = "(";
-    for (auto node = this->oprands.begin();
-        node < this->oprands.end(); node++) {
+    for (auto node = this->operands.begin();
+        node < this->operands.end(); node++) {
         ret += (*node)->get_infix();
-        if (this->oprands.end() - node > 1) {
+        if (this->operands.end() - node > 1) {
             ret = ret + " " + this->tok.text + " ";
         }
         else {
