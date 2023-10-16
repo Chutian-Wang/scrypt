@@ -10,6 +10,9 @@ AST* AST::parse(const std::vector<Token> & tokens) {
     if (tokens.size() == 1 && tokens[0].type == TokenType::END) {
         unexp_tok_err(tokens[0]);
     };
+    if (tokens.size() == 2 && tokens[0].type == TokenType::NUMBER) {
+        return new Number(tokens[0]);
+    }
     // Check if fist token is LRAREN
     if (tokens[0].type != TokenType::LPAREN) {
         unexp_tok_err(tokens[0]);
@@ -54,10 +57,6 @@ AST* AST::parse(const std::vector<Token>& tokens,
             }
             // The only return branch
             case (TokenType::RPAREN): {
-                // Check if node_queue is empty
-                if (node_queue.size() == 0) {
-                    unexp_tok_err(*head);
-                }
                 // Check if first node is legal (it shouldn't be!)
                 if (node_queue[0]->is_legal()) {
                     Token err_tok = node_queue[0]->get_token();
@@ -67,7 +66,7 @@ AST* AST::parse(const std::vector<Token>& tokens,
                     unexp_tok_err(err_tok);
                 }
                 // Check if number of nodes is good
-                if (node_queue.size() < 3) {
+                if (node_queue.size() < 2) {
                     unexp_tok_err(*head);
                 }
                 // Check if all other nodes are legal (they should be!)
