@@ -8,7 +8,8 @@
 
 AST* AST::parse(const std::vector<Token> & tokens) {
     // Check if given empty expression
-    if (tokens.size() == 1 && tokens[0].type == TokenType::END) {
+    if (tokens.size() == 1 &&
+        tokens[0].type == TokenType::END) {
         throw UnexpTokError(tokens[0]);
     };
     // Check if a single number is recieved
@@ -24,27 +25,19 @@ AST* AST::parse(const std::vector<Token> & tokens) {
     if (tokens[0].type != TokenType::LPAREN) {
         throw UnexpTokError(tokens[0]);
     }
-    // Check if first node is number.
+    // Check if second token is number
     if (tokens[1].type == TokenType::NUMBER) {
         throw UnexpTokError(tokens[1]);
     }
+    // Parse sub-expressions
     auto head = tokens.begin();
     auto ret = AST::parse(tokens, head);
     head++;
-    // Check if END is reached and nothing is left
-    // This is probably unecessary
-    if (tokens.end() - head > 1 or (*head).type != TokenType::END) { 
+    // Check if something is left after a complete
+    // expression is parsed
+    if ((*head).type != TokenType::END) { 
         delete ret;
-        // Something after END
-        if (tokens.end() - head > 1){
-            delete ret;
-            throw UnexpTokError(*(head));
-        }
-        // No END
-        else {
-            delete ret;
-            throw UnexpTokError(*(--head));
-        }
+        throw UnexpTokError(*(head));
     }
     return ret;
 }
@@ -55,7 +48,8 @@ AST* AST::parse(const std::vector<Token>& tokens,
 
     std::vector<AST*> node_queue;
 
-    while (head < tokens.end() && (*head).type != TokenType::END) {
+    while (head < tokens.end() &&
+        (*head).type != TokenType::END) {
         head++;
         switch ((*head).type) {
             case (TokenType::LPAREN): {
@@ -75,7 +69,8 @@ AST* AST::parse(const std::vector<Token>& tokens,
             }
             // The only return branch
             case (TokenType::RPAREN): {
-                // Check if first node is legal (it shouldn't be!)
+                // Check if first node is legal
+                // (it shouldn't be!)
                 if (node_queue[0]->is_legal()) {
                     Token err_tok = node_queue[0]->get_token();
                     for (auto node: node_queue) {
@@ -90,7 +85,8 @@ AST* AST::parse(const std::vector<Token>& tokens,
                     }
                     throw UnexpTokError(*head);
                 }
-                // Check if all other nodes are legal (they should be!)
+                // Check if all other nodes are legal
+                // (they should be!)
                 for (auto node = node_queue.begin() + 1;
                     node != node_queue.end(); node++) {
                     // Operators must contain legal operands
