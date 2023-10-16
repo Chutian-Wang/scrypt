@@ -50,11 +50,4 @@ public:
     virtual const char* what() const noexcept;
 };
 
-
-// Legacy depreciated...
-void syntax_err(Token tok);
-void unexp_tok_err(Token tok);
-void exp_tok_err(Token tok);
-void div_by_zero_err();
-
 #endif

@@ -15,7 +15,7 @@ SyntaxError::SyntaxError(const Token& tok) {
 }
 
 SyntaxError::~SyntaxError() {
-    delete this->msg;
+    delete[] this->msg;
 }
 
 const char* SyntaxError::what() const noexcept {
@@ -33,7 +33,7 @@ UnexpTokError::UnexpTokError(const Token& tok) {
 }
 
 UnexpTokError::~UnexpTokError() {
-    delete this->msg;
+    delete[] this->msg;
 }
 
 const char* UnexpTokError::what() const noexcept {

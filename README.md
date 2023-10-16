@@ -35,11 +35,13 @@ scrypt
     |- Makefile
     |- LICENSE
     |- src
-    |   |- main.cpp
+    |   |- lex.cpp
+    |   |- parse.cpp
     |   |- lib
-    |   |   |- lexer.h
-    |   |   |- lexer.cpp
-    |   |   |- token.h
+    |   |   |- Lexer.h
+    |   |   |- Lexer.cpp
+    |   |   |- Token.h
+    |   |   |- Token.cpp
     |   |   |- AST.h
     |   |   |- AST.cpp
     |   |   |- Nodes.h
