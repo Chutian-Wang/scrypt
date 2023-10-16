@@ -8,7 +8,7 @@
 AST* AST::parse(const std::vector<Token> & tokens) {
     // Check if given empty expression
     if (tokens.size() == 1 && tokens[0].type == TokenType::END) {
-        unexp_tok_err(tokens[0]);
+        throw UnexpTokError(tokens[0]);
     };
     // Check if a single number is recieved
     if (tokens[0].type == TokenType::NUMBER) {
@@ -16,30 +16,31 @@ AST* AST::parse(const std::vector<Token> & tokens) {
             return new Number(tokens[0]);
         }
         else {
-            unexp_tok_err(tokens[1]);
+            throw UnexpTokError(tokens[1]);
         }
     }
     // Check if fist token is LPRAREN
     if (tokens[0].type != TokenType::LPAREN) {
-        unexp_tok_err(tokens[0]);
+        throw UnexpTokError(tokens[0]);
     }
     // Check if first node is number.
     if (tokens[1].type == TokenType::NUMBER) {
-        unexp_tok_err(tokens[1]);
+        throw UnexpTokError(tokens[1]);
     }
     auto head = tokens.begin();
     auto ret = AST::parse(tokens, head);
     head++;
     // Check if END is reached and nothing is left
+    // This is probably unecessary
     if (tokens.end() - head > 1 or (*head).type != TokenType::END) { 
         delete ret;
         // Something after END
         if (tokens.end() - head > 1){
-            unexp_tok_err(*(head));
+            throw UnexpTokError(*(head));
         }
         // No END
         else {
-            exp_tok_err(Token(TokenType::END ,"END", (*head).row, (*head).column + 1));
+            throw UnexpTokError(*(--head));
         }
     }
     return ret;
@@ -69,14 +70,14 @@ AST* AST::parse(const std::vector<Token>& tokens,
                     for (auto node: node_queue) {
                         delete node;
                     }
-                    unexp_tok_err(err_tok);
+                    throw UnexpTokError(err_tok);
                 }
                 // Check if number of nodes is good
                 if (node_queue.size() < 2) {
                     for (auto node: node_queue){
                         delete node;
                     }
-                    unexp_tok_err(*head);
+                    throw UnexpTokError(*head);
                 }
                 // Check if all other nodes are legal (they should be!)
                 for (auto node = node_queue.begin() + 1;
@@ -88,7 +89,7 @@ AST* AST::parse(const std::vector<Token>& tokens,
                         for (auto node: node_queue) {
                             delete node;
                         }
-                        unexp_tok_err(err_tok);
+                        throw UnexpTokError(err_tok);
                     }
                 }
                 // Create and return the root
@@ -111,7 +112,7 @@ AST* AST::parse(const std::vector<Token>& tokens,
                 for (auto node: node_queue) {
                     delete node;
                 }
-                unexp_tok_err((*head));
+                throw UnexpTokError((*head));
             }
         }
     }
@@ -119,6 +120,6 @@ AST* AST::parse(const std::vector<Token>& tokens,
     for (auto node: node_queue) {
         delete node;
     }
-    unexp_tok_err(*head);
+    throw UnexpTokError(*head);
     return nullptr;
 }

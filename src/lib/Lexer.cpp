@@ -7,6 +7,7 @@
 #include <cctype>
 #include "Token.h"
 #include "Lexer.h"
+#include "Errors.h"
 
 Lexer::Lexer() {
     currRow = 1;
@@ -99,12 +100,14 @@ void Lexer::tokenize(std::istream& input){
                     size_t idx = num.find('.');
                     if (idx == 0){
                         str += token;
-                        throw Token(TokenType::ERR, str, currRow, currCol-(num.length()-1));
+                        throw SyntaxError(
+                            Token(TokenType::ERR, str, currRow, currCol-(num.length()-1)));
                         str = "";
                     }
                     else if (idx == num.length()-1){
                         str += token;
-                        throw Token(TokenType::ERR, str, currRow, currCol+1);
+                        throw SyntaxError(
+                            Token(TokenType::ERR, str, currRow, currCol+1));
                         str = "";
                     }
                     else{
@@ -119,12 +122,14 @@ void Lexer::tokenize(std::istream& input){
                     size_t idx = num.find('.');
                     if (idx == 0){
                         str += token;
-                        throw Token(TokenType::ERR, str, currRow, currCol-(num.length()-1));
+                        throw SyntaxError(
+                            Token(TokenType::ERR, str, currRow, currCol-(num.length()-1)));
                         str = "";
                     }
                     else{
                         str += token;
-                        throw Token(TokenType::ERR, str, currRow, period2);
+                        throw SyntaxError(
+                            Token(TokenType::ERR, str, currRow, period2));
                         str = "";
                     }
                 }
@@ -133,7 +138,8 @@ void Lexer::tokenize(std::istream& input){
         }
         else{
             str += token;
-            throw Token(TokenType::ERR, str, currRow, currCol);
+            throw SyntaxError(
+                Token(TokenType::ERR, str, currRow, currCol));
             str = "";
         }
     }

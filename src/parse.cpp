@@ -3,6 +3,7 @@
 #include <sstream>
 #include "lib/Lexer.h"
 #include "lib/AST.h"
+#include "lib/Errors.h"
 
 int main() {
     try{
@@ -17,9 +18,17 @@ int main() {
         std::cout << parser->eval() << std::endl;
         delete parser;
     }
-    catch(Token error){
-        std::cout << "Syntax error on line " << error.row << " column " << error.column << ".\n";
-        exit(1);
+    catch(SyntaxError& err) {
+        std::cout << err.what();
+        exit(SYNTAX_ERR);
+    }
+    catch(UnexpTokError& err) {
+        std::cout << err.what();
+        exit(UNEXP_TOK);
+    }
+    catch(DivByZero& err) {
+        std::cout << err.what();
+        exit(DIV_BY_ZERO);
     }
 
     return 0;

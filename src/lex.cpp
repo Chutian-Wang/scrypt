@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include "lib/Lexer.h"
+#include "lib/Errors.h"
 
 int main() {
     try{
@@ -15,9 +16,16 @@ int main() {
             std::cout << token.text << std::endl;
         }
     }
-    catch(Token error){
-        std::cout << "Syntax error on line " << error.row << " column " << error.column << ".\n";
-        exit(1);
+    catch(SyntaxError& err) {
+        std::cout << err.what();
+        exit(SYNTAX_ERR);
+    }
+    catch(UnexpTokError& err) {
+        std::cout << err.what();
+        exit(UNEXP_TOK);
+    }
+    catch(ScryptError& err) {
+        std::cout << "Bad ScryptError" << std::endl;
     }
 
     return 0;
