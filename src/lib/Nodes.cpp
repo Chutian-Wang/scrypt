@@ -25,7 +25,7 @@ bool Number::is_legal() const {
 }
 
 std::string Number::get_infix() const {
-    return this->tok.text;
+    return std::to_string(this->val);
 }
 
 // Operator implememtations ----------------------------------
