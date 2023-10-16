@@ -54,6 +54,10 @@ AST* AST::parse(const std::vector<Token>& tokens,
             }
             // The only return branch
             case (TokenType::RPAREN): {
+                // Check if node_queue is empty
+                if (node_queue.size() == 0) {
+                    unexp_tok_err(*head);
+                }
                 // Check if first node is legal (it shouldn't be!)
                 if (node_queue[0]->is_legal()) {
                     Token err_tok = node_queue[0]->get_token();
