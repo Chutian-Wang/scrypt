@@ -37,10 +37,12 @@ AST* AST::parse(const std::vector<Token> & tokens) {
         delete ret;
         // Something after END
         if (tokens.end() - head > 1){
+            delete ret;
             throw UnexpTokError(*(head));
         }
         // No END
         else {
+            delete ret;
             throw UnexpTokError(*(--head));
         }
     }
