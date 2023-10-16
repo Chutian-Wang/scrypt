@@ -31,7 +31,14 @@ AST* AST::parse(const std::vector<Token> & tokens) {
     }
     // Parse sub-expressions
     auto head = tokens.begin();
-    auto ret = AST::parse(tokens, head);
+    AST* ret;
+    try {
+        ret = AST::parse(tokens, head);
+    }
+    catch (const std::exception& err) {
+        throw err;
+    }
+    
     head++;
     // Check if something is left after a complete
     // expression is parsed
