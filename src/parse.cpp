@@ -19,11 +19,11 @@ int main() {
     }
     catch(const SyntaxError& err) {
         std::cout << err.what();
-        exit(SYNTAX_ERR);
+        return SYNTAX_ERR;
     }
     catch(const UnexpTokError& err) {
         std::cout << err.what();
-        exit(UNEXP_TOK);
+        return UNEXP_TOK;
     }
     
     try {
@@ -32,7 +32,7 @@ int main() {
     }
     catch(const DivByZero& err) {
         std::cout << err.what();
-        exit(DIV_BY_ZERO);
+        return DIV_BY_ZERO;
     }
 
     return 0;
