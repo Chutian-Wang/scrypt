@@ -10,6 +10,7 @@
 
 #include "Token.h"
 #include <iostream>
+#include <cstring>
 
 // Use these macros as exit code.
 #define SYNTAX_ERR  1

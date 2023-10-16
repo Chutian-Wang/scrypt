@@ -24,7 +24,7 @@ executable.
 use `leaks --atExit -- <command and args>`. For example,
 `leaks --atExit -- ./build/parse < test.txt` will print any
 memory leaks that have occured along with other information.
-Unfortunately, it usually does not provide you with any
+Unfortunately, it sometimes does not provide you with any
 information regarding the source of the leaks. `leaks` comes
 with OSX after 2020.
 

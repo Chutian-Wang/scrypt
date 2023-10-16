@@ -4,6 +4,7 @@
 #include <vector>
 #include <stack>
 #include <string>
+#include <cstring>
 
 AST* AST::parse(const std::vector<Token> & tokens) {
     // Check if given empty expression
