@@ -2,6 +2,7 @@
 #include "Token.h"
 #include <iostream>
 #include <sstream>
+#include <cstring>
 
 ScryptError::~ScryptError() {
     delete this->msg;
