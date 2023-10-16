@@ -7,8 +7,6 @@
 
 class Lexer{
     public:
-        Lexer(const std::string &input);
-        
         // Default constructor for empty instance creation
         Lexer();
 
@@ -18,7 +16,7 @@ class Lexer{
         // e.g. {(, +, (, *, 1, 2, ), 3, )} parsed from the S-
         // expression (+ (* 1 2) 3) which evaluates to the
         // mathematical expression 1 + 2 * 3
-        void tokenize(const std::string& expr);
+        void tokenize(std::istream& input);
 
         const std::vector<Token>& getTokens() const;
 
@@ -27,15 +25,10 @@ class Lexer{
         int                currRow;
         int                currCol;
 
-        // If we must store raw text do it here
-        // Each element of this vector contains a line of raw
-        // text
-        std::vector<std::string> textLines;
-
         // Helper function
         // Used in tokenize() to add a new Token into the vector tokens 
         // each time a new token is reached
-        void addToken(TokenType type, const std::string &token);
+        void addToken(TokenType type, const std::string &token, int row, int col);
 };
 
 #endif //LEXER_H
