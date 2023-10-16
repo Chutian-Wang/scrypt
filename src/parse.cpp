@@ -6,17 +6,16 @@
 #include "lib/Errors.h"
 
 int main() {
+    static AST* parser;
     try{
         Lexer lexer;
         lexer.tokenize(std::cin);
 
         auto tokens = lexer.get_tokens();
-        AST* parser = AST::parse(tokens);
+        parser = AST::parse(tokens);
         std::ostringstream oss;
         parser->get_infix(oss);
         std::cout << oss.str() << '\n';
-        std::cout << parser->eval() << std::endl;
-        delete parser;
     }
     catch(const SyntaxError& err) {
         std::cout << err.what();
@@ -25,6 +24,11 @@ int main() {
     catch(const UnexpTokError& err) {
         std::cout << err.what();
         exit(UNEXP_TOK);
+    }
+    
+    try {
+        std::cout << parser->eval() << std::endl;
+        delete parser;
     }
     catch(const DivByZero& err) {
         std::cout << err.what();
