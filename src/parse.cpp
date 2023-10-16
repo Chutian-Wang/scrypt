@@ -8,8 +8,7 @@ int main() {
         Lexer lexer;
         lexer.tokenize(std::cin);
 
-        std::vector<Token> tokens = lexer.get_tokens();
-
+        auto tokens = lexer.get_tokens();
         AST* parser = AST::parse(tokens);
         std::cout << parser->get_infix() << '\n';
         std::cout << parser->eval() << std::endl;

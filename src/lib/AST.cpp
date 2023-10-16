@@ -6,6 +6,7 @@
 #include <string>
 
 AST* AST::parse(const std::vector<Token> & tokens) {
+    if (tokens.size() == 1 && tokens[0].type == TokenType::END) return nullptr;
     auto head = tokens.begin();
     auto ret = AST::parse(tokens, head);
     head++;

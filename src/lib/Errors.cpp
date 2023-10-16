@@ -3,7 +3,7 @@
 #include <iostream>
 
 void syntax_err(Token tok) {
-    std::cerr <<
+    std::cout <<
         "Syntax error on line " <<
         std::to_string(tok.row) <<
         " column " <<
@@ -13,7 +13,7 @@ void syntax_err(Token tok) {
 }
 
 void unexp_tok_err(Token tok) {
-    std::cerr <<
+    std::cout <<
         "Unexpected token at line " <<
         std::to_string(tok.row) <<
         " column " <<
@@ -23,7 +23,7 @@ void unexp_tok_err(Token tok) {
 }
 
 void exp_tok_err(Token tok) {
-    std::cerr <<
+    std::cout <<
         "Expecting token at line " <<
         std::to_string(tok.row) <<
         " column " <<
@@ -33,6 +33,6 @@ void exp_tok_err(Token tok) {
 }
 
 void div_by_zero_err() {
-    std::cerr << "Runtime error: division by zero." << std::endl;
+    std::cout << "Runtime error: division by zero." << std::endl;
     exit(3);
 }
