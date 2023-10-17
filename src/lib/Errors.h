@@ -20,7 +20,7 @@
  * Children of this custom Error class should be thrown
  * wherever exceptions occur. Do not throw a std::exception!
 */
-class ScryptError: public std::exception{
+class ScryptError: public std::exception {
 public:
     Token tok;
     const char* msg;

@@ -5,7 +5,7 @@
 #include <string>
 #include "Token.h"
 
-class Lexer{
+class Lexer {
     public:
         // Default constructor for empty instance creation
         Lexer();

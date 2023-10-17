@@ -12,7 +12,7 @@ enum struct TokenType {
     ERR         // Any other 
 };
 
-class Token{
+class Token {
 public:
     TokenType   type;
     std::string text;

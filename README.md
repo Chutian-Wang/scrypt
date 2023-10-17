@@ -10,6 +10,7 @@
 - C++ files with main() functions should go directly inside src.
 - All other C++ files (including headers) should go inside src/lib.
 - Make an announcement to all group members before you edit the Makefile
+- Always update README.md (including the file/class trees) for documentation.
 
 ## Build Instructions
 - Make a build folder under the repo folder using `mkdir`.
@@ -29,28 +30,54 @@ code segfaults. `leaks` comes with OSX after 2020.
 ## File Structure
 ```
 scrypt
-    |- README.md
-    |- Makefile
-    |- LICENSE
-    |- src
-    |   |- lex.cpp
-    |   |- parse.cpp
-    |   |- lib
-    |   |   |- Lexer.h
-    |   |   |- Lexer.cpp
-    |   |   |- Token.h
-    |   |   |- Token.cpp
-    |   |   |- AST.h
-    |   |   |- AST.cpp
-    |   |   |- Nodes.h
-    |   |   |- Nodes.cpp
-    |   |_  ...
-    |
-    |- build
-    |   |- main
-    |   |- lexer.o
-    |   |- AST.o
-    |_  ...
+    ├── LICENSE
+    ├── Makefile
+    ├── README.md
+    ├── build
+    └── src
+        ├── lex.cpp
+        ├── lib
+        │   ├── AST.cpp
+        │   ├── AST.h
+        │   ├── Errors.cpp
+        │   ├── Errors.h
+        │   ├── Lexer.cpp
+        │   ├── Lexer.h
+        │   ├── Nodes.cpp
+        │   ├── Nodes.h
+        │   ├── Token.cpp
+        │   └── Token.h
+        └── parse.cpp
+```
+
+## Class Structure and Special Macros
+```
+Class
+    ├── AST (Virtual)
+    |   ├── Number
+    |   └── Operator
+    ├── std::exception
+    |   └── ScryptError (Virtual)
+    |       ├── SyntaxError
+    |       ├── UnexpTokError
+    |       └── DivByZero
+    ├── Lexer (Base)
+    └── Token (Base)
+
+Struct
+    └── TokenType (enum)
+        ├── NUMBER
+        ├── OPERATOR
+        ├── LPAREN
+        ├── RPAREN
+        ├── END
+        └── ERR
+    
+Macros
+    └── (Return Codes)
+        ├── SYNTAX_ERR   1
+        ├── UNEXP_TOK    2
+        └── DIV_BY_ZERO  3
 ```
 
 ## General Workflow
@@ -64,7 +91,6 @@ comments and make changes accordingly and make new commits.
 ** When both threads are satisfied, thread B will merge the PR. **
 
 ## Class Links
-
 - GitHub for the syllabus, the schedule, and the assignments:
     https://github.com/ucsb-cs32/f23
 - Piazza for class announcements and Q&A:
@@ -73,7 +99,6 @@ comments and make changes accordingly and make new commits.
     https://www.gradescope.com/courses/640286
 
 ## References
-
 - C++ Reference The simple, user-friendly version:
     https://cplusplus.com/reference/
 - C++ Reference The more detailed but less friendly version:

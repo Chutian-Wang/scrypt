@@ -22,7 +22,7 @@ AST* AST::parse(const std::vector<Token> & tokens) {
     // Parse sub-expressions
     auto head = tokens.begin();
     AST* ret = nullptr;
-    try{
+    try {
         ret = AST::parse(tokens, head);
     }
     catch (const UnexpTokError& err) {
