@@ -7,6 +7,7 @@
 - Do not push to the master branch directly. Always create a PR.
 - Code review comments must be meaningful.
 - Commit messages must be meaningful.
+- Always format your code before submitting for review.
 - C++ files with main() functions should go directly inside src.
 - All other C++ files (including headers) should go inside src/lib.
 - Make an announcement to all group members before you edit the Makefile
@@ -79,6 +80,14 @@ Macros
         ├── UNEXP_TOK    2
         └── DIV_BY_ZERO  3
 ```
+
+## Code Format
+We will use google formatting for our projects.
+To automate formatting process, you can use clang-format.
+clang-format can be installed with most package managing
+programs such as apt-get or brew if you are on MacOS.
+> https://clang.llvm.org/docs/ClangFormat.html
+> Example Usage: `clang-format -i -style=google ./src/*.cpp ./src/lib/*.cpp ./src/lib/*.h`
 
 ## General Workflow
 We work in two thread usually. Both threads fetch from the

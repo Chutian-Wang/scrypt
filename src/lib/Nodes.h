@@ -1,43 +1,44 @@
 #ifndef NODES_H
 #define NODES_H
-#include "AST.h"
 #include <string>
 #include <vector>
 
-class Number: public AST {
-private:
-    Token tok;
-    
-    double val;
+#include "AST.h"
 
-public:
-    Number(const Token& tok);
-    virtual ~Number();
+class Number : public AST {
+ private:
+  Token tok;
 
-    virtual const Token&    get_token() const;
-    virtual double          eval()      const;
-    virtual bool            is_legal()  const;
-    virtual void get_infix(std::ostringstream& oss) const;
+  double val;
+
+ public:
+  Number(const Token &tok);
+  virtual ~Number();
+
+  virtual const Token &get_token() const;
+  virtual double eval() const;
+  virtual bool is_legal() const;
+  virtual void get_infix(std::ostringstream &oss) const;
 };
 
-class Operator: public AST {
-private:
-    Token tok;
-    bool validated;
-    bool legal;
+class Operator : public AST {
+ private:
+  Token tok;
+  bool validated;
+  bool legal;
 
-    std::vector<AST*> operands;
+  std::vector<AST *> operands;
 
-public:
-    Operator(const Token& tok);
-    virtual ~Operator();
+ public:
+  Operator(const Token &tok);
+  virtual ~Operator();
 
-    void add_operand(std::vector<AST*> nodes);
-    void add_operand(AST* node);
+  void add_operand(std::vector<AST *> nodes);
+  void add_operand(AST *node);
 
-    virtual const Token&    get_token() const;
-    virtual double          eval()      const;
-    virtual bool            is_legal()  const;
-    virtual void get_infix(std::ostringstream& oss) const;
+  virtual const Token &get_token() const;
+  virtual double eval() const;
+  virtual bool is_legal() const;
+  virtual void get_infix(std::ostringstream &oss) const;
 };
 #endif
