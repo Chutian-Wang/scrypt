@@ -15,7 +15,7 @@ enum struct TokenType {
 class Token{
 public:
     TokenType   type;
-    std::string text; // what the token is, e.g. "+", used later for printing
+    std::string text;
     int         row;
     int         column;
 

@@ -5,8 +5,8 @@
 
 ## GitHub Rules
 - Do not push to the master branch directly. Always create a PR.
-- Always run `make clean` before commiting and pushing.
 - Code review comments must be meaningful.
+- Commit messages must be meaningful.
 - C++ files with main() functions should go directly inside src.
 - All other C++ files (including headers) should go inside src/lib.
 - Make an announcement to all group members before you edit the Makefile
@@ -15,18 +15,16 @@
 - Make a build folder under the repo folder using `mkdir`.
 - Run `make` or `make all` to make, executables are now
 generated in the build folder.
-- Run `make <module>` to make a specific lib module or
-executable.
 
 ## Debugging
 - GDB/LLDB
-- If you are on MacOS, there is a subsitute for Valgrind,
+- If you are on MacOS, there is a subsitute for Valgrind:
 use `leaks --atExit -- <command and args>`. For example,
 `leaks --atExit -- ./build/parse < test.txt` will print any
 memory leaks that have occured along with other information.
 Unfortunately, it sometimes does not provide you with any
-information regarding the source of the leaks. `leaks` comes
-with OSX after 2020.
+information regarding the source of the leaks, e.g. when your
+code segfaults. `leaks` comes with OSX after 2020.
 
 ## File Structure
 ```
@@ -63,9 +61,7 @@ their work, they submit a PR to be reviewed by thread B. Thread
 B will pull from thread A's branch and review the code to make
 constructive comments. Thread A will then review thread B's
 comments and make changes accordingly and make new commits.
-**
-When both threads are satisfied, thread B will merge the PR.
-**
+** When both threads are satisfied, thread B will merge the PR. **
 
 ## Class Links
 

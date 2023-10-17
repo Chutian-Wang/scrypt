@@ -25,8 +25,8 @@ const char* SyntaxError::what() const noexcept {
 UnexpTokError::UnexpTokError(const Token& tok) {
     this->tok = tok;
     std::ostringstream oss;
-    oss << "Unexpected token at line " << tok.row << " column " <<
-        tok.column << ": " << tok.text << '\n';
+    oss << "Unexpected token at line " << tok.row <<
+        " column " << tok.column << ": " << tok.text << '\n';
     size_t strlen = oss.str().size() + 1;
     this->msg = new char[strlen];
     memcpy((void*)msg, oss.str().c_str(), strlen);

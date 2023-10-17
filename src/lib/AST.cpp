@@ -61,19 +61,19 @@ AST* AST::parse(const std::vector<Token>& tokens,
                 }
                 break;
             }
-            // The only return branch
+            // This is the only return branch
             case (TokenType::RPAREN): {
                 // node_queue must have elements
                 if (node_queue.size() == 0) {
                     throw UnexpTokError(*head);
                 }
                 if (
-                    // first node cannot be legal
+                    // First node cannot be legal
                     !(node_queue[0]->is_legal()) &&
-                    // must have at least 1 operand
+                    // Must have at least 1 operand
                     node_queue.size() > 1
                 ) {
-                    // all other nodes must be legal
+                    // All other nodes must be legal
                     for (auto node = node_queue.begin() + 1;
                         node < node_queue.end(); node++) {
                         if (!((*node)->is_legal())) {
@@ -116,7 +116,7 @@ AST* AST::parse(const std::vector<Token>& tokens,
                 break;
             }
             default: {
-                // END or ERR
+                // Premature END or ERR
                 // Clear memory
                 for (auto node: node_queue) {
                     delete node;

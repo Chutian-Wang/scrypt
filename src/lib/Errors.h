@@ -24,6 +24,7 @@ class ScryptError: public std::exception{
 public:
     Token tok;
     const char* msg;
+
     ScryptError() {};
     virtual ~ScryptError() {};
     virtual const char* what() const noexcept = 0;
@@ -46,6 +47,7 @@ public:
 class DivByZero: public ScryptError {
 public:
     DivByZero();
+    // what() is static, no need to write destructor
     virtual ~DivByZero() {};
     virtual const char* what() const noexcept;
 };
