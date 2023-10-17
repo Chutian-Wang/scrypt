@@ -7,39 +7,17 @@
 #include <cstring>
 
 AST* AST::parse(const std::vector<Token> & tokens) {
-    // Check if given empty expression
-    if (tokens.size() == 1 &&
-        tokens[0].type == TokenType::END) {
-        throw UnexpTokError(tokens[0]);
-    };
-    // Check if a single number is recieved
-    if (tokens[0].type == TokenType::NUMBER) {
-        if (tokens.size() == 2) {
-            return new Number(tokens[0]);
-        }
-        else {
-            throw UnexpTokError(tokens[1]);
-        }
-    }
-    // Check if fist token is LPRAREN
-    if (tokens[0].type != TokenType::LPAREN) {
-        throw UnexpTokError(tokens[0]);
-    }
-    // Check if second token is number
-    if (tokens[1].type == TokenType::NUMBER) {
-        throw UnexpTokError(tokens[1]);
-    }
     // Parse sub-expressions
     auto head = tokens.begin();
     AST* ret;
-    ret = AST::parse(tokens, head);
-    
-    head++;
-    // Check if something is left after a complete
-    // expression is parsed
-    if ((*head).type != TokenType::END) { 
-        delete ret;
-        throw UnexpTokError(*(head));
+    try{
+        ret = AST::parse(tokens, ++head);
+    }
+    catch (const UnexpTokError err) {
+        throw err;
+    }
+    if (head->type != TokenType::END) {
+        throw UnexpTokError(*head);
     }
     return ret;
 }
@@ -50,27 +28,30 @@ AST* AST::parse(const std::vector<Token>& tokens,
 
     std::vector<AST*> node_queue;
 
-    while (head < tokens.end() &&
-        (*head).type != TokenType::END) {
-        head++;
+    while (1) {
         switch ((*head).type) {
             case (TokenType::LPAREN): {
                 // when parse returns, head is set to one
                 // token past the matching RPARAN in the
                 // next cycle.
                 try {
-                    node_queue.push_back(parse(tokens, head));
+                    node_queue.push_back(parse(tokens, ++head));
                 }
-                catch (const std::exception& err) {
-                    for (auto node: node_queue) {
-                        delete node;
-                    }
+                catch (const UnexpTokError& err) {
                     throw err;
                 }
                 break;
             }
             // The only return branch
             case (TokenType::RPAREN): {
+                // Check if number of nodes is good
+                if (node_queue.size() > 1 &&
+                    !node_queue[0]->is_legal()) {
+                    for (auto node: node_queue){
+                        delete node;
+                    }
+                    throw UnexpTokError(*head);
+                }
                 // Check if first node is legal
                 // (it shouldn't be!)
                 if (node_queue[0]->is_legal()) {
@@ -79,13 +60,6 @@ AST* AST::parse(const std::vector<Token>& tokens,
                         delete node;
                     }
                     throw UnexpTokError(err_tok);
-                }
-                // Check if number of nodes is good
-                if (node_queue.size() < 2) {
-                    for (auto node: node_queue){
-                        delete node;
-                    }
-                    throw UnexpTokError(*head);
                 }
                 // Check if all other nodes are legal
                 // (they should be!)
@@ -118,17 +92,18 @@ AST* AST::parse(const std::vector<Token>& tokens,
             default: {
                 // END or ERR
                 // Clear memory
-                for (auto node: node_queue) {
-                    delete node;
+                if (node_queue.size() == 1 && node_queue[0]->is_legal()) {
+                    return node_queue[0];
                 }
-                throw UnexpTokError((*head));
+                else {
+                    for (auto node: node_queue) {
+                        delete node;
+                    }
+                    throw UnexpTokError((*head));
+                }
             }
         }
+        head++;
     }
-    // Met END before RPAREN
-    for (auto node: node_queue) {
-        delete node;
-    }
-    throw UnexpTokError(*head);
     return nullptr;
 }

@@ -25,10 +25,6 @@ int main() {
         std::cout << err.what();
         return UNEXP_TOK;
     }
-    catch(const std::exception& err) {
-        std::cout << err.what();
-        return 2;
-    }
     
     try {
         std::cout << parser->eval() << std::endl;
