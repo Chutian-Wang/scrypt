@@ -7,13 +7,17 @@
 #include <cstring>
 
 AST* AST::parse(const std::vector<Token> & tokens) {
-    if (tokens.size() < 3) {
-        if (tokens[0].type == TokenType::NUMBER) {
+    // Deal with short token lists
+    if (tokens[0].type == TokenType::NUMBER) {
+        if (tokens.size() < 3) {
             return new Number(tokens[0]);
         }
         else {
-            throw UnexpTokError(tokens[0]);
+            throw UnexpTokError(tokens[1]);
         }
+    }
+    if (tokens[0].type != TokenType::LPAREN) {
+        throw UnexpTokError(tokens[0]);
     }
     // Parse sub-expressions
     auto head = tokens.begin();
@@ -114,10 +118,11 @@ AST* AST::parse(const std::vector<Token>& tokens,
             default: {
                 // END or ERR
                 // Clear memory
+                Token err_tok = node_queue[0]->get_token();
                 for (auto node: node_queue) {
                     delete node;
                 }
-                throw UnexpTokError((*head));
+                throw UnexpTokError(err_tok);
             }
         }
     }
