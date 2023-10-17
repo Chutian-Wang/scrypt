@@ -19,7 +19,7 @@ AST* AST::parse(const std::vector<Token> & tokens) {
     auto head = tokens.begin();
     AST* ret = nullptr;
     try{
-        ret = AST::parse(tokens, ++head);
+        ret = AST::parse(tokens, head);
     }
     catch (const UnexpTokError& err) {
         throw;
@@ -38,7 +38,8 @@ AST* AST::parse(const std::vector<Token>& tokens,
 
     std::vector<AST*> node_queue;
 
-    while (1) {
+    while ((head + 1) < tokens.end()) {
+        head++;
         switch ((*head).type) {
             case (TokenType::LPAREN): {
                 // when parse returns, head is set to one
@@ -46,7 +47,7 @@ AST* AST::parse(const std::vector<Token>& tokens,
                 // next cycle.
                 try {
                     node_queue.push_back(
-                        parse(tokens, ++head));
+                        parse(tokens, head));
                 }
                 catch (const UnexpTokError& err) {
                     for (auto node: node_queue) {
@@ -113,19 +114,12 @@ AST* AST::parse(const std::vector<Token>& tokens,
             default: {
                 // END or ERR
                 // Clear memory
-                if (node_queue.size() == 1 &&
-                    node_queue[0]->is_legal()) {
-                    return node_queue[0];
+                for (auto node: node_queue) {
+                    delete node;
                 }
-                else {
-                    for (auto node: node_queue) {
-                        delete node;
-                    }
-                    throw UnexpTokError((*head));
-                }
+                throw UnexpTokError((*head));
             }
         }
-        head++;
     }
     return nullptr;
 }
