@@ -27,7 +27,7 @@ int main() {
     }
     catch(const std::exception& err) {
         std::cout << err.what();
-        return -1;
+        return 2;
     }
     
     try {
