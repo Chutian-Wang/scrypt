@@ -39,3 +39,4 @@ class Lexer{
 };
 
 #endif //LEXER_H
+
