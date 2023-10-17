@@ -44,42 +44,34 @@ AST* AST::parse(const std::vector<Token>& tokens,
             }
             // The only return branch
             case (TokenType::RPAREN): {
-                // Check if number of nodes is good
-                if (node_queue.size() > 1 &&
-                    !node_queue[0]->is_legal()) {
-                    for (auto node: node_queue){
-                        delete node;
-                    }
-                    throw UnexpTokError(*head);
-                }
-                // Check if first node is legal
-                // (it shouldn't be!)
-                if (node_queue[0]->is_legal()) {
-                    Token err_tok = node_queue[0]->get_token();
-                    for (auto node: node_queue) {
-                        delete node;
-                    }
-                    throw UnexpTokError(err_tok);
-                }
-                // Check if all other nodes are legal
-                // (they should be!)
-                for (auto node = node_queue.begin() + 1;
-                    node != node_queue.end(); node++) {
-                    // Operators must contain legal operands
-                    if (!((*node)->is_legal())) {
-                        // Clear memory
-                        Token err_tok = (*node)->get_token();
-                        for (auto node: node_queue) {
-                            delete node;
+                if (
+                    // first node cannot be legal
+                    !node_queue[0]->is_legal() &&
+                    // must have at least 1 operand
+                    node_queue.size() > 1
+                ) {
+                    // all other nodes must be legal
+                    for (auto node = node_queue.begin() + 1;
+                        node < node_queue.end(); node++) {
+                        if (!((*node)->is_legal())) {
+                            Token err_tok = (*node)->get_token();
+                            for (auto node:node_queue) {
+                                delete node;
+                            }
+                            throw UnexpTokError(err_tok);
                         }
-                        throw UnexpTokError(err_tok);
+                        Operator* ret = node_queue[0];
+                        node_queue.erase(node_queue.begin());
+                        ret->add_operand(node_queue);
+                        return ret;
                     }
                 }
-                // Create and return the root
-                Operator* ret = (Operator*) node_queue[0];
-                node_queue.erase(node_queue.begin());
-                ret->add_operand(node_queue);
-                return ret;
+                else if (node_queue[0]->is_legal()) {
+                    
+                }
+                else {
+                    
+                }
             }
             case (TokenType::OPERATOR): {
                 node_queue.push_back(new Operator(*(head)));
