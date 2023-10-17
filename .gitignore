@@ -36,3 +36,6 @@ build/*
 
 # Mac Stuff
 .DS_Store
+
+# For vscode users
+.vscode
