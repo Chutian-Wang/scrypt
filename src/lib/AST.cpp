@@ -118,11 +118,10 @@ AST* AST::parse(const std::vector<Token>& tokens,
             default: {
                 // END or ERR
                 // Clear memory
-                Token err_tok = node_queue[0]->get_token();
                 for (auto node: node_queue) {
                     delete node;
                 }
-                throw UnexpTokError(err_tok);
+                throw UnexpTokError(*head);
             }
         }
     }
