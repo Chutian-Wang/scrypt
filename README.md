@@ -82,8 +82,8 @@ Macros
 ```
 
 ## Code Format
-We will use google formatting for our projects.
-To automate formatting process, you can use clang-format.
+We will use　the google format conventions for our projects.
+To automate the formatting process, you can use clang-format.
 clang-format can be installed with most package managing
 programs such as apt-get or brew if you are on MacOS.
 > https://clang.llvm.org/docs/ClangFormat.html
@@ -98,6 +98,14 @@ B will pull from thread A's branch and review the code to make
 constructive comments. Thread A will then review thread B's
 comments and make changes accordingly and make new commits.
 ** When both threads are satisfied, thread B will merge the PR. **
+
+## Team Information
+|   Name        |   Email                   |
+|---------------|---------------------------|
+|Barry Wang     |chutian_wang@ucsb.edu      |
+|Chloe Ta       |cqta@ucsb.edu              |
+|Evania Cheng   |evania@umail.ucsb.edu      |
+|Jennie Wu      |Jingyi_wu@umail.ucsb.edu   |
 
 ## Class Links
 - GitHub for the syllabus, the schedule, and the assignments:
