@@ -90,7 +90,7 @@ programs such as apt-get or brew if you are on MacOS.
 > Example Usage: `clang-format -i -style=google ./src/*.cpp ./src/lib/*.cpp ./src/lib/*.h`
 
 ## General Workflow
-We work in two thread usually. Both threads fetch from the
+We work in two threads usually. Both threads fetch from the
 master branch for the last checkpoint. Thread A works on the
 files and make some commits. When thread A is satisfied with
 their work, they submit a PR to be reviewed by thread B. Thread
