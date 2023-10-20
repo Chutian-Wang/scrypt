@@ -23,58 +23,58 @@ void Lexer::add_token(TokenType type, const std::string &token, int row,
 
 const std::vector<Token> &Lexer::get_tokens() const { return tokens; }
 
-bool Lexer::isAlpha(char c){
-	// check if the token is a alphabet or _
-	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_');
+bool Lexer::isAlpha(char c) {
+  // check if the token is a alphabet or _
+  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_');
 }
 
-bool Lexer::isAlphaNum(char c){
-	// check if the token is alphabet, _ or number
-	return isAlpha(c) || std::isdigit(c);
+bool Lexer::isAlphaNum(char c) {
+  // check if the token is alphabet, _ or number
+  return isAlpha(c) || std::isdigit(c);
 }
 
-void Lexer::readIdentifier(char token, std::istream &input){
-	// read and add identifier to tokens
-	std::string id;
-	char newToken;
-	int pos = currCol;
-	id += token;
-	while (isAlphaNum(input.peek())){
-		input.get(newToken);
-		id += newToken;
-		currCol ++;
-	}
-	add_token(TokenType::INDENTIFIER, id, currRow, pos);
+void Lexer::readIdentifier(char token, std::istream &input) {
+  // read and add identifier to tokens
+  std::string id;
+  char newToken;
+  int pos = currCol;
+  id += token;
+  while (isAlphaNum(input.peek())) {
+    input.get(newToken);
+    id += newToken;
+    currCol++;
+  }
+  add_token(TokenType::INDENTIFIER, id, currRow, pos);
 }
 
-void Lexer::readNum(char token, std::istream &input){
-	// read number
-	std::string num;
+void Lexer::readNum(char token, std::istream &input) {
+  // read number
+  std::string num;
   int period2, temp(0);
-	char newToken;
+  char newToken;
 
-	num += token;
-	while (std::isdigit(input.peek()) || (input.peek() == '.')){
-		input.get(newToken);
-		num += newToken;
-		currCol ++;
-		if (newToken == '.') {
-    	// if we encounter a period, we increment temp
-    	// and store the position of 2nd period (where
-    	// the error location should be) in period2
-    	if (temp == 0) {
-      	temp++;
-    	} else if (temp == 1) {
-      	period2 = currCol;
-      	temp++;
-    	}
-  	}
-	}
+  num += token;
+  while (std::isdigit(input.peek()) || (input.peek() == '.')) {
+    input.get(newToken);
+    num += newToken;
+    currCol++;
+    if (newToken == '.') {
+      // if we encounter a period, we increment temp
+      // and store the position of 2nd period (where
+      // the error location should be) in period2
+      if (temp == 0) {
+        temp++;
+      } else if (temp == 1) {
+        period2 = currCol;
+        temp++;
+      }
+    }
+  }
   validateNum(period2, num);
 }
 
-void Lexer::validateNum(int pos, const std::string &number){
-	// if the number is completely read, we now check if
+void Lexer::validateNum(int pos, const std::string &number) {
+  // if the number is completely read, we now check if
   // the number is valid by counting the number of period
   // inside the number
   int n = std::count(number.begin(), number.end(), '.');
@@ -144,14 +144,13 @@ void Lexer::tokenize(std::istream &input) {
       add_token(TokenType::OPERATOR, "*", currRow, currCol);
     } else if (token == '/') {
       add_token(TokenType::OPERATOR, "/", currRow, currCol);
-    } else if (token == '='){
-			add_token(TokenType::ASSIGN, "=", currRow, currCol);
-		}	else if (std::isdigit(token)) {
+    } else if (token == '=') {
+      add_token(TokenType::ASSIGN, "=", currRow, currCol);
+    } else if (std::isdigit(token)) {
       readNum(token, input);
-    } else if (isAlpha(token)){
-			readIdentifier(token, input);
-		}
-		else {
+    } else if (isAlpha(token)) {
+      readIdentifier(token, input);
+    } else {
       str += token;
       throw SyntaxError(Token(TokenType::ERR, str, currRow, currCol));
       str = "";
