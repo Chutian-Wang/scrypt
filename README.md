@@ -82,7 +82,7 @@ Macros
 ```
 
 ## Code Format
-We will use　the google format conventions for our projects.
+We will use the google format conventions for our projects.
 To automate the formatting process, you can use clang-format.
 clang-format can be installed with most package managing
 programs such as apt-get or brew if you are on MacOS.

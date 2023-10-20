@@ -24,14 +24,17 @@ void Lexer::add_token(TokenType type, const std::string &token, int row,
 const std::vector<Token> &Lexer::get_tokens() const { return tokens; }
 
 bool Lexer::isAlpha(char c){
+	// check if the token is a alphabet or _
 	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_');
 }
 
 bool Lexer::isAlphaNum(char c){
+	// check if the token is alphabet, _ or number
 	return isAlpha(c) || std::isdigit(c);
 }
 
 void Lexer::readIdentifier(char token, std::istream &input){
+	// read and add identifier to tokens
 	std::string id;
 	char newToken;
 	int pos = currCol;
@@ -45,6 +48,7 @@ void Lexer::readIdentifier(char token, std::istream &input){
 }
 
 void Lexer::readNum(char token, std::istream &input){
+	// read number
 	std::string num;
   int period2, temp(0);
 	char newToken;
