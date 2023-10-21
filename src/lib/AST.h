@@ -6,26 +6,42 @@
 
 #include "Token.h"
 
-// This is the base class for all Nodes.
+/**
+ * This is the base class for all Nodes.
+ * The static parse_S functions construct an AST.
+ */
+
 class AST {
  public:
-  // Function for parsing top level tree creation,
-  // This function calls the explicit version with
-  // head = tokens.begin()
-  static AST *parse(const std::vector<Token> &tokens);
-  static AST *parse(const std::vector<Token> &tokens,
-                    std::vector<Token>::const_iterator &head);
+  /**
+   * Function for parsing top level tree creation,
+   * This function calls the explicit version with
+   * head = tokens.begin()
+   * These functions expect S-expression input form
+   */
+  static AST *parse_S(const std::vector<Token> &tokens);
+  static AST *parse_S(const std::vector<Token> &tokens,
+                      std::vector<Token>::const_iterator &head);
+
+  /**
+   * These are the new parser constructor that supports
+   * infix form. TODO.
+   */
+  static AST *parse_infix(const std::vector<Token> &tokens);
+  static AST *parse_infix(const std::vector<Token> &tokens,
+                          std::vector<Token>::const_iterator &head);
 
   virtual ~AST(){};
 
-  // Function for parse() to get sub-class tokens
+  // Function for parse functions to get node tokens
   virtual const Token &get_token() const = 0;
-  // Function for parse to get validity of a node
+  // Function for parse functions to get validity of a node
   virtual bool is_legal() const = 0;
   // Function to evaluate the subtree:
   virtual double eval() const = 0;
-  // This function pushes the subtree's infix form into oss
-  virtual void get_infix(std::ostringstream &oss) const = 0;
+  // These function pushes the subtree's infix form into oss
+  virtual void get_infix_S(std::ostringstream &oss) const = 0;
+  virtual void get_infix_infix(std::ostringstream &oss) const = 0;
 };
 
 #endif

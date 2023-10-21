@@ -8,7 +8,6 @@
 class Number : public AST {
  private:
   Token tok;
-
   double val;
 
  public:
@@ -18,7 +17,8 @@ class Number : public AST {
   virtual const Token &get_token() const;
   virtual double eval() const;
   virtual bool is_legal() const;
-  virtual void get_infix(std::ostringstream &oss) const;
+  virtual void get_infix_S(std::ostringstream &oss) const;
+  virtual void get_infix_infix(std::ostringstream &oss) const;
 };
 
 class Operator : public AST {
@@ -39,6 +39,26 @@ class Operator : public AST {
   virtual const Token &get_token() const;
   virtual double eval() const;
   virtual bool is_legal() const;
-  virtual void get_infix(std::ostringstream &oss) const;
+  virtual void get_infix_S(std::ostringstream &oss) const;
+  virtual void get_infix_infix(std::ostringstream &oss) const;
 };
+
+// Shared TODO!
+class Identifier : public AST {
+ private:
+  Token tok;
+  double val;
+  bool assigned;
+
+ public:
+  Identifier(const Token &tok);
+  virtual ~Identifier();
+
+  virtual const Token &get_token() const;
+  virtual double eval() const;
+  virtual bool is_legal() const;
+  virtual void get_infix_S(std::ostringstream &oss) const;
+  virtual void get_infix_infix(std::ostringstream &oss) const;
+};
+
 #endif

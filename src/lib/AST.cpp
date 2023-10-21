@@ -8,7 +8,7 @@
 #include "Errors.h"
 #include "Nodes.h"
 
-AST *AST::parse(const std::vector<Token> &tokens) {
+AST *AST::parse_S(const std::vector<Token> &tokens) {
   // Deal with short token lists
   if (tokens[0].type == TokenType::NUMBER) {
     if (tokens.size() < 3) {
@@ -24,7 +24,7 @@ AST *AST::parse(const std::vector<Token> &tokens) {
   auto head = tokens.begin();
   AST *ret = nullptr;
   try {
-    ret = AST::parse(tokens, head);
+    ret = AST::parse_S(tokens, head);
   } catch (const UnexpTokError &err) {
     throw;
   }
@@ -36,20 +36,20 @@ AST *AST::parse(const std::vector<Token> &tokens) {
   return ret;
 }
 
-// After call to parse, head is set to the last token read.
-AST *AST::parse(const std::vector<Token> &tokens,
-                std::vector<Token>::const_iterator &head) {
+// After call to parse_S, head is set to the last token read.
+AST *AST::parse_S(const std::vector<Token> &tokens,
+                  std::vector<Token>::const_iterator &head) {
   std::vector<AST *> node_queue;
 
   while ((head + 1) < tokens.end()) {
     head++;
     switch ((*head).type) {
       case (TokenType::LPAREN): {
-        // when parse returns, head is set to one
+        // when parse_S returns, head is set to one
         // token past the matching RPARAN in the
         // next cycle.
         try {
-          node_queue.push_back(parse(tokens, head));
+          node_queue.push_back(parse_S(tokens, head));
         } catch (const UnexpTokError &err) {
           for (auto node : node_queue) {
             delete node;

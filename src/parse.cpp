@@ -13,27 +13,20 @@ int main() {
     lexer.tokenize(std::cin);
 
     auto tokens = lexer.get_tokens();
-    parser = AST::parse(tokens);
+    parser = AST::parse_S(tokens);
     std::ostringstream oss;
-    parser->get_infix(oss);
+    parser->get_infix_S(oss);
     std::cout << oss.str() << '\n';
-  } catch (const SyntaxError &err) {
-    std::cout << err.what();
+  } catch (const ScryptError &err) {
+    std::cout << err.what() << std::endl;
     return SYNTAX_ERR;
-  } catch (const UnexpTokError &err) {
-    std::cout << err.what();
-    return UNEXP_TOK;
   }
 
   try {
     std::cout << parser->eval() << std::endl;
     delete parser;
-  } catch (const DivByZero &err) {
-    std::cout << err.what();
-    return DIV_BY_ZERO;
-  } catch (const std::exception &err) {
-    std::cout << err.what();
-    return -1;
+  } catch (const ScryptError &err) {
+    return ScryptError::handle(std::cout, err);
   }
 
   return 0;
