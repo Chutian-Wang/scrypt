@@ -104,7 +104,7 @@ We will use the following variable naming conventions.
 If you checked the class structure above, you would find that we
 have a nested error hierachy. This is in place to make automatic
 error handling possible. The `ScryptError` base class has a static
-function `ScryptError::handle(std::ostream &cout, const ScryptError &err);`
+function `int ScryptError::handle(std::ostream &cout, const ScryptError &err);`
 that will handle any error for you in the catch block without
 you needing to worry about error types or return codes, please see the
 following example.
@@ -121,7 +121,7 @@ try {
   }
 
 Please implement any future error classes under the right parent,
-e.g. any runtime error should be children of ScrtptRuntimeError.
+e.g. any runtime error should be children of ScriptRuntimeError.
 ```
 
 ## General Workflow
