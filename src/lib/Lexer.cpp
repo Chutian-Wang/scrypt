@@ -23,23 +23,23 @@ void Lexer::add_token(TokenType type, const std::string &token, int row,
 
 const std::vector<Token> &Lexer::get_tokens() const { return tokens; }
 
-bool Lexer::isAlpha(char c) {
+bool Lexer::is_alpha(char c) {
   // check if the token is a alphabet or _
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c == '_');
 }
 
-bool Lexer::isAlphaNum(char c) {
+bool Lexer::is_alpha_num(char c) {
   // check if the token is alphabet, _ or number
-  return isAlpha(c) || std::isdigit(c);
+  return is_alpha(c) || std::isdigit(c);
 }
 
-void Lexer::readIdentifier(char token, std::istream &input) {
+void Lexer::read_identifier(char token, std::istream &input) {
   // read and add identifier to tokens
   std::string id;
   char newToken;
   int pos = currCol;
   id += token;
-  while (isAlphaNum(input.peek())) {
+  while (is_alpha_num(input.peek())) {
     input.get(newToken);
     id += newToken;
     currCol++;
@@ -47,7 +47,7 @@ void Lexer::readIdentifier(char token, std::istream &input) {
   add_token(TokenType::INDENTIFIER, id, currRow, pos);
 }
 
-void Lexer::readNum(char token, std::istream &input) {
+void Lexer::read_num(char token, std::istream &input) {
   // read number
   std::string num;
   int period2, temp(0);
@@ -70,10 +70,10 @@ void Lexer::readNum(char token, std::istream &input) {
       }
     }
   }
-  validateNum(period2, num);
+  validate_num(period2, num);
 }
 
-void Lexer::validateNum(int pos, const std::string &number) {
+void Lexer::validate_num(int pos, const std::string &number) {
   // if the number is completely read, we now check if
   // the number is valid by counting the number of period
   // inside the number
@@ -147,9 +147,9 @@ void Lexer::tokenize(std::istream &input) {
     } else if (token == '=') {
       add_token(TokenType::ASSIGN, "=", currRow, currCol);
     } else if (std::isdigit(token)) {
-      readNum(token, input);
-    } else if (isAlpha(token)) {
-      readIdentifier(token, input);
+      read_num(token, input);
+    } else if (is_alpha(token)) {
+      read_identifier(token, input);
     } else {
       str += token;
       throw SyntaxError(Token(TokenType::ERR, str, currRow, currCol));

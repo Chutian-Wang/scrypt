@@ -17,13 +17,7 @@ int main() {
       std::cout << token.text << std::endl;
     }
   } catch (SyntaxError &err) {
-    std::cout << err.what();
-    exit(SYNTAX_ERR);
-  } catch (UnexpTokError &err) {
-    std::cout << err.what();
-    exit(UNEXP_TOK);
-  } catch (ScryptError &err) {
-    std::cout << "Bad ScryptError" << std::endl;
+    return ScryptError::handle(std::cout, err);
   }
 
   return 0;
