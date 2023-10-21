@@ -81,9 +81,11 @@ Struct
     
 Macros
     └── (Return Codes)
-        ├── SYNTAX_ERR   1
-        ├── UNEXP_TOK    2
-        └── DIV_BY_ZERO  3
+        ├── SYNTAX_ERR      1
+        ├── UNEXP_TOK       2
+        ├── SCRYPT_RUNTIME  3
+        ├── DIV_BY_ZERO     SCRYPT_RUNTIME
+        └── DIV_BY_ZERO     SCRYPT_RUNTIME
 ```
 
 ## Code Format
