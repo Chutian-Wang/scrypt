@@ -114,11 +114,12 @@ following example.
 try {
     std::cout << parser->eval() << std::endl;
     delete parser;
-  } catch (const ScryptError &err) {
+} catch (const ScryptError &err) {
     // Do not use exit()! use return to avoid hard exit 
     // unwinding problems
     return ScryptError::handle(std::cout, err);
-  }
+}
+```
 
 Please implement any future error classes under the right parent,
 e.g. any runtime error should be children of ScriptRuntimeError.
