@@ -123,7 +123,6 @@ try {
 
 Please implement any future error classes under the right parent,
 e.g. any runtime error should be children of ScriptRuntimeError.
-```
 
 ## General Workflow
 We work in two threads usually. Both threads fetch from the
