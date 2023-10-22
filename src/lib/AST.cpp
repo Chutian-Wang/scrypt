@@ -4,6 +4,8 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include <map>
+#include <iostream>
 
 #include "Errors.h"
 #include "Nodes.h"
@@ -118,4 +120,45 @@ AST *AST::parse_S(const std::vector<Token> &tokens,
     }
   }
   return nullptr;
+}
+
+//Infix parser
+std::map<char, int> operatorP = {
+    {'=', 0},
+    {'+', 1},
+    {'-', 1},
+    {'*', 2},
+    {'/', 2},
+    {'(', 3},
+    {')', 3},
+};
+
+AST *AST::parse_infix(const std::vector<Token> &tokens) {
+
+}
+
+AST *AST::parse_infix(const std::vector<Token> &tokens, int minP = 0) {
+  if (tokens.empty()) {
+    return nullptr;
+  }
+
+  int i = 0;
+  Token lhs = tokens[0];
+  Token ahead = tokens[i++];
+  Token rhs;
+
+  while((ahead.type == TokenType::OPERATOR) && operatorP.at(ahead) >= minP) {
+    auto op = ahead;
+    rhs = tokens[i++];
+    // rhs := parse_primary ()
+    ahead = tokens[i++];
+    minP = operatorP.at(op);
+    // parse_infix()
+    // while (ahead.type == TokenType::OPERATOR) && operatorP.at(ahead) > minP ||) {
+    // rhs := parse_expression_1 
+    // ahead = tokens[i++];
+    // }
+    // lhs := result of applying op with operands lhs and rhs
+  }
+  return lhs;
 }

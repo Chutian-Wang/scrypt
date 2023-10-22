@@ -29,7 +29,7 @@ class AST {
    */
   static AST *parse_infix(const std::vector<Token> &tokens);
   static AST *parse_infix(const std::vector<Token> &tokens,
-                          std::vector<Token>::const_iterator &head);
+                          int minP);
 
   virtual ~AST(){};
 
