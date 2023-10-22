@@ -30,6 +30,11 @@ class Lexer {
   // Used in tokenize() to add a new Token into the vector tokens
   // each time a new token is reached
   void add_token(TokenType type, const std::string &token, int row, int col);
+  bool is_alpha(char c);
+  bool is_alpha_num(char c);
+  void read_num(char token, std::istream &input);
+  void read_identifier(char token, std::istream &input);
+  void validate_num(int pos, const std::string &number);
 };
 
 #endif  // LEXER_H

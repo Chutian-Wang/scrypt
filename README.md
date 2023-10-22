@@ -56,12 +56,15 @@ scrypt
 Class
     ├── AST (Virtual)
     |   ├── Number
-    |   └── Operator
+    |   ├── Operator
+    |   └── Identifer
     ├── std::exception
     |   └── ScryptError (Virtual)
     |       ├── SyntaxError
     |       ├── UnexpTokError
-    |       └── DivByZero
+    |       └── ScryptRuntimeError
+    |           ├── DivByZero
+    |           └── UnknownIdent
     ├── Lexer (Base)
     └── Token (Base)
 
@@ -71,26 +74,60 @@ Struct
         ├── OPERATOR
         ├── LPAREN
         ├── RPAREN
+        ├── ASSIGN
+        ├── IDENTIFIER
         ├── END
         └── ERR
     
 Macros
     └── (Return Codes)
-        ├── SYNTAX_ERR   1
-        ├── UNEXP_TOK    2
-        └── DIV_BY_ZERO  3
+        ├── SYNTAX_ERR      1
+        ├── UNEXP_TOK       2
+        ├── SCRYPT_RUNTIME  3
+        ├── DIV_BY_ZERO     SCRYPT_RUNTIME
+        └── DIV_BY_ZERO     SCRYPT_RUNTIME
 ```
 
 ## Code Format
-We will use　the google format conventions for our projects.
+We will use the google format conventions for our projects.
 To automate the formatting process, you can use clang-format.
 clang-format can be installed with most package managing
 programs such as apt-get or brew if you are on MacOS.
 > https://clang.llvm.org/docs/ClangFormat.html
 > Example Usage: `clang-format -i -style=google ./src/*.cpp ./src/lib/*.cpp ./src/lib/*.h`
 
+We will use the following variable naming conventions.
+- Functions: camel_case_func()
+- Class/Struct/Types: ExampleClass
+- Macros: EXAMPLE_MACRO
+- ScryptError class naming please refer to error handling section.
+
+## Error Handling
+If you checked the class structure above, you would find that we
+have a nested error hierachy. This is in place to make automatic
+error handling possible. The `ScryptError` base class has a static
+function `int ScryptError::handle(std::ostream &cout, const ScryptError &err);`
+that will handle any error for you in the catch block without
+you needing to worry about error types or return codes, please see the
+following example.
+
+```
+// this is in main()
+try {
+    std::cout << parser->eval() << std::endl;
+    delete parser;
+} catch (const ScryptError &err) {
+    // Do not use exit()! use return to avoid hard exit 
+    // unwinding problems
+    return ScryptError::handle(std::cout, err);
+}
+```
+
+Please implement any future error classes under the right parent,
+e.g. any runtime error should be children of ScriptRuntimeError.
+
 ## General Workflow
-We work in two thread usually. Both threads fetch from the
+We work in two threads usually. Both threads fetch from the
 master branch for the last checkpoint. Thread A works on the
 files and make some commits. When thread A is satisfied with
 their work, they submit a PR to be reviewed by thread B. Thread

@@ -21,7 +21,11 @@ double Number::eval() const { return this->val; }
 
 bool Number::is_legal() const { return true; }
 
-void Number::get_infix(std::ostringstream &oss) const { oss << this->val; }
+void Number::get_infix_S(std::ostringstream &oss) const { oss << this->val; }
+
+void Number::get_infix_infix(std::ostringstream &oss) const {
+  oss << this->val;
+}
 
 // Operator implememtations ----------------------------------
 Operator::Operator(const Token &tok) {
@@ -108,15 +112,20 @@ bool Operator::is_legal() const {
   }
 }
 
-void Operator::get_infix(std::ostringstream &oss) const {
-  oss << "(";
+void Operator::get_infix_S(std::ostringstream &oss) const {
+  oss << '(';
   for (auto node = this->operands.begin(); node < this->operands.end();
        node++) {
-    (*node)->get_infix(oss);
+    (*node)->get_infix_S(oss);
     if (this->operands.end() - node > 1) {
-      oss << " " << (this->tok.text) << " ";
+      oss << ' ' << (this->tok.text) << ' ';
     } else {
-      oss << ")";
+      oss << ')';
     }
   }
+}
+
+void Operator::get_infix_infix(std::ostringstream &oss) const {
+  oss << '(' << this->operands[0]->get_token().text << ' ' << this->tok.text
+      << ' ' << this->operands[1]->get_token().text << ')';
 }
