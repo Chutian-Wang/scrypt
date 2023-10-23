@@ -44,7 +44,7 @@ void Lexer::read_identifier(char token, std::istream &input) {
     id += newToken;
     currCol++;
   }
-  add_token(TokenType::INDENTIFIER, id, currRow, pos);
+  add_token(TokenType::IDENTIFIER, id, currRow, pos);
 }
 
 void Lexer::read_num(char token, std::istream &input) {

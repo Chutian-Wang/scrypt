@@ -49,3 +49,17 @@ DivByZero::DivByZero() {
 const char *DivByZero::what() const noexcept {
   return "Runtime error: division by zero.";
 }
+
+UnknownIdent::UnknownIdent(const Token &tok) {
+  this->exit_code = UNKNOWN_IDENT;
+  this->tok = tok;
+  std::ostringstream oss;
+  oss << "Runtime error: unknown identifier " << tok.text;
+  size_t strlen = oss.str().size() + 1;
+  this->msg = new char[strlen];
+  memcpy((void *)msg, oss.str().c_str(), strlen);
+}
+
+UnknownIdent::~UnknownIdent() { delete[] this->msg; }
+
+const char *UnknownIdent::what() const noexcept { return this->msg; }
