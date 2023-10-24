@@ -5,12 +5,12 @@
 
 enum struct TokenType {
   NUMBER,
-  OPERATOR,     // +, -, *, /
-  LPAREN,       // (
-  RPAREN,       // )
-  ASSIGN,       // =
-  INDENTIFIER,  // Series of letters, numbers, and underscores. They must start
-                // with letters or underscores.
+  OPERATOR,    // +, -, *, /
+  LPAREN,      // (
+  RPAREN,      // )
+  ASSIGN,      // =
+  IDENTIFIER,  // Series of letters, numbers, and underscores. They must start
+               // with letters or underscores.
   END,
   ERR  // Any other
 };

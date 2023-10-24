@@ -67,9 +67,8 @@ class DivByZero : public ScryptRuntimeError {
 // Shared TODO!
 class UnknownIdent : public ScryptRuntimeError {
  public:
-  UnknownIdent();
-  // what() is static, no need to write destructor
-  virtual ~UnknownIdent(){};
+  UnknownIdent(const Token &tok);
+  virtual ~UnknownIdent();
   virtual const char *what() const noexcept;
 };
 

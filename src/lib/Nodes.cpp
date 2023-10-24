@@ -129,3 +129,34 @@ void Operator::get_infix_infix(std::ostringstream &oss) const {
   oss << '(' << this->operands[0]->get_token().text << ' ' << this->tok.text
       << ' ' << this->operands[1]->get_token().text << ')';
 }
+
+// Identifier implememtations ----------------------------------
+Identifier::Identifier(const Token &tok) {
+  this->tok = tok;
+  this->val = 0;
+  this->assigned = false;
+}
+
+Identifier::~Identifier() {
+  // Nothing on the heap
+}
+
+const Token &Identifier::get_token() const { return this->tok; }
+
+double Identifier::eval() const {
+  if (this->assigned) {
+    return this->val;
+  } else {
+    throw UnknownIdent(this->tok);
+  }
+}
+
+bool Identifier::is_legal() const { return this->assigned; }
+
+void Identifier::get_infix_S(std::ostringstream &oss) const {
+  oss << this->tok.text;
+}
+
+void Identifier::get_infix_infix(std::ostringstream &oss) const {
+  oss << this->tok.text;
+}
