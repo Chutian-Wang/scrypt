@@ -8,40 +8,56 @@
 #include "Errors.h"
 #include "Nodes.h"
 
-AST *AST::parse_S(const std::vector<Token> &tokens) {
-  // Deal with short token lists
-  if (tokens[0].type == TokenType::NUMBER) {
-    if (tokens.size() < 3) {
-      return new Number(tokens[0]);
-    } else {
-      throw UnexpTokError(tokens[1]);
-    }
-  }
-  if (tokens[0].type != TokenType::LPAREN) {
-    throw UnexpTokError(tokens[0]);
-  }
-  // Parse sub-expressions
+std::vector<AST*> AST::parse_S_multiple(const std::vector<Token> &tokens) {
+  std::vector<AST*> multiple_S = {};
   auto head = tokens.begin();
   AST *ret = nullptr;
+  while ((head)->type != TokenType::END) {
+    try {
+      ret = AST::parse_S_short(head);
+      multiple_S.push_back(ret);
+    } catch (const UnexpTokError &err) {
+      delete ret;
+      throw;
+    }
+    head++;
+  }
+  return multiple_S;
+}
+
+AST *AST::parse_S_short(std::vector<Token>::const_iterator &head) {
+  // Deal with short token lists
+  if ((*head).type == TokenType::NUMBER) {
+    if ((head + 1)->type == TokenType::END) {
+      return new Number(*(head));
+    } else {
+      throw UnexpTokError(*(head + 1));
+    }
+  }
+  if ((*head).type != TokenType::LPAREN) {
+    throw UnexpTokError(*head);
+  }
+  // Parse sub-expressions
+  AST *ret = nullptr;
   try {
-    ret = AST::parse_S(tokens, head);
+    ret = AST::parse_S(head);
   } catch (const UnexpTokError &err) {
     throw;
   }
   // Check redundent expression
-  if ((++head)->type != TokenType::END) {
-    delete ret;
-    throw UnexpTokError(*head);
-  }
+  // if ((++head)->type != TokenType::END) {
+  //   std::cout << "here1\n";
+  //   delete ret;
+  //   throw UnexpTokError(*head);
+  // }
   return ret;
 }
 
 // After call to parse_S, head is set to the last token read.
-AST *AST::parse_S(const std::vector<Token> &tokens,
-                  std::vector<Token>::const_iterator &head) {
+AST *AST::parse_S(std::vector<Token>::const_iterator &head) {
   std::vector<AST *> node_queue;
 
-  while ((head + 1) < tokens.end()) {
+  while (1) {
     head++;
     switch ((*head).type) {
       case (TokenType::LPAREN): {
@@ -49,7 +65,7 @@ AST *AST::parse_S(const std::vector<Token> &tokens,
         // token past the matching RPARAN in the
         // next cycle.
         try {
-          node_queue.push_back(parse_S(tokens, head));
+          node_queue.push_back(parse_S(head));
         } catch (const UnexpTokError &err) {
           for (auto node : node_queue) {
             delete node;
@@ -107,9 +123,14 @@ AST *AST::parse_S(const std::vector<Token> &tokens,
         node_queue.push_back(new Number(*(head)));
         break;
       }
+      case (TokenType::IDENTIFIER): {
+        node_queue.push_back(new Identifier(*(head)));
+        break;
+      }
       default: {
         // Premature END or ERR
         // Clear memory
+        std::cout << "entered default switch case\n";
         for (auto node : node_queue) {
           delete node;
         }

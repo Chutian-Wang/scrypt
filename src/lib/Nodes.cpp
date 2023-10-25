@@ -92,7 +92,17 @@ double Operator::eval() const {
       return ret;
       break;
     }
-
+    case ('='): {
+      // double ret = (this->operands.end() - 1)->eval();
+      double ret = 0;
+      // for (auto node = (this->operands).end() - 1;
+      //      node > this->operands.begin(); node--) {
+      //   (*node)->val = ret;
+      //   (*node)->assigned = true;
+      // }
+      return ret;
+      break;
+    }
     default: {
       return 0;
       break;
@@ -105,6 +115,16 @@ bool Operator::is_legal() const {
     return this->legal;
   else {
     if (this->operands.size() < 2) return false;
+    if ((this->tok).text[0] == '=') {
+      for (auto node = this->operands.begin(); node < this->operands.end();
+       node++) {
+        // Ensures all but rightmost arguments are identifiers
+        if (node != std::prev(this->operands.end()) && (*node)->get_token().type != TokenType::IDENTIFIER) {
+          return false;
+        }
+        // TODO: ensure rightmost argument is a number
+       }
+    }
     for (auto node : this->operands) {
       if (!(node->is_legal())) return false;
     }
