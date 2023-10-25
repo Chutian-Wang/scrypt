@@ -1,6 +1,7 @@
 #include "Nodes.h"
 
 #include <sstream>
+#include <cmath>
 
 #include "Errors.h"
 #include "Token.h"
