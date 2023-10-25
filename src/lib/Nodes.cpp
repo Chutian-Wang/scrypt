@@ -1,7 +1,6 @@
 #include "Nodes.h"
 
 #include <sstream>
-#include <cmath>
 
 #include "Errors.h"
 #include "Token.h"
@@ -87,7 +86,7 @@ double Operator::eval() const {
            node < this->operands.end(); node++) {
         ret /= (*node)->eval();
       }
-      if (isinf(ret)) {
+      if (std::isinf(ret)) {
         throw DivByZero();
       }
       return ret;
