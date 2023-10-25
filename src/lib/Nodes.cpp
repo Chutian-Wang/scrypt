@@ -84,10 +84,10 @@ double Operator::eval() const {
       double ret = this->operands[0]->eval();
       for (auto node = (this->operands).begin() + 1;
            node < this->operands.end(); node++) {
-        if ((*node)->eval() == 0. && ret != 0.) {
-          throw DivByZero();
-        }
         ret /= (*node)->eval();
+      }
+      if (isinf(ret)) {
+        throw DivByZero();
       }
       return ret;
       break;

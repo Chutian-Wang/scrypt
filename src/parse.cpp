@@ -7,26 +7,21 @@
 #include "lib/Lexer.h"
 
 int main() {
-  std::vector<AST*> expressions;
-  // static AST *parser;
+  std::vector<AST *> expressions;
   try {
     Lexer lexer;
     lexer.tokenize(std::cin);
-    // std::string input = "20 (+ 1 2)";
-    // std::istringstream iss(input);
-    // lexer.tokenize(iss);
     auto tokens = lexer.get_tokens();
-    for (auto token : tokens) {
-      std::cout << std::setw(4) << token.row;
-      std::cout << std::setw(5) << token.column << "  ";
-      std::cout << token.text << std::endl;
-    }
     expressions = AST::parse_S_multiple(tokens);
-    for (auto expr: expressions) {
+    for (auto expr : expressions) {
       std::ostringstream oss;
       expr->get_infix_S(oss);
       std::cout << oss.str() << '\n';
-      std::cout << expr->eval() << std::endl;
+      try {
+        std::cout << expr->eval() << std::endl;
+      } catch (const ScryptError &err) {
+        std::cout << err.what() << std::endl;
+      }
       delete expr;
     }
   } catch (const ScryptError &err) {

@@ -44,12 +44,6 @@ AST *AST::parse_S_short(std::vector<Token>::const_iterator &head) {
   } catch (const UnexpTokError &err) {
     throw;
   }
-  // Check redundent expression
-  // if ((++head)->type != TokenType::END) {
-  //   std::cout << "here1\n";
-  //   delete ret;
-  //   throw UnexpTokError(*head);
-  // }
   return ret;
 }
 
