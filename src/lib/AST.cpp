@@ -130,7 +130,6 @@ AST *AST::parse_S(std::vector<Token>::const_iterator &head) {
       default: {
         // Premature END or ERR
         // Clear memory
-        std::cout << "entered default switch case\n";
         for (auto node : node_queue) {
           delete node;
         }
