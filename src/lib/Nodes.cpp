@@ -2,9 +2,12 @@
 
 #include <sstream>
 #include <cmath>
+#include <map>
 
 #include "Errors.h"
 #include "Token.h"
+
+extern std::map<std::string, Identifier*> symbols;
 
 // Number implementations ------------------------------------
 Number::Number(const Token &tok) {
@@ -85,22 +88,29 @@ double Operator::eval() const {
       double ret = this->operands[0]->eval();
       for (auto node = (this->operands).begin() + 1;
            node < this->operands.end(); node++) {
+        if ((*node)->eval() == 0. && ret != 0.) {
+          throw DivByZero();
+        }
         ret /= (*node)->eval();
-      }
-      if (std::isinf(ret)) {
-        throw DivByZero();
       }
       return ret;
       break;
     }
     case ('='): {
-      // double ret = (this->operands.end() - 1)->eval();
-      double ret = 0;
-      // for (auto node = (this->operands).end() - 1;
-      //      node > this->operands.begin(); node--) {
-      //   (*node)->val = ret;
-      //   (*node)->assigned = true;
-      // }
+      /**
+       * checks:
+       *   eval() ran for the last node
+       *   every other node is Ident
+       *  then:
+       *    assign every Ident = lastnode->eval()
+       *    Ident->assigned = 1;
+       *  eval might throw errors
+      */
+      double ret = (*(this->operands).end() - 1)->eval();
+      for (auto node = ((this->operands).end() - 2);
+           node >= ((this->operands).begin()); node--) {
+        ((Identifier*)(*node))->assign(ret);
+      }
       return ret;
       break;
     }
@@ -173,6 +183,12 @@ double Identifier::eval() const {
 }
 
 bool Identifier::is_legal() const { return this->assigned; }
+
+void Identifier::assign(double x) {
+  symbols[this->tok.text] = this;
+  this->val = x;
+  this->assigned = true;
+}
 
 void Identifier::get_infix_S(std::ostringstream &oss) const {
   oss << this->tok.text;

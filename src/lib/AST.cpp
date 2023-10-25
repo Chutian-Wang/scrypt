@@ -4,9 +4,12 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "Errors.h"
 #include "Nodes.h"
+
+std::map<std::string, Identifier*> symbols {};
 
 std::vector<AST*> AST::parse_S_multiple(const std::vector<Token> &tokens) {
   std::vector<AST*> multiple_S = {};
@@ -75,14 +78,19 @@ AST *AST::parse_S(std::vector<Token>::const_iterator &head) {
           throw UnexpTokError(*head);
         }
         if (
+            // Normal operators
             // First node cannot be legal
-            !(node_queue[0]->is_legal()) &&
+            (!(node_queue[0]->is_legal()) &&
             // Must have at least 1 operand
-            node_queue.size() > 1) {
+            node_queue.size() > 1) ||
+            // Assignment needs to be legal
+            (node_queue[0]->get_token().type == TokenType::IDENTIFIER &&
+            node_queue[0]->is_legal())
+            ) {
           // All other nodes must be legal
           for (auto node = node_queue.begin() + 1; node < node_queue.end();
                node++) {
-            if (!((*node)->is_legal())) {
+            if (!((*node)->is_legal()) && !((*node)->get_token().type == TokenType::IDENTIFIER)) {
               Token err_tok = (*node)->get_token();
               for (auto node : node_queue) {
                 delete node;

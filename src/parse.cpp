@@ -6,8 +6,10 @@
 #include "lib/Errors.h"
 #include "lib/Lexer.h"
 
+
 int main() {
   std::vector<AST *> expressions;
+  int return_code = 0;
   try {
     Lexer lexer;
     lexer.tokenize(std::cin);
@@ -20,12 +22,13 @@ int main() {
       try {
         std::cout << expr->eval() << std::endl;
       } catch (const ScryptError &err) {
-        std::cout << err.what() << std::endl;
+        return_code = ScryptError::handle(std::cout, err);
       }
       delete expr;
     }
   } catch (const ScryptError &err) {
     return ScryptError::handle(std::cout, err);
   }
-  return 0;
+
+  return return_code;
 }
