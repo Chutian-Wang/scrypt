@@ -12,15 +12,10 @@ int main() {
   try {
     Lexer lexer;
     lexer.tokenize(std::cin);
-    // std::string input = "(* 2 20) (+ 1 2)";
+    // std::string input = "20 (+ 1 2)";
     // std::istringstream iss(input);
     // lexer.tokenize(iss);
     auto tokens = lexer.get_tokens();
-    for (auto token : tokens) {
-      std::cout << std::setw(4) << token.row;
-      std::cout << std::setw(5) << token.column << "  ";
-      std::cout << token.text << std::endl;
-    }
     expressions = AST::parse_S_multiple(tokens);
     for (auto expr: expressions) {
       std::ostringstream oss;

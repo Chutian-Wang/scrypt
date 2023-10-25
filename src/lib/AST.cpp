@@ -28,7 +28,7 @@ std::vector<AST*> AST::parse_S_multiple(const std::vector<Token> &tokens) {
 AST *AST::parse_S_short(std::vector<Token>::const_iterator &head) {
   // Deal with short token lists
   if ((*head).type == TokenType::NUMBER) {
-    if ((head + 1)->type == TokenType::END) {
+    if (((head + 1)->type == TokenType::LPAREN) || ((head + 1)->type == TokenType::END)) {
       return new Number(*(head));
     } else {
       throw UnexpTokError(*(head + 1));
