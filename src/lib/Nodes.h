@@ -1,8 +1,8 @@
 #ifndef NODES_H
 #define NODES_H
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "AST.h"
 
@@ -17,6 +17,7 @@ class Number : public AST {
 
   virtual const Token &get_token() const;
   virtual double eval() const;
+  virtual double __eval() const;
   virtual bool is_legal() const;
   virtual void get_infix_S(std::ostream &oss) const;
   virtual void get_infix_infix(std::ostream &oss) const;
@@ -39,6 +40,7 @@ class Operator : public AST {
 
   virtual const Token &get_token() const;
   virtual double eval() const;
+  virtual double __eval() const;
   virtual bool is_legal() const;
   virtual void get_infix_S(std::ostream &oss) const;
   virtual void get_infix_infix(std::ostream &oss) const;
@@ -58,6 +60,7 @@ class Identifier : public AST {
 
   virtual const Token &get_token() const;
   virtual double eval() const;
+  virtual double __eval() const;
   virtual bool is_legal() const;
   virtual void get_infix_S(std::ostream &oss) const;
   virtual void get_infix_infix(std::ostream &oss) const;

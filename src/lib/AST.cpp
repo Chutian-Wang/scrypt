@@ -1,21 +1,22 @@
 #include "AST.h"
 
 #include <cstring>
+#include <map>
+#include <memory>
 #include <stack>
 #include <string>
 #include <vector>
-#include <memory>
-#include <map>
 
 #include "Errors.h"
 #include "Nodes.h"
 
-std::map<std::string, std::shared_ptr<AST>> symbols {};
+std::map<std::string, std::shared_ptr<AST>> symbols{};
 
-std::vector<std::shared_ptr<AST>> AST::parse_S_multiple(const std::vector<Token> &tokens) {
+std::vector<std::shared_ptr<AST>> AST::parse_S_multiple(
+    const std::vector<Token> &tokens) {
   std::vector<std::shared_ptr<AST>> multiple_S = {};
   auto head = tokens.begin();
-  std::shared_ptr<AST>ret = nullptr;
+  std::shared_ptr<AST> ret = nullptr;
   while ((head)->type != TokenType::END) {
     std::shared_ptr<AST> ret = AST::parse_S_short(head);
     multiple_S.push_back(ret);
@@ -24,10 +25,12 @@ std::vector<std::shared_ptr<AST>> AST::parse_S_multiple(const std::vector<Token>
   return multiple_S;
 }
 
-std::shared_ptr<AST> AST::parse_S_short(std::vector<Token>::const_iterator &head) {
+std::shared_ptr<AST> AST::parse_S_short(
+    std::vector<Token>::const_iterator &head) {
   // Deal with short token lists
   if ((*head).type == TokenType::NUMBER) {
-    if (((head + 1)->type == TokenType::LPAREN) || ((head + 1)->type == TokenType::END)) {
+    if (((head + 1)->type == TokenType::LPAREN) ||
+        ((head + 1)->type == TokenType::END)) {
       return std::shared_ptr<AST>(new Number(*(head)));
     } else {
       throw UnexpTokError(*(head + 1));
@@ -66,16 +69,16 @@ std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
             // Normal operators
             // First node cannot be legal
             (!(node_queue[0]->is_legal()) &&
-            // Must have at least 1 operand
-            node_queue.size() > 1) ||
+             // Must have at least 1 operand
+             node_queue.size() > 1) ||
             // Assignment needs to be legal
             (node_queue[0]->get_token().type == TokenType::IDENTIFIER &&
-            node_queue[0]->is_legal())
-            ) {
+             node_queue[0]->is_legal())) {
           // All other nodes must be legal
           for (auto node = node_queue.begin() + 1; node < node_queue.end();
                node++) {
-            if (!((*node)->is_legal()) && !((*node)->get_token().type == TokenType::IDENTIFIER)) {
+            if (!((*node)->is_legal()) &&
+                !((*node)->get_token().type == TokenType::IDENTIFIER)) {
               Token err_tok = (*node)->get_token();
               throw UnexpTokError(err_tok);
             }
@@ -83,7 +86,7 @@ std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
           // Construct subtree
           std::shared_ptr<AST> ret = node_queue[0];
           node_queue.erase(node_queue.begin());
-          ((Operator*)ret.get())->add_operand(node_queue);
+          ((Operator *)ret.get())->add_operand(node_queue);
           return ret;
         } else if (node_queue[0]->is_legal()) {
           Token err_tok = node_queue[0]->get_token();
@@ -127,7 +130,8 @@ std::shared_ptr<AST> AST::parse_infix(const std::vector<Token> &tokens) {
   return ret;
 }
 
-std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head) {
+std::shared_ptr<AST> AST::parse_infix(
+    std::vector<Token>::const_iterator &head) {
   std::shared_ptr<AST> lhs;
   if (head->type == TokenType::LPAREN) {
     lhs = parse_infix(++head);
@@ -136,19 +140,22 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head) 
       throw UnexpTokError(*(head + 1));
     }
     head++;
-  }
-  else if (head->type == TokenType::NUMBER || head->type == TokenType::IDENTIFIER) {
+  } else if (head->type == TokenType::NUMBER ||
+             head->type == TokenType::IDENTIFIER) {
+    // Invalid first token will get handled by parse_primary
     lhs = parse_primary(*head);
   }
+  //
   return parse_infix(head, lhs, 0);
 }
 
 std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
-                      std::shared_ptr<AST> lhs, int min_p) {
+                                      std::shared_ptr<AST> lhs, int min_p) {
   std::shared_ptr<AST> rhs = nullptr;
   if (head->type != TokenType::NUMBER && head->type != TokenType::IDENTIFIER) {
     // Invalid first token in an expression
-    if (!(head->type == TokenType::RPAREN && lhs.get() != nullptr)) throw UnexpTokError(*head);
+    if (!(head->type == TokenType::RPAREN && lhs.get() != nullptr))
+      throw UnexpTokError(*head);
   }
   auto peek = head + 1;
   while (peek->is_binary() && peek->get_p() >= min_p) {
@@ -161,13 +168,12 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
         throw UnexpTokError(*(head + 1));
       }
       head++;
-    }
-    else {
+    } else {
       rhs = parse_primary(*head);
     }
     peek = head + 1;
-    if (((peek)->is_binary() && (peek)->get_p() > op->get_token().get_p())
-        || peek->text[0] == '=') {
+    while (((peek)->is_binary() && (peek)->get_p() > op->get_token().get_p()) ||
+           peek->text[0] == '=') {
       rhs = parse_infix(head, rhs, (peek)->get_p());
       peek = head + 1;
     }
@@ -178,20 +184,19 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
   return lhs;
 }
 
-std::shared_ptr<AST> AST::parse_primary(const Token& tok) {
-  if (tok.type == TokenType::NUMBER) return std::shared_ptr<AST>(new Number(tok));
+std::shared_ptr<AST> AST::parse_primary(const Token &tok) {
+  if (tok.type == TokenType::NUMBER)
+    return std::shared_ptr<AST>(new Number(tok));
   else if (tok.type == TokenType::IDENTIFIER) {
     if (symbols.find(tok.text) == symbols.end()) {
       // symbol does not exist
       std::shared_ptr<AST> ret(new Identifier(tok));
       symbols[tok.text] = ret;
       return ret;
-    }
-    else {
+    } else {
       return symbols[tok.text];
     }
-  }
-  else {
+  } else {
     throw UnexpTokError(tok);
   }
 }

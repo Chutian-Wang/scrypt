@@ -1,8 +1,8 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-#include <string>
 #include <map>
+#include <string>
 
 enum struct TokenType {
   NUMBER,
@@ -15,13 +15,8 @@ enum struct TokenType {
   ERR  // Any other
 };
 
-static const std::map<char, int> p_map {
-  {'=', 1},
-  {'+', 2},
-  {'-', 2},
-  {'*', 3},
-  {'/', 3}
-};
+static const std::map<char, int> p_map{
+    {'=', 1}, {'+', 2}, {'-', 2}, {'*', 3}, {'/', 3}};
 
 class Token {
  public:

@@ -1,12 +1,11 @@
 #include <iomanip>
 #include <iostream>
-#include <sstream>
 #include <memory>
+#include <sstream>
 
 #include "lib/AST.h"
 #include "lib/Errors.h"
 #include "lib/Lexer.h"
-
 
 int main() {
   std::vector<std::shared_ptr<AST>> expressions;
