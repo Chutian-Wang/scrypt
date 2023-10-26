@@ -54,6 +54,8 @@ class Identifier : public AST {
   Identifier(const Token &tok);
   virtual ~Identifier();
 
+  void assign(double x);
+
   virtual const Token &get_token() const;
   virtual double eval() const;
   virtual bool is_legal() const;

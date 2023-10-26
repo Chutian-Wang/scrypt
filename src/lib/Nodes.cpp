@@ -1,6 +1,7 @@
 #include "Nodes.h"
 
 #include <sstream>
+#include <cmath>
 #include <map>
 
 #include "Errors.h"
@@ -93,7 +94,24 @@ double Operator::eval() const {
       return ret;
       break;
     }
-
+    case ('='): {
+      /**
+       * checks:
+       *   eval() ran for the last node
+       *   every other node is Ident
+       *  then:
+       *    assign every Ident = lastnode->eval()
+       *    Ident->assigned = 1;
+       *  eval might throw errors
+      */
+      double ret = (*((this->operands).end() - 1))->eval();
+      for (auto node = ((this->operands).end() - 2);
+           node >= ((this->operands).begin()); node--) {
+        ((Identifier*)(*node))->assign(ret);
+      }
+      return ret;
+      break;
+    }
     default: {
       return 0;
       break;
@@ -106,6 +124,16 @@ bool Operator::is_legal() const {
     return this->legal;
   else {
     if (this->operands.size() < 2) return false;
+    if ((this->tok).text[0] == '=') {
+      for (auto node = this->operands.begin(); node < this->operands.end();
+       node++) {
+        // Ensures all but rightmost arguments are identifiers
+        if (node != std::prev(this->operands.end()) && (*node)->get_token().type != TokenType::IDENTIFIER) {
+          return false;
+        }
+        // TODO: ensure rightmost argument is a number
+       }
+    }
     for (auto node : this->operands) {
       if (!(node->is_legal())) return false;
     }
@@ -153,6 +181,12 @@ double Identifier::eval() const {
 }
 
 bool Identifier::is_legal() const { return this->assigned; }
+
+void Identifier::assign(double x) {
+  symbols[this->tok.text] = this;
+  this->val = x;
+  this->assigned = true;
+}
 
 void Identifier::get_infix_S(std::ostream &oss) const {
   oss << this->tok.text;

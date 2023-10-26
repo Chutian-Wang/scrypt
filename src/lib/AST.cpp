@@ -5,51 +5,71 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <map>
 
 #include "Errors.h"
 #include "Nodes.h"
 
-std::map<std::string, std::shared_ptr<AST>> symbols {};
+std::map<std::string, Identifier*> symbols {};
 
-std::shared_ptr<AST> AST::parse_S(const std::vector<Token> &tokens) {
+std::vector<AST*> AST::parse_S_multiple(const std::vector<Token> &tokens) {
+  std::vector<AST*> multiple_S = {};
+  auto head = tokens.begin();
+  AST *ret = nullptr;
+  while ((head)->type != TokenType::END) {
+    try {
+      ret = AST::parse_S_short(head);
+      multiple_S.push_back(ret);
+    } catch (const UnexpTokError &err) {
+      delete ret;
+      throw;
+    }
+    head++;
+  }
+  return multiple_S;
+}
+
+AST *AST::parse_S_short(std::vector<Token>::const_iterator &head) {
   // Deal with short token lists
-  if (tokens[0].type == TokenType::NUMBER) {
-    if (tokens.size() < 3) {
-      return std::shared_ptr<AST>(new Number(tokens[0]));
+  if ((*head).type == TokenType::NUMBER) {
+    if (((head + 1)->type == TokenType::LPAREN) || ((head + 1)->type == TokenType::END)) {
+      return new Number(*(head));
     } else {
-      throw UnexpTokError(tokens[1]);
+      throw UnexpTokError(*(head + 1));
     }
   }
-  if (tokens[0].type != TokenType::LPAREN) {
-    throw UnexpTokError(tokens[0]);
+  if ((*head).type != TokenType::LPAREN) {
+    throw UnexpTokError(*head);
   }
   // Parse sub-expressions
-  auto head = tokens.begin();
-  std::shared_ptr<AST> ret = nullptr;
+  AST *ret = nullptr;
   try {
-    ret = AST::parse_S(tokens, head);
+    ret = AST::parse_S(head);
   } catch (const UnexpTokError &err) {
     throw;
-  }
-  // Check redundent expression
-  if ((++head)->type != TokenType::END) {
-    throw UnexpTokError(*head);
   }
   return ret;
 }
 
 // After call to parse_S, head is set to the last token read.
-std::shared_ptr<AST> AST::parse_S(const std::vector<Token> &tokens,
-                  std::vector<Token>::const_iterator &head) {
-  std::vector<std::shared_ptr<AST> > node_queue;
+AST *AST::parse_S(std::vector<Token>::const_iterator &head) {
+  std::vector<AST *> node_queue;
 
-  while ((head + 1) < tokens.end()) {
+  while (1) {
     head++;
     switch ((*head).type) {
       case (TokenType::LPAREN): {
         // when parse_S returns, head is set to one
         // token past the matching RPARAN in the
         // next cycle.
+        try {
+          node_queue.push_back(parse_S(head));
+        } catch (const UnexpTokError &err) {
+          for (auto node : node_queue) {
+            delete node;
+          }
+          throw;
+        }
         node_queue.push_back(parse_S(tokens, head));
         break;
       }
@@ -60,14 +80,19 @@ std::shared_ptr<AST> AST::parse_S(const std::vector<Token> &tokens,
           throw UnexpTokError(*head);
         }
         if (
+            // Normal operators
             // First node cannot be legal
-            !(node_queue[0]->is_legal()) &&
+            (!(node_queue[0]->is_legal()) &&
             // Must have at least 1 operand
-            node_queue.size() > 1) {
+            node_queue.size() > 1) ||
+            // Assignment needs to be legal
+            (node_queue[0]->get_token().type == TokenType::IDENTIFIER &&
+            node_queue[0]->is_legal())
+            ) {
           // All other nodes must be legal
           for (auto node = node_queue.begin() + 1; node < node_queue.end();
                node++) {
-            if (!((*node)->is_legal())) {
+            if (!((*node)->is_legal()) && !((*node)->get_token().type == TokenType::IDENTIFIER)) {
               Token err_tok = (*node)->get_token();
               throw UnexpTokError(err_tok);
             }
@@ -91,6 +116,10 @@ std::shared_ptr<AST> AST::parse_S(const std::vector<Token> &tokens,
       }
       case (TokenType::NUMBER): {
         node_queue.push_back(std::shared_ptr<AST>(new Number(*(head))));
+        break;
+      }
+      case (TokenType::IDENTIFIER): {
+        node_queue.push_back(std::shared_ptr<AST>(new Identifier(*(head))));
         break;
       }
       default: {

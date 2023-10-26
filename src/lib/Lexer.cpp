@@ -145,7 +145,7 @@ void Lexer::tokenize(std::istream &input) {
     } else if (token == '/') {
       add_token(TokenType::OPERATOR, "/", currRow, currCol);
     } else if (token == '=') {
-      add_token(TokenType::ASSIGN, "=", currRow, currCol);
+      add_token(TokenType::OPERATOR, "=", currRow, currCol);
     } else if (std::isdigit(token)) {
       read_num(token, input);
     } else if (is_alpha(token)) {
