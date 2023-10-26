@@ -15,8 +15,7 @@ Token::Token(TokenType type, const std::string &text, int row, int column) {
 }
 
 bool Token::is_binary() const {
-  return  this->type == TokenType::ASSIGN ||
-          this->type == TokenType::OPERATOR;
+  return this->type == TokenType::OPERATOR;
 }
 
 int Token::get_p() const {

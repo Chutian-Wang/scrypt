@@ -95,19 +95,10 @@ double Operator::eval() const {
       break;
     }
     case ('='): {
-      /**
-       * checks:
-       *   eval() ran for the last node
-       *   every other node is Ident
-       *  then:
-       *    assign every Ident = lastnode->eval()
-       *    Ident->assigned = 1;
-       *  eval might throw errors
-      */
       double ret = (*((this->operands).end() - 1))->eval();
       for (auto node = ((this->operands).end() - 2);
            node >= ((this->operands).begin()); node--) {
-        ((Identifier*)(*node))->assign(ret);
+        ((Identifier*)(node->get()))->assign(ret);
       }
       return ret;
       break;

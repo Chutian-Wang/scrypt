@@ -21,9 +21,9 @@ class AST {
    * head = tokens.begin()
    * These functions expect S-expression input form
    */
-  static std::vector<AST*> parse_S_multiple(const std::vector<Token> &tokens);
-  static AST *parse_S_short(std::vector<Token>::const_iterator &head);
-  static AST *parse_S(std::vector<Token>::const_iterator &head);
+  static std::vector<std::shared_ptr<AST>> parse_S_multiple(const std::vector<Token> &tokens);
+  static std::shared_ptr<AST> parse_S_short(std::vector<Token>::const_iterator &head);
+  static std::shared_ptr<AST> parse_S(std::vector<Token>::const_iterator &head);
 
   /**
    * These are the new parser constructor that supports

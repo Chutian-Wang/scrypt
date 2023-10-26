@@ -10,30 +10,25 @@
 #include "Errors.h"
 #include "Nodes.h"
 
-std::map<std::string, Identifier*> symbols {};
+std::map<std::string, std::shared_ptr<AST>> symbols {};
 
-std::vector<AST*> AST::parse_S_multiple(const std::vector<Token> &tokens) {
-  std::vector<AST*> multiple_S = {};
+std::vector<std::shared_ptr<AST>> AST::parse_S_multiple(const std::vector<Token> &tokens) {
+  std::vector<std::shared_ptr<AST>> multiple_S = {};
   auto head = tokens.begin();
-  AST *ret = nullptr;
+  std::shared_ptr<AST>ret = nullptr;
   while ((head)->type != TokenType::END) {
-    try {
-      ret = AST::parse_S_short(head);
-      multiple_S.push_back(ret);
-    } catch (const UnexpTokError &err) {
-      delete ret;
-      throw;
-    }
+    std::shared_ptr<AST> ret = AST::parse_S_short(head);
+    multiple_S.push_back(ret);
     head++;
   }
   return multiple_S;
 }
 
-AST *AST::parse_S_short(std::vector<Token>::const_iterator &head) {
+std::shared_ptr<AST> AST::parse_S_short(std::vector<Token>::const_iterator &head) {
   // Deal with short token lists
   if ((*head).type == TokenType::NUMBER) {
     if (((head + 1)->type == TokenType::LPAREN) || ((head + 1)->type == TokenType::END)) {
-      return new Number(*(head));
+      return std::shared_ptr<AST>(new Number(*(head)));
     } else {
       throw UnexpTokError(*(head + 1));
     }
@@ -42,18 +37,14 @@ AST *AST::parse_S_short(std::vector<Token>::const_iterator &head) {
     throw UnexpTokError(*head);
   }
   // Parse sub-expressions
-  AST *ret = nullptr;
-  try {
-    ret = AST::parse_S(head);
-  } catch (const UnexpTokError &err) {
-    throw;
-  }
+  std::shared_ptr<AST> ret;
+  ret = AST::parse_S(head);
   return ret;
 }
 
 // After call to parse_S, head is set to the last token read.
-AST *AST::parse_S(std::vector<Token>::const_iterator &head) {
-  std::vector<AST *> node_queue;
+std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
+  std::vector<std::shared_ptr<AST>> node_queue;
 
   while (1) {
     head++;
@@ -62,15 +53,7 @@ AST *AST::parse_S(std::vector<Token>::const_iterator &head) {
         // when parse_S returns, head is set to one
         // token past the matching RPARAN in the
         // next cycle.
-        try {
-          node_queue.push_back(parse_S(head));
-        } catch (const UnexpTokError &err) {
-          for (auto node : node_queue) {
-            delete node;
-          }
-          throw;
-        }
-        node_queue.push_back(parse_S(tokens, head));
+        node_queue.push_back(parse_S(head));
         break;
       }
       // This is the only return branch
@@ -184,7 +167,7 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
     }
     peek = head + 1;
     if (((peek)->is_binary() && (peek)->get_p() > op->get_token().get_p())
-        || peek->type == TokenType::ASSIGN) {
+        || peek->text[0] == '=') {
       rhs = parse_infix(head, rhs, (peek)->get_p());
       peek = head + 1;
     }

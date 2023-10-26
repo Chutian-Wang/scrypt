@@ -9,7 +9,7 @@
 
 
 int main() {
-  std::vector<AST *> expressions;
+  std::vector<std::shared_ptr<AST>> expressions;
   int return_code = 0;
   try {
     Lexer lexer;
@@ -28,7 +28,6 @@ int main() {
       } catch (const ScryptError &err) {
         return_code = ScryptError::handle(std::cout, err);
       }
-      delete expr;
     }
   } catch (const ScryptError &err) {
     return ScryptError::handle(std::cout, err);
