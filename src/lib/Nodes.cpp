@@ -106,7 +106,7 @@ double Operator::eval() const {
        *    Ident->assigned = 1;
        *  eval might throw errors
       */
-      double ret = (*(this->operands).end() - 1)->eval();
+      double ret = (*((this->operands).end() - 1))->eval();
       for (auto node = ((this->operands).end() - 2);
            node >= ((this->operands).begin()); node--) {
         ((Identifier*)(*node))->assign(ret);
