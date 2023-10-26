@@ -1,9 +1,12 @@
 #include "Nodes.h"
 
 #include <sstream>
+#include <map>
 
 #include "Errors.h"
 #include "Token.h"
+
+extern std::map<std::string, AST*> symbols;
 
 // Number implementations ------------------------------------
 Number::Number(const Token &tok) {
@@ -21,9 +24,9 @@ double Number::eval() const { return this->val; }
 
 bool Number::is_legal() const { return true; }
 
-void Number::get_infix_S(std::ostringstream &oss) const { oss << this->val; }
+void Number::get_infix_S(std::ostream &oss) const { oss << this->val; }
 
-void Number::get_infix_infix(std::ostringstream &oss) const {
+void Number::get_infix_infix(std::ostream &oss) const {
   oss << this->val;
 }
 
@@ -35,18 +38,16 @@ Operator::Operator(const Token &tok) {
 }
 
 Operator::~Operator() {
-  for (auto node : this->operands) {
-    delete node;
-  }
+  // smart pointer takes care...
 }
 
-void Operator::add_operand(std::vector<AST *> nodes) {
+void Operator::add_operand(std::vector<std::shared_ptr<AST>> nodes) {
   for (auto node : nodes) {
     this->add_operand(node);
   }
 }
 
-void Operator::add_operand(AST *node) {
+void Operator::add_operand(std::shared_ptr<AST>node) {
   this->validated = false;
   this->operands.push_back(node);
 }
@@ -112,7 +113,7 @@ bool Operator::is_legal() const {
   }
 }
 
-void Operator::get_infix_S(std::ostringstream &oss) const {
+void Operator::get_infix_S(std::ostream &oss) const {
   oss << '(';
   for (auto node = this->operands.begin(); node < this->operands.end();
        node++) {
@@ -125,7 +126,7 @@ void Operator::get_infix_S(std::ostringstream &oss) const {
   }
 }
 
-void Operator::get_infix_infix(std::ostringstream &oss) const {
+void Operator::get_infix_infix(std::ostream &oss) const {
   oss << '(' << this->operands[0]->get_token().text << ' ' << this->tok.text
       << ' ' << this->operands[1]->get_token().text << ')';
 }
@@ -153,10 +154,10 @@ double Identifier::eval() const {
 
 bool Identifier::is_legal() const { return this->assigned; }
 
-void Identifier::get_infix_S(std::ostringstream &oss) const {
+void Identifier::get_infix_S(std::ostream &oss) const {
   oss << this->tok.text;
 }
 
-void Identifier::get_infix_infix(std::ostringstream &oss) const {
+void Identifier::get_infix_infix(std::ostream &oss) const {
   oss << this->tok.text;
 }

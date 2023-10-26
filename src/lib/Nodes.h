@@ -2,6 +2,7 @@
 #define NODES_H
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "AST.h"
 
@@ -17,8 +18,8 @@ class Number : public AST {
   virtual const Token &get_token() const;
   virtual double eval() const;
   virtual bool is_legal() const;
-  virtual void get_infix_S(std::ostringstream &oss) const;
-  virtual void get_infix_infix(std::ostringstream &oss) const;
+  virtual void get_infix_S(std::ostream &oss) const;
+  virtual void get_infix_infix(std::ostream &oss) const;
 };
 
 class Operator : public AST {
@@ -27,23 +28,22 @@ class Operator : public AST {
   bool validated;
   bool legal;
 
-  std::vector<AST *> operands;
+  std::vector<std::shared_ptr<AST>> operands;
 
  public:
   Operator(const Token &tok);
   virtual ~Operator();
 
-  void add_operand(std::vector<AST *> nodes);
-  void add_operand(AST *node);
+  void add_operand(std::vector<std::shared_ptr<AST>> nodes);
+  void add_operand(std::shared_ptr<AST> node);
 
   virtual const Token &get_token() const;
   virtual double eval() const;
   virtual bool is_legal() const;
-  virtual void get_infix_S(std::ostringstream &oss) const;
-  virtual void get_infix_infix(std::ostringstream &oss) const;
+  virtual void get_infix_S(std::ostream &oss) const;
+  virtual void get_infix_infix(std::ostream &oss) const;
 };
 
-// Shared TODO!
 class Identifier : public AST {
  private:
   Token tok;
@@ -57,8 +57,8 @@ class Identifier : public AST {
   virtual const Token &get_token() const;
   virtual double eval() const;
   virtual bool is_legal() const;
-  virtual void get_infix_S(std::ostringstream &oss) const;
-  virtual void get_infix_infix(std::ostringstream &oss) const;
+  virtual void get_infix_S(std::ostream &oss) const;
+  virtual void get_infix_infix(std::ostream &oss) const;
 };
 
 #endif

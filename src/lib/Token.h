@@ -2,6 +2,7 @@
 #define TOKEN_H
 
 #include <string>
+#include <map>
 
 enum struct TokenType {
   NUMBER,
@@ -15,6 +16,14 @@ enum struct TokenType {
   ERR  // Any other
 };
 
+static const std::map<char, int> p_map {
+  {'=', 1},
+  {'+', 2},
+  {'-', 2},
+  {'*', 3},
+  {'/', 3}
+};
+
 class Token {
  public:
   TokenType type;
@@ -24,6 +33,9 @@ class Token {
 
   Token();
   Token(TokenType type, const std::string &text, int row, int column);
+
+  bool is_binary() const;
+  int get_p() const;
 };
 
 #endif  // TOKEN_H

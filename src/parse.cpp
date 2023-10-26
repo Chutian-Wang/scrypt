@@ -1,13 +1,14 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <memory>
 
 #include "lib/AST.h"
 #include "lib/Errors.h"
 #include "lib/Lexer.h"
 
 int main() {
-  static AST *parser;
+  static std::shared_ptr<AST> parser;
   try {
     Lexer lexer;
     lexer.tokenize(std::cin);
@@ -24,7 +25,6 @@ int main() {
 
   try {
     std::cout << parser->eval() << std::endl;
-    delete parser;
   } catch (const ScryptError &err) {
     return ScryptError::handle(std::cout, err);
   }
