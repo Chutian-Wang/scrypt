@@ -176,6 +176,11 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
       rhs = parse_infix(head, rhs, (peek)->get_p());
       peek = head + 1;
     }
+    if (op->get_token().text[0] == '=') {
+      if (lhs->get_token().type != TokenType::IDENTIFIER) {
+        throw UnexpTokError(op->get_token());
+      }
+    }
     ((Operator *)op.get())->add_operand(lhs);
     ((Operator *)op.get())->add_operand(rhs);
     lhs = op;
