@@ -49,8 +49,7 @@ class AST {
   // Internal function to evaluate the subtree:
   virtual double __eval() const = 0;
   // These function pushes the subtree's infix form into oss
-  virtual void get_infix_S(std::ostream &oss) const = 0;
-  virtual void get_infix_infix(std::ostream &oss) const = 0;
+  virtual void get_infix(std::ostream &oss) const = 0;
 };
 
 #endif

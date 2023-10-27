@@ -74,7 +74,6 @@ Struct
         ├── OPERATOR
         ├── LPAREN
         ├── RPAREN
-        ├── ASSIGN
         ├── IDENTIFIER
         ├── END
         └── ERR

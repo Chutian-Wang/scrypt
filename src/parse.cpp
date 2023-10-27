@@ -20,7 +20,7 @@ int main() {
     expressions = AST::parse_S_multiple(tokens);
     for (auto expr : expressions) {
       std::ostringstream oss;
-      expr->get_infix_S(oss);
+      expr->get_infix(oss);
       std::cout << oss.str() << '\n';
       try {
         std::cout << expr->eval() << std::endl;

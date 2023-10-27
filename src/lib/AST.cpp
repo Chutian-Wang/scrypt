@@ -10,7 +10,7 @@
 #include "Errors.h"
 #include "Nodes.h"
 
-std::map<std::string, std::shared_ptr<AST>> symbols{};
+std::map<std::string, double> symbols{};
 
 std::vector<std::shared_ptr<AST>> AST::parse_S_multiple(
     const std::vector<Token> &tokens) {
@@ -145,7 +145,6 @@ std::shared_ptr<AST> AST::parse_infix(
     // Invalid first token will get handled by parse_primary
     lhs = parse_primary(*head);
   }
-  //
   return parse_infix(head, lhs, 0);
 }
 
@@ -188,14 +187,7 @@ std::shared_ptr<AST> AST::parse_primary(const Token &tok) {
   if (tok.type == TokenType::NUMBER)
     return std::shared_ptr<AST>(new Number(tok));
   else if (tok.type == TokenType::IDENTIFIER) {
-    if (symbols.find(tok.text) == symbols.end()) {
-      // symbol does not exist
-      std::shared_ptr<AST> ret(new Identifier(tok));
-      symbols[tok.text] = ret;
-      return ret;
-    } else {
-      return symbols[tok.text];
-    }
+    return std::shared_ptr<AST>(new Identifier(tok));
   } else {
     throw UnexpTokError(tok);
   }

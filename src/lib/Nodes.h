@@ -19,8 +19,7 @@ class Number : public AST {
   virtual double eval() const;
   virtual double __eval() const;
   virtual bool is_legal() const;
-  virtual void get_infix_S(std::ostream &oss) const;
-  virtual void get_infix_infix(std::ostream &oss) const;
+  virtual void get_infix(std::ostream &oss) const;
 };
 
 class Operator : public AST {
@@ -42,28 +41,25 @@ class Operator : public AST {
   virtual double eval() const;
   virtual double __eval() const;
   virtual bool is_legal() const;
-  virtual void get_infix_S(std::ostream &oss) const;
-  virtual void get_infix_infix(std::ostream &oss) const;
+  virtual void get_infix(std::ostream &oss) const;
 };
 
 class Identifier : public AST {
  private:
   Token tok;
-  double val;
-  bool assigned;
 
  public:
   Identifier(const Token &tok);
   virtual ~Identifier();
 
   void assign(double x);
+  bool assigned() const;
 
   virtual const Token &get_token() const;
   virtual double eval() const;
   virtual double __eval() const;
   virtual bool is_legal() const;
-  virtual void get_infix_S(std::ostream &oss) const;
-  virtual void get_infix_infix(std::ostream &oss) const;
+  virtual void get_infix(std::ostream &oss) const;
 };
 
 #endif
