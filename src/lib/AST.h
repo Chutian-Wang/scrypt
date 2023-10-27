@@ -22,7 +22,7 @@ class AST {
    */
   static std::vector<std::shared_ptr<AST>> parse_S_multiple(
       const std::vector<Token> &tokens);
-  static std::shared_ptr<AST> parse_S_short(
+  static std::shared_ptr<AST> parse_S_top(
       std::vector<Token>::const_iterator &head);
   static std::shared_ptr<AST> parse_S(std::vector<Token>::const_iterator &head);
 
@@ -42,7 +42,9 @@ class AST {
 
   // Function for parse functions to get node tokens
   virtual const Token &get_token() const = 0;
-  // Function for parse functions to get validity of a node
+  // Function for parse_S functions to get the static
+  // validity of a node, if an Identifier is not assigned
+  // it is still deemed valid in static analysis.
   virtual bool is_legal() const = 0;
   // User function to evaluate the subtree:
   virtual double eval() const = 0;

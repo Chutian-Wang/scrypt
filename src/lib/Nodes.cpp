@@ -122,24 +122,33 @@ double Operator::__eval() const {
 
 bool Operator::is_legal() const {
   if (this->validated)
-    return this->legal;
+    return true;
   else {
     if (this->operands.size() < 2) return false;
     if ((this->tok).text[0] == '=') {
+      // Assignment
+      // Ensures all but rightmost arguments are identifiers
       for (auto node = this->operands.begin(); node < this->operands.end();
            node++) {
-        // Ensures all but rightmost arguments are identifiers
-        if (node != std::prev(this->operands.end()) &&
+        if (*node != this->operands.back() &&
             (*node)->get_token().type != TokenType::IDENTIFIER) {
           return false;
         }
-        // TODO: ensure rightmost argument is a number
       }
+      // Ensures right most node is legal
+      if (!operands.back()->is_legal()) {
+        return false;
+      }
+      return true;
+    } else {
+      // Regular node
+      for (auto node : this->operands) {
+        if (!(node->is_legal()) &&
+            node->get_token().type != TokenType::IDENTIFIER)
+          return false;
+      }
+      return true;
     }
-    for (auto node : this->operands) {
-      if (!(node->is_legal())) return false;
-    }
-    return true;
   }
 }
 

@@ -10,22 +10,27 @@
 #include "Errors.h"
 #include "Nodes.h"
 
+// This global map tracks the variables
+// declear as extern in other files where needed
 std::map<std::string, double> symbols{};
 
+// This is the super level S expression parser
+// returns all of the expressions as a vector of
+// std::shared_ptr<AST>.
 std::vector<std::shared_ptr<AST>> AST::parse_S_multiple(
     const std::vector<Token> &tokens) {
-  std::vector<std::shared_ptr<AST>> multiple_S = {};
+  std::vector<std::shared_ptr<AST>> expressions;
   auto head = tokens.begin();
   std::shared_ptr<AST> ret = nullptr;
   while ((head)->type != TokenType::END) {
-    std::shared_ptr<AST> ret = AST::parse_S_short(head);
-    multiple_S.push_back(ret);
+    std::shared_ptr<AST> ret = AST::parse_S_top(head);
+    expressions.push_back(ret);
     head++;
   }
-  return multiple_S;
+  return expressions;
 }
 
-std::shared_ptr<AST> AST::parse_S_short(
+std::shared_ptr<AST> AST::parse_S_top(
     std::vector<Token>::const_iterator &head) {
   // Deal with short token lists
   if ((*head).type == TokenType::NUMBER) {
@@ -65,16 +70,13 @@ std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
         if (node_queue.size() == 0) {
           throw UnexpTokError(*head);
         }
-        if (
-            // Normal operators
-            // First node cannot be legal
-            (!(node_queue[0]->is_legal()) &&
-             // Must have at least 1 operand
-             node_queue.size() > 1) ||
-            // Assignment needs to be legal
-            (node_queue[0]->get_token().type == TokenType::IDENTIFIER &&
-             node_queue[0]->is_legal())) {
-          // All other nodes must be legal
+        if ((!(node_queue[0]->is_legal()) &&  // First node cannot be legal
+             node_queue.size() > 1) &&        // Must have at least 1 operand
+            node_queue[0]->get_token().text[0] !=
+                '='  // Deal with assignment separately
+        ) {
+          // Deal with regular operators
+          // All operand nodes must be legal
           for (auto node = node_queue.begin() + 1; node < node_queue.end();
                node++) {
             if (!((*node)->is_legal()) &&
@@ -82,6 +84,28 @@ std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
               Token err_tok = (*node)->get_token();
               throw UnexpTokError(err_tok);
             }
+          }
+          // Construct subtree
+          std::shared_ptr<AST> ret = node_queue[0];
+          node_queue.erase(node_queue.begin());
+          ((Operator *)ret.get())->add_operand(node_queue);
+          return ret;
+        } else if (node_queue[0]->get_token().text[0] == '=') {
+          // Deal with assignment
+          // Assignment cannot already be legal
+          if (node_queue[0]->is_legal()) {
+            throw UnexpTokError(node_queue[0]->get_token());
+          }
+          for (auto node = node_queue.begin() + 1; node < node_queue.end();
+               node++) {
+            if (node != node_queue.end() - 1 &&
+                (*node)->get_token().type != TokenType::IDENTIFIER) {
+              throw UnexpTokError((*node)->get_token());
+            }
+          }
+          // Ensures right most node is legal
+          if (!node_queue.back()->is_legal()) {
+            throw UnexpTokError((node_queue.back())->get_token());
           }
           // Construct subtree
           std::shared_ptr<AST> ret = node_queue[0];
@@ -157,6 +181,7 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
       throw UnexpTokError(*head);
   }
   auto peek = head + 1;
+  // Same level loop
   while (peek->is_binary() && peek->get_p() >= min_p) {
     std::shared_ptr<AST> op(new Operator(*peek));
     head = peek + 1;
@@ -171,6 +196,7 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
       rhs = parse_primary(*head);
     }
     peek = head + 1;
+    // Higher level loop
     while (((peek)->is_binary() && (peek)->get_p() > op->get_token().get_p()) ||
            peek->text[0] == '=') {
       rhs = parse_infix(head, rhs, (peek)->get_p());
@@ -178,6 +204,7 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
     }
     if (op->get_token().text[0] == '=') {
       if (lhs->get_token().type != TokenType::IDENTIFIER) {
+        // Only identifier is allowed on lhs for assignment
         throw UnexpTokError(op->get_token());
       }
     }
