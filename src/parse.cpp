@@ -13,7 +13,7 @@ int main() {
   try {
     Lexer lexer;
     lexer.tokenize(std::cin);
-    // std::string input = "(= a 3)";
+    // std::string input = "(= a )";
     // std::istringstream iss(input);
     // lexer.tokenize(iss);
     auto tokens = lexer.get_tokens();
