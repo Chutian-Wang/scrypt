@@ -58,7 +58,7 @@ std::shared_ptr<AST> AST::parse_S_top(
 // After call to parse_S, head is set to the last token read.
 std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
   std::vector<std::shared_ptr<AST>> node_queue;
-
+  auto head0 = head;
   while (1) {
     head++;
     switch ((*head).type) {
@@ -66,6 +66,7 @@ std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
         // when parse_S returns, head is set to one
         // token past the matching RPARAN in the
         // next cycle.
+        head0 = head;
         node_queue.push_back(parse_S(head));
         break;
       }
@@ -93,7 +94,7 @@ std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
           // Construct subtree
           std::shared_ptr<AST> ret = node_queue[0];
           node_queue.erase(node_queue.begin());
-          ((Operator *)ret.get())->add_operand(node_queue);
+          ((Operator *)ret.get())->add_operand(node_queue); // SEG FAULTING HERE?
           return ret;
         } else if (node_queue[0]->get_token().text[0] == '=') {
           // Deal with assignment
@@ -105,7 +106,7 @@ std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
                node++) {
             if (node != node_queue.end() - 1 &&
                 (*node)->get_token().type != TokenType::IDENTIFIER) {
-              throw UnexpTokError((*node)->get_token());
+              throw UnexpTokError(*head0);
             }
           }
           // Ensures right most node is legal
@@ -126,6 +127,11 @@ std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
         break;
       }
       case (TokenType::OPERATOR): {
+        if (((head)->text[0] == '=')) {
+           if (((head+1)->type != TokenType::IDENTIFIER) && ((head+1)->type != TokenType::LPAREN)) {
+             throw UnexpTokError(*head0);
+             }
+        }
         node_queue.push_back(std::shared_ptr<AST>(new Operator(*(head))));
         break;
       }

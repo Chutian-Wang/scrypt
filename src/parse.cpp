@@ -13,9 +13,6 @@ int main() {
   try {
     Lexer lexer;
     lexer.tokenize(std::cin);
-    // std::string input = "(= a )";
-    // std::istringstream iss(input);
-    // lexer.tokenize(iss);
     auto tokens = lexer.get_tokens();
     expressions = AST::parse_S_multiple(tokens);
     for (auto expr : expressions) {
