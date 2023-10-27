@@ -33,6 +33,10 @@ std::vector<std::shared_ptr<AST>> AST::parse_S_multiple(
 std::shared_ptr<AST> AST::parse_S_top(
     std::vector<Token>::const_iterator &head) {
   // Deal with short token lists
+  if (((head + 1)->type == TokenType::OPERATOR) && 
+    ((head + 2)->type == TokenType::RPAREN)){
+        throw UnexpTokError(*(head + 2));
+    }
   if ((*head).type == TokenType::NUMBER) {
     if (((head + 1)->type == TokenType::LPAREN) ||
         ((head + 1)->type == TokenType::END)) {
