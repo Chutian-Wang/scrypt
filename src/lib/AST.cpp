@@ -74,6 +74,9 @@ std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
         if (node_queue.size() == 0) {
           throw UnexpTokError(*head);
         }
+        if (node_queue.size() == 2) {
+          throw UnexpTokError(*(head));
+        }
         if ((!(node_queue[0]->is_legal()) &&  // First node cannot be legal
              node_queue.size() > 1) &&        // Must have at least 1 operand
             node_queue[0]->get_token().text[0] !=
