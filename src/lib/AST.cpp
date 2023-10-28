@@ -33,7 +33,6 @@ std::vector<std::shared_ptr<AST>> AST::parse_S_multiple(
 std::shared_ptr<AST> AST::parse_S_top(
     std::vector<Token>::const_iterator &head) {
   // Deal with short token lists
-  // Check 1: right parentheses should never follow an operator
   if (((head + 1)->type == TokenType::OPERATOR) && 
     ((head + 2)->type == TokenType::RPAREN)){
         throw UnexpTokError(*(head + 2));
@@ -76,12 +75,16 @@ std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
         if (node_queue.size() == 0) {
           throw UnexpTokError(*head);
         }
+        // Case 1: node_queue[0] is not '='
         if ((!(node_queue[0]->is_legal()) &&  // First node cannot be legal
              node_queue.size() > 1) &&        // Must have at least 1 operand
             node_queue[0]->get_token().text[0] !=
                 '='  // Deal with assignment separately
         ) {
           if (node_queue.size() == 2) {
+            // Operator cannot perform any functions on just identifier
+            // e.g. (+2) --> is okay
+            // e.g. (+a) --> not okay
             if ((node_queue[1]->get_token().type == TokenType::IDENTIFIER)) {
                   throw UnexpTokError(*head0);
                 }
@@ -102,7 +105,8 @@ std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
           node_queue.erase(node_queue.begin());
           ((Operator *)ret.get())->add_operand(node_queue); // SEG FAULTING HERE?
           return ret;
-        } else if (node_queue[0]->get_token().text[0] == '=') {
+        } // Case 2: node_queue[0] is  '='
+        else if (node_queue[0]->get_token().text[0] == '=') {
           // Deal with assignment
           // Assignment cannot already be legal
           if (node_queue[0]->is_legal()) {
