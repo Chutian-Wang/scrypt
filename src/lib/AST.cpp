@@ -106,6 +106,9 @@ std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
                node++) {
             if (node != node_queue.end() - 1 &&
                 (*node)->get_token().type != TokenType::IDENTIFIER) {
+                  if ((*(node+1))->get_token().type == TokenType::IDENTIFIER) {
+                    throw UnexpTokError((*(node+1))->get_token());
+                  }
               throw UnexpTokError(*head0);
             }
           }
