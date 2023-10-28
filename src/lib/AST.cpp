@@ -109,7 +109,7 @@ std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
                   if ((*(node+1))->get_token().type == TokenType::IDENTIFIER) {
                     throw UnexpTokError((*(node+1))->get_token());
                   }
-              throw UnexpTokError(*head0);
+              throw UnexpTokError((*(node+1))->get_token());
             }
           }
           // Ensures right most node is legal
