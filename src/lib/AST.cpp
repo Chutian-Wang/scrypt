@@ -81,10 +81,16 @@ std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
             node_queue[0]->get_token().text[0] !=
                 '='  // Deal with assignment separately
         ) {
+          if (node_queue.size() == 2) {
+            if ((node_queue[1]->get_token().type == TokenType::IDENTIFIER)) {
+                  throw UnexpTokError(*head0);
+                }
+          }
           // Deal with regular operators
           // All operand nodes must be legal
           for (auto node = node_queue.begin() + 1; node < node_queue.end();
                node++) {
+            // Only identifiers can be illegal
             if (!((*node)->is_legal()) &&
                 !((*node)->get_token().type == TokenType::IDENTIFIER)) {
               Token err_tok = (*node)->get_token();
