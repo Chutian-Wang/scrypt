@@ -129,7 +129,7 @@ std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
       case (TokenType::OPERATOR): {
         if (((head)->text[0] == '=')) {
            if (((head+1)->type != TokenType::IDENTIFIER) && ((head+1)->type != TokenType::LPAREN)) {
-             throw UnexpTokError(*head0);
+             throw UnexpTokError(*(head+1));
              }
         }
         node_queue.push_back(std::shared_ptr<AST>(new Operator(*(head))));
