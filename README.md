@@ -1,7 +1,6 @@
 # scrypt
 > CS32 fall project #1
-> scrypt/01 - Calculator.md
-> https://github.com/ucsb-cs32/f23/blob/master/scrypt/01%20-%20Calculator.md
+> https://github.com/ucsb-cs32/f23/tree/207e30bc6d76e049b77f9fcd1fd22b7cc8aa5863/scrypt
 
 ## GitHub Rules
 - Do not push to the master branch directly. Always create a PR.
