@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-
+#include <unordered_map>
 #include "Token.h"
 
 class Lexer {
@@ -25,6 +25,7 @@ class Lexer {
   std::vector<Token> tokens;
   int currRow;
   int currCol;
+  static const std::unordered_map<std::string, TokenType> keywords;
 
   // Helper function
   // Used in tokenize() to add a new Token into the vector tokens
@@ -32,6 +33,7 @@ class Lexer {
   void add_token(TokenType type, const std::string &token, int row, int col);
   bool is_alpha(char c);
   bool is_alpha_num(char c);
+  void readComparison(char token, std::istream &input);
   void read_num(char token, std::istream &input);
   void read_identifier(char token, std::istream &input);
   void validate_num(int pos, const std::string &number);
