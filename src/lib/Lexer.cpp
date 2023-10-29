@@ -133,9 +133,9 @@ bool match(char expected, char curr){
 void Lexer::readComparison(char token, std::istream &input){
     std::string str;
     if (token == '>'){
-      str = match('=', input.peek()) ? ">=" : "=";
+      str = match('=', input.peek()) ? ">=" : ">";
     } else if (token == '<'){
-      str = match('=', input.peek()) ? "<=" : "=";
+      str = match('=', input.peek()) ? "<=" : "<";
     } else if (token == '='){
       str = match('=', input.peek()) ? "==" : "=";
     } 
