@@ -34,13 +34,9 @@ bool Lexer::is_alpha_num(char c) {
 }
 
 const std::unordered_map<std::string, TokenType> Lexer::keywords = {
-    {"false", TokenType::FALSE},
-    {"true", TokenType::TRUE},
-    {"if", TokenType::IF},
-    {"while", TokenType::WHILE},
-    {"print", TokenType::PRINT},
-    {"else", TokenType::ELSE}
-};
+    {"false", TokenType::FALSE}, {"true", TokenType::TRUE},
+    {"if", TokenType::IF},       {"while", TokenType::WHILE},
+    {"print", TokenType::PRINT}, {"else", TokenType::ELSE}};
 
 void Lexer::read_identifier(char token, std::istream &input) {
   // read and add identifier to tokens
@@ -53,12 +49,11 @@ void Lexer::read_identifier(char token, std::istream &input) {
     id += newToken;
     currCol++;
   }
-  if (keywords.find(id) == keywords.end()){
+  if (keywords.find(id) == keywords.end()) {
     add_token(TokenType::IDENTIFIER, id, currRow, pos);
-  } else{
+  } else {
     add_token(keywords.at(id), id, currRow, pos);
   }
-  
 }
 
 void Lexer::read_num(char token, std::istream &input) {
@@ -125,27 +120,27 @@ void Lexer::validate_num(int pos, const std::string &number) {
   }
 }
 
-bool match(char expected, char curr){
-    if (expected != curr) return false;
-    return true;
+bool match(char expected, char curr) {
+  if (expected != curr) return false;
+  return true;
 }
 
-void Lexer::readComparison(char token, std::istream &input){
-    std::string str;
-    if (token == '>'){
-      str = match('=', input.peek()) ? ">=" : ">";
-    } else if (token == '<'){
-      str = match('=', input.peek()) ? "<=" : "<";
-    } else if (token == '='){
-      str = match('=', input.peek()) ? "==" : "=";
-    } 
-    if (str.length() == 2){
-      add_token(TokenType::OPERATOR, str, currRow, currCol);
-      input.get();
-      currCol ++;
-    } else {
-      add_token(TokenType::OPERATOR, str, currRow, currCol);
-    }
+void Lexer::read_comparison(char token, std::istream &input) {
+  std::string str;
+  if (token == '>') {
+    str = match('=', input.peek()) ? ">=" : ">";
+  } else if (token == '<') {
+    str = match('=', input.peek()) ? "<=" : "<";
+  } else if (token == '=') {
+    str = match('=', input.peek()) ? "==" : "=";
+  }
+  if (str.length() == 2) {
+    add_token(TokenType::OPERATOR, str, currRow, currCol);
+    input.get();
+    currCol++;
+  } else {
+    add_token(TokenType::OPERATOR, str, currRow, currCol);
+  }
 }
 
 void Lexer::tokenize(std::istream &input) {
@@ -190,13 +185,13 @@ void Lexer::tokenize(std::istream &input) {
     } else if (token == '!') {
       input.get();
       add_token(TokenType::OPERATOR, "!=", currRow, currCol);
-      currCol ++;
+      currCol++;
     } else if (token == '=') {
-      readComparison(token, input);
+      read_comparison(token, input);
     } else if (token == '<') {
-      readComparison(token, input);
+      read_comparison(token, input);
     } else if (token == '>') {
-      readComparison(token, input);
+      read_comparison(token, input);
     } else if (token == '&') {
       add_token(TokenType::OPERATOR, "&", currRow, currCol);
     } else if (token == '^') {

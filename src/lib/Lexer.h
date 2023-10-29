@@ -2,8 +2,9 @@
 #define LEXER_H
 
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
+
 #include "Token.h"
 
 class Lexer {
@@ -33,7 +34,7 @@ class Lexer {
   void add_token(TokenType type, const std::string &token, int row, int col);
   bool is_alpha(char c);
   bool is_alpha_num(char c);
-  void readComparison(char token, std::istream &input);
+  void read_comparison(char token, std::istream &input);
   void read_num(char token, std::istream &input);
   void read_identifier(char token, std::istream &input);
   void validate_num(int pos, const std::string &number);
