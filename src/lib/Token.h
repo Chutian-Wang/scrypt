@@ -23,8 +23,10 @@ enum struct TokenType {
   ERR  // Any other
 };
 
-static const std::map<char, int> p_map{
-    {'=', 1}, {'+', 2}, {'-', 2}, {'*', 3}, {'/', 3}};
+static const std::map<std::string, int> p_map{
+    {"=", 1}, {"==", 2}, {"!=", 2}, {"<", 2}, {"<=", 2}, 
+    {">", 2}, {">=", 2}, {"&", 2}, {"^", 2}, {"|", 2},
+    {"+", 3}, {"-", 3}, {"*", 4}, {"/", 4}, {"%", 4}};
 
 class Token {
  public:

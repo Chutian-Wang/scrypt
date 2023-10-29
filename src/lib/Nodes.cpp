@@ -1,9 +1,8 @@
-#include "Nodes.h"
-
 #include <cmath>
 #include <map>
 #include <sstream>
-
+#include "Nodes.h"
+#include "Value.h"
 #include "Errors.h"
 #include "Token.h"
 
@@ -21,9 +20,9 @@ Number::~Number() {
 
 const Token &Number::get_token() const { return this->tok; }
 
-double Number::eval() const { return this->__eval(); }
+Value Number::eval() const { return this->__eval(); }
 
-double Number::__eval() const { return this->val; }
+Value Number::__eval() const { return this->val; }
 
 bool Number::is_legal() const { return true; }
 
@@ -53,7 +52,7 @@ void Operator::add_operand(std::shared_ptr<AST> node) {
 
 const Token &Operator::get_token() const { return this->tok; }
 
-double Operator::eval() const {
+Value Operator::eval() const {
   auto old_map = symbols;
   try {
     return this->__eval();
@@ -64,60 +63,47 @@ double Operator::eval() const {
   }
 }
 
-double Operator::__eval() const {
-  switch ((this->tok).text[0]) {
-    case ('+'): {
-      double ret = 0;
-      for (auto node : this->operands) {
-        ret += node->__eval();
-      }
-      return ret;
-      break;
+Value Operator::__eval() const {
+  std::string str = (this->tok).text;
+  if (str == "+"){
+    Value ret(0.0);
+    for (auto node : this->operands) {
+      ret._double += node->__eval()._double;
     }
-    case ('-'): {
-      double ret = this->operands[0]->__eval();
+    return ret;
+  } else if (str == "-"){
+    Value ret(this->operands[0]->__eval());
+    for (auto node = (this->operands).begin() + 1;
+      node < this->operands.end(); node++) {
+      ret._double -= (*node)->__eval()._double;
+    }
+    return ret;
+  } else if (str == "*"){
+    Value ret(1.0);
+      for (auto node : this->operands) {
+        ret._double *= node->__eval()._double;
+      }
+    return ret;
+  } else if (str == "/"){
+    Value ret(this->operands[0]->__eval());
       for (auto node = (this->operands).begin() + 1;
            node < this->operands.end(); node++) {
-        ret -= (*node)->__eval();
-      }
-      return ret;
-      break;
-    }
-    case ('*'): {
-      double ret = 1;
-      for (auto node : this->operands) {
-        ret *= node->__eval();
-      }
-      return ret;
-      break;
-    }
-    case ('/'): {
-      double ret = this->operands[0]->__eval();
-      for (auto node = (this->operands).begin() + 1;
-           node < this->operands.end(); node++) {
-        if ((*node)->__eval() == 0.) {
+        if ((*node)->__eval()._double == 0.) {
           throw DivByZero();
         }
-        ret /= (*node)->__eval();
+        ret._double /= (*node)->__eval()._double;
       }
-      return ret;
-      break;
-    }
-    case ('='): {
-      // get rhs value
-      double ret = (*((this->operands).end() - 1))->__eval();
+    return ret;
+  } else if (str == "=") {
+    // get rhs value
+      Value ret((*((this->operands).end() - 1))->__eval());
       for (auto node = ((this->operands).end() - 2);
            node >= ((this->operands).begin()); node--) {
         ((Identifier *)(node->get()))->assign(ret);
       }
-      return ret;
-      break;
-    }
-    default: {
-      return 0;
-      break;
-    }
+    return ret;
   }
+  return Value(0.0);
 }
 
 bool Operator::is_legal() const {
@@ -174,9 +160,9 @@ Identifier::~Identifier() {
 
 const Token &Identifier::get_token() const { return this->tok; }
 
-double Identifier::eval() const { return this->__eval(); }
+Value Identifier::eval() const { return this->__eval(); }
 
-double Identifier::__eval() const {
+Value Identifier::__eval() const {
   if (this->assigned()) {
     return symbols[this->tok.text];
   } else {
@@ -186,7 +172,7 @@ double Identifier::__eval() const {
 
 bool Identifier::is_legal() const { return this->assigned(); }
 
-void Identifier::assign(double x) { symbols[this->tok.text] = x; }
+void Identifier::assign(Value x) { symbols[this->tok.text] = x; }
 
 bool Identifier::assigned() const {
   return !(symbols.find(this->tok.text) == symbols.end());

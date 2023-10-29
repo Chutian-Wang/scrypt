@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-
+#include "Value.h"
 #include "Token.h"
 
 /**
@@ -53,11 +53,11 @@ class AST {
   // User function to evaluate the subtree:
   // This function will revert identifiers to their previous
   // values if evaluation fails
-  virtual double eval() const = 0;
+  virtual Value eval() const = 0;
   // Internal function to evaluate the subtree:
   // This function will NOT revert identifiers to their previous
   // values if evaluation fails
-  virtual double __eval() const = 0;
+  virtual Value __eval() const = 0;
   // These function pushes the subtree's infix form into oss
   virtual void get_infix(std::ostream &oss) const = 0;
 };

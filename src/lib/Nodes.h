@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-
+#include "Value.h"
 #include "AST.h"
 
 class Number : public AST {
@@ -16,8 +16,8 @@ class Number : public AST {
   virtual ~Number();
 
   virtual const Token &get_token() const;
-  virtual double eval() const;
-  virtual double __eval() const;
+  virtual Value eval() const;
+  virtual Value __eval() const;
   virtual bool is_legal() const;
   virtual void get_infix(std::ostream &oss) const;
 };
@@ -38,8 +38,8 @@ class Operator : public AST {
   void add_operand(std::shared_ptr<AST> node);
 
   virtual const Token &get_token() const;
-  virtual double eval() const;
-  virtual double __eval() const;
+  virtual Value eval() const;
+  virtual Value __eval() const;
   virtual bool is_legal() const;
   virtual void get_infix(std::ostream &oss) const;
 };
@@ -52,12 +52,12 @@ class Identifier : public AST {
   Identifier(const Token &tok);
   virtual ~Identifier();
 
-  void assign(double x);
+  void assign(Value x);
   bool assigned() const;
 
   virtual const Token &get_token() const;
-  virtual double eval() const;
-  virtual double __eval() const;
+  virtual Value eval() const;
+  virtual Value __eval() const;
   virtual bool is_legal() const;
   virtual void get_infix(std::ostream &oss) const;
 };

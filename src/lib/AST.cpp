@@ -6,13 +6,13 @@
 #include <stack>
 #include <string>
 #include <vector>
-
+#include "Value.h"
 #include "Errors.h"
 #include "Nodes.h"
 
 // This global map tracks the variables
-// declear as extern in other files where needed
-std::map<std::string, double> symbols{};
+// declare as external in other files where needed
+std::map<std::string, Value> symbols{};
 
 // This is the super level S expression parser
 // returns all of the expressions as a vector of
