@@ -64,7 +64,6 @@ class DivByZero : public ScryptRuntimeError {
   virtual const char *what() const noexcept;
 };
 
-// Shared TODO!
 class UnknownIdent : public ScryptRuntimeError {
  public:
   UnknownIdent(const Token &tok);
