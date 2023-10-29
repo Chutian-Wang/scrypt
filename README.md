@@ -37,6 +37,7 @@ scrypt
     ├── build
     └── src
         ├── calc.cpp
+        ├── format.cpp
         ├── lex.cpp
         ├── lib
         │   ├── AST.cpp
@@ -48,24 +49,28 @@ scrypt
         │   ├── Nodes.cpp
         │   ├── Nodes.h
         │   ├── Token.cpp
-        │   └── Token.h
-        └── parse.cpp
+        │   ├── Token.h
+        │   └── Value.h
+        ├── parse.cpp
+        └── scrypt.cpp
 ```
 
 ## Class Structure and Special Macros
 ```
 Class
     ├── AST (Virtual)
-    |   ├── Number
-    |   ├── Operator
-    |   └── Identifer
+    │   ├── Number
+    │   ├── Operator
+    │   └── Identifer
     ├── std::exception
-    |   └── ScryptError (Virtual)
-    |       ├── SyntaxError
-    |       ├── UnexpTokError
-    |       └── ScryptRuntimeError
-    |           ├── DivByZero
-    |           └── UnknownIdent
+    │   └── ScryptError (Virtual)
+    │       ├── SyntaxError
+    │       ├── UnexpTokError
+    │       └── ScryptRuntimeError
+    │           ├── DivByZero
+    │           ├── UnknownIdent
+    │           ├── InvalidCond
+    │           └── InvalidOperand
     ├── Lexer (Base)
     └── Token (Base)
 
@@ -85,7 +90,9 @@ Macros
         ├── UNEXP_TOK       2
         ├── SCRYPT_RUNTIME  3
         ├── DIV_BY_ZERO     SCRYPT_RUNTIME
-        └── UNKNOWN_IDENT   SCRYPT_RUNTIME
+        ├── UNKNOWN_IDENT   SCRYPT_RUNTIME
+        ├── INVALID_COND    SCRYPT_RUNTIME
+        └── INVALID_OPRAND  SCRYPT_RUNTIME
 ```
 
 ## Code Format
