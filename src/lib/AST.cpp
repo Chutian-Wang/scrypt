@@ -226,11 +226,11 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
     peek = head + 1;
     // Higher level loop
     while (((peek)->is_binary() && (peek)->get_p() > op->get_token().get_p()) ||
-           peek->text[0] == '=') {
+           peek->text == "=") {
       rhs = parse_infix(head, rhs, (peek)->get_p());
       peek = head + 1;
     }
-    if (op->get_token().text[0] == '=') {
+    if (op->get_token().text == "=") {
       if (lhs->get_token().type != TokenType::IDENTIFIER) {
         // Only identifier is allowed on lhs for assignment
         throw UnexpTokError(op->get_token());

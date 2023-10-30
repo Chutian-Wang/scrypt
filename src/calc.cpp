@@ -8,8 +8,9 @@
 
 int main() {
   std::shared_ptr<AST> parser;
-  std::string line;
-  while (std::getline(std::cin, line)) {
+  std::string line = "(2 == 3)";
+  std::istringstream issComplete(line);
+  while (std::getline(issComplete, line)) {
     try {
       auto iss = std::istringstream(line);
       Lexer lexer;
@@ -17,7 +18,7 @@ int main() {
       parser = AST::parse_infix(lexer.get_tokens());
       parser->get_infix(std::cout);
       std::cout << std::endl;
-      std::cout << parser->eval()._double << std::endl;
+      // std::cout << parser->eval(). << std::endl;
     } catch (const ScryptError &err) {
       ScryptError::handle(std::cout, err);
     }
