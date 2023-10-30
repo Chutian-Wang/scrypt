@@ -13,8 +13,7 @@ enum struct TokenType {
   RCBRACE,     // }
   IDENTIFIER,  // Series of letters, numbers, and underscores. They must start
                // with letters or underscores.
-  TRUE,
-  FALSE,
+  BOOL,
   WHILE,
   IF,
   PRINT,

@@ -23,6 +23,22 @@ class Number : public AST {
   virtual void get_infix(std::ostream &oss) const;
 };
 
+class Boolean : public AST {
+ private:
+  Token tok;
+  bool boolean;
+
+ public:
+  Boolean(const Token &tok);
+  virtual ~Boolean();
+
+  virtual const Token &get_token() const;
+  virtual Value eval() const;
+  virtual Value __eval() const;
+  virtual bool is_legal() const;
+  virtual void get_infix(std::ostream &oss) const;
+};
+
 class Operator : public AST {
  private:
   Token tok;
@@ -37,6 +53,7 @@ class Operator : public AST {
 
   void add_operand(std::vector<std::shared_ptr<AST>> nodes);
   void add_operand(std::shared_ptr<AST> node);
+  bool valid_op(std::string op, std::vector<std::shared_ptr<AST>> operands) const;
 
   virtual const Token &get_token() const;
   virtual Value eval() const;
