@@ -55,12 +55,12 @@ void Operator::add_operand(std::shared_ptr<AST> node) {
 const Token &Operator::get_token() const { return this->tok; }
 
 Value Operator::eval() const {
-  auto old_map = symbols;
+  // auto old_map = symbols;
   try {
     return this->__eval();
   } catch (const ScryptRuntimeError &err) {
     // Restore variables
-    symbols = old_map;
+    // symbols = old_map;
     throw;
   }
 }
@@ -105,49 +105,53 @@ Value Operator::__eval() const {
     }
     return ret;
   } else if (str == "==") {
-    Value ret(this->operands[0]->__eval());
-    for (auto node = (this->operands).begin() + 1; node < this->operands.end();
-         node++) {
-      if (((*node)->eval().type == ValueType::BOOL)) {
-        if (((*(node + 1))->eval().type == ValueType::BOOL)) {
-          ret._bool =
-              ((*node)->__eval()._bool == (*(node + 1))->__eval()._bool);
-        } else {
-          throw InvalidOperand();
-        }
-      }
-      if ((*node)->eval().type == ValueType::DOUBLE) {
-        if ((*(node + 1))->eval().type == ValueType::BOOL) {
-          ret._bool =
-              ((*node)->__eval()._double == (*(node + 1))->__eval()._double);
-        } else {
-          throw InvalidOperand();
-        }
-      }
+    if ((this->operands[0]->__eval().type == ValueType::BOOL) && (this->operands[1]->__eval().type == ValueType::BOOL)) {
+      Value ret((this->operands[0]->__eval()._bool) == ((this->operands[1]->__eval()._bool)));
+      return ret;
+    } else if ((this->operands[0]->__eval().type == ValueType::DOUBLE) && (this->operands[1]->__eval().type == ValueType::DOUBLE)) {
+      Value ret((this->operands[0]->__eval()._double) == ((this->operands[1]->__eval()._double)));
+      return ret;
+    } else {
+      throw InvalidOperand();
     }
-    return ret;
   } else if (str == "!=") {
-    Value ret(this->operands[0]->__eval());
-    for (auto node = (this->operands).begin() + 1; node < this->operands.end();
-         node++) {
-      if (((*node)->eval().type == ValueType::BOOL)) {
-        if (((*(node + 1))->eval().type == ValueType::BOOL)) {
-          ret._bool =
-              ((*node)->__eval()._bool != (*(node + 1))->__eval()._bool);
-        } else {
-          throw InvalidOperand();
-        }
-      }
-      if ((*node)->eval().type == ValueType::DOUBLE) {
-        if ((*(node + 1))->eval().type == ValueType::BOOL) {
-          ret._bool =
-              ((*node)->__eval()._double != (*(node + 1))->__eval()._double);
-        } else {
-          throw InvalidOperand();
-        }
-      }
+    if ((this->operands[0]->__eval().type == ValueType::BOOL) && (this->operands[1]->__eval().type == ValueType::BOOL)) {
+      Value ret((this->operands[0]->__eval()._bool) != ((this->operands[1]->__eval()._bool)));
+      return ret;
+    } else if ((this->operands[0]->__eval().type == ValueType::DOUBLE) && (this->operands[1]->__eval().type == ValueType::DOUBLE)) {
+      Value ret((this->operands[0]->__eval()._double) != ((this->operands[1]->__eval()._double)));
+      return ret;
+    } else {
+      throw InvalidOperand();
     }
-    return ret;
+  } else if (str == "<") {
+    if ((this->operands[0]->__eval().type == ValueType::DOUBLE) && (this->operands[1]->__eval().type == ValueType::DOUBLE)) {
+      Value ret((this->operands[0]->__eval()._double) < ((this->operands[1]->__eval()._double)));
+      return ret;
+    } else {
+      throw InvalidOperand();
+    }
+  } else if (str == "<=") {
+    if ((this->operands[0]->__eval().type == ValueType::DOUBLE) && (this->operands[1]->__eval().type == ValueType::DOUBLE)) {
+      Value ret((this->operands[0]->__eval()._double) <= ((this->operands[1]->__eval()._double)));
+      return ret;
+    } else {
+      throw InvalidOperand();
+    }
+  } else if (str == ">") {
+    if ((this->operands[0]->__eval().type == ValueType::DOUBLE) && (this->operands[1]->__eval().type == ValueType::DOUBLE)) {
+      Value ret((this->operands[0]->__eval()._double) > ((this->operands[1]->__eval()._double)));
+      return ret;
+    } else {
+      throw InvalidOperand();
+    }
+  } else if (str == ">=") {
+    if ((this->operands[0]->__eval().type == ValueType::DOUBLE) && (this->operands[1]->__eval().type == ValueType::DOUBLE)) {
+      Value ret((this->operands[0]->__eval()._double) >= ((this->operands[1]->__eval()._double)));
+      return ret;
+    } else {
+      throw InvalidOperand();
+    }
   }
   return Value(0.0);
 }
