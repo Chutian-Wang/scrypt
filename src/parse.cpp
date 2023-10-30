@@ -20,7 +20,7 @@ int main() {
       expr->get_infix(oss);
       std::cout << oss.str() << '\n';
       try {
-        std::cout << expr->eval() << std::endl;
+        std::cout << expr->eval()._double << std::endl;
       } catch (const ScryptError &err) {
         return_code = ScryptError::handle(std::cout, err);
       }

@@ -72,7 +72,7 @@ Value Operator::__eval() const {
     }
     return ret;
   } else if (str == "-"){
-    Value ret(this->operands[0]->__eval());
+    Value ret(this->operands[0]->__eval()._double);
     for (auto node = (this->operands).begin() + 1;
       node < this->operands.end(); node++) {
       ret._double -= (*node)->__eval()._double;
@@ -85,7 +85,7 @@ Value Operator::__eval() const {
       }
     return ret;
   } else if (str == "/"){
-    Value ret(this->operands[0]->__eval());
+    Value ret(this->operands[0]->__eval()._double);
       for (auto node = (this->operands).begin() + 1;
            node < this->operands.end(); node++) {
         if ((*node)->__eval()._double == 0.) {
@@ -96,7 +96,7 @@ Value Operator::__eval() const {
     return ret;
   } else if (str == "=") {
     // get rhs value
-      Value ret((*((this->operands).end() - 1))->__eval());
+      Value ret((*((this->operands).end() - 1))->__eval()._double);
       for (auto node = ((this->operands).end() - 2);
            node >= ((this->operands).begin()); node--) {
         ((Identifier *)(node->get()))->assign(ret);
@@ -172,7 +172,14 @@ Value Identifier::__eval() const {
 
 bool Identifier::is_legal() const { return this->assigned(); }
 
-void Identifier::assign(Value x) { symbols[this->tok.text] = x; }
+void Identifier::assign(Value x) { 
+    if (x.type == ValueType::BOOL){
+        symbols[this->tok.text] = x._bool;
+    }
+    if (x.type == ValueType::DOUBLE){
+        symbols[this->tok.text] = x._double;
+    }
+}
 
 bool Identifier::assigned() const {
   return !(symbols.find(this->tok.text) == symbols.end());

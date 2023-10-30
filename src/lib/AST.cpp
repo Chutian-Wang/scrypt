@@ -1,5 +1,5 @@
 #include "AST.h"
-
+#include <any>
 #include <cstring>
 #include <map>
 #include <memory>
@@ -12,7 +12,7 @@
 
 // This global map tracks the variables
 // declare as external in other files where needed
-std::map<std::string, Value> symbols{};
+std::map<std::string, std::any> symbols{};
 
 // This is the super level S expression parser
 // returns all of the expressions as a vector of
