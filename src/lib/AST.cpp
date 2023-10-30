@@ -6,7 +6,6 @@
 #include <vector>
 #include <map>
 #include <iostream>
-
 #include "Errors.h"
 #include "Nodes.h"
 
@@ -122,43 +121,139 @@ AST *AST::parse_S(const std::vector<Token> &tokens,
   return nullptr;
 }
 
-//Infix parser
-std::map<char, int> operatorP = {
-    {'=', 0},
-    {'+', 1},
-    {'-', 1},
-    {'*', 2},
-    {'/', 2},
-    {'(', 3},
-    {')', 3},
-};
-
+// Infix parser
 AST *AST::parse_infix(const std::vector<Token> &tokens) {
-
+    size_t start = 0; // Initialize the starting position.
+    AST *lhs = parse_primary(tokens, start);
+    return parse_infix(lhs, 0, tokens, start);
 }
 
-AST *AST::parse_infix(const std::vector<Token> &tokens, int minP = 0) {
-  if (tokens.empty()) {
+AST *AST::parse_infix(AST *lhs, int minP, const std::vector<Token> &tokens, size_t &start) {
+  while (start < tokens.size()) {
+    const Token &lookahead = tokens[start];
+    if (lookahead.type == TokenType::OPERATOR || lookahead.type == TokenType::ASSIGN) {
+        char op = lookahead.text[0];
+
+      if (Token::Precedence.count(op) > 0 && Token::Precedence.at(op) >= minP) {
+        ++start;
+
+      AST *rhs = parse_primary(tokens, start);
+
+        while (start < tokens.size() && (tokens[start].type == TokenType::OPERATOR || tokens[start].type == TokenType::ASSIGN)) {
+          char nextOp = tokens[start].text[0];
+          int nextP = Token::Precedence.at(nextOp);
+
+          if (nextP > Token::Precedence.at(op) || (nextP == Token::Precedence.at(op) && nextOp == '=')) {
+            rhs = parse_infix(rhs, nextP + 1, tokens, start);
+          } 
+          else {
+            break;
+          }
+        }
+
+      if (op == '+') {
+        lhs += rhs;
+      } 
+      else if (op == '-') {
+        lhs -= rhs;
+      } 
+      else if (op == '*') {
+        lhs *= rhs;
+      } 
+      else {
+        lhs /= rhs;
+      }
+    } 
+    else {
+      break;
+    }
+  } 
+  else {
+    break;
+  }
+  }
+return lhs;
+}
+
+AST *AST::parse_primary(const std::vector<Token> &tokens, size_t &start) {
+    if (start >= tokens.size()) {
+        return nullptr;
+    }
+
+    const Token &token = tokens[start];
+
+    if (token.type == TokenType::NUMBER) {
+        double value = std::stod(token.text);
+        ++start;
+        return new NumericAST(value);
+    } else if (token.type == TokenType::IDENTIFIER) {
+        std::string variableName = token.text;
+        ++start;
+        return new VariableAST(variableName);
+    } else if (token.type == TokenType::LPAREN) {
+        ++start;
+        AST *expression = parse_infix(nullptr, 0, tokens, start);
+
+        if (start < tokens.size() && tokens[start].type == TokenType::RPAREN) {
+            ++start;
+        } else {
+            // Handle missing closing parenthesis as an error.
+            throw SyntaxError(start);
+        }
+        return expression;
+    }
+
+    // Handle other cases for functions, constants, or additional primary constructs.
+    // You should expand this function based on your specific language's primary expressions.
+
     return nullptr;
-  }
-
-  int i = 0;
-  Token lhs = tokens[0];
-  Token ahead = tokens[i++];
-  Token rhs;
-
-  while((ahead.type == TokenType::OPERATOR) && operatorP.at(ahead) >= minP) {
-    auto op = ahead;
-    rhs = tokens[i++];
-    // rhs := parse_primary ()
-    ahead = tokens[i++];
-    minP = operatorP.at(op);
-    // parse_infix()
-    // while (ahead.type == TokenType::OPERATOR) && operatorP.at(ahead) > minP ||) {
-    // rhs := parse_expression_1 
-    // ahead = tokens[i++];
-    // }
-    // lhs := result of applying op with operands lhs and rhs
-  }
-  return lhs;
 }
+
+
+
+//   lookahead++;
+
+//   int parenCount;
+//   while ((*lookahead).type == TokenType::LPAREN) {
+//     lookahead++;
+//     ++parenCount;
+//   }
+
+//   if ((*lookahead).type != TokenType::LPAREN) {
+//       // int begin = (tokens.size() - lookahead.size()) - 1;
+//       // think of a way to get lookahead.size()
+//       // arse_infix(tokens[begin]);
+//   }
+  
+//   char op = lookahead;
+//   while (((*lookahead).type == TokenType::OPERATOR || (*lookahead).type == TokenType::ASSIGN) && 
+//           Token::Precedence.at(op) >= minP) {
+//     AST *rhs = lookahead++;
+//     while(((*lookahead).type == TokenType::OPERATOR || (*lookahead).type == TokenType::ASSIGN)  && 
+//           (Token::Precedence.at(op) > minP || op == '=')) {
+//       if (Token::Precedence.at(lookahead) > Token::Precedence.at(op)) {
+//         rhs = parse_infix(rhs, Token::Precedence.at(op) + 1, tokens);
+//       }
+//       else {
+//         rhs = parse_infix(rhs, Precedence.at(op), tokens);
+//       }
+//       lookahead++;
+//     }
+
+//     //solve for lhs + op + rhs and assign it to lhs
+//     if (op == '+') {
+//       lhs = lhs + rhs;
+//     }
+//     else if (op == '-') {
+//       lhs = lhs - rhs;
+//     }
+//     else if (op == '*') {
+//       lhs = lhs * rhs;
+//     }
+//     else {
+//       lhs = lhs / rhs;
+//     }
+
+//   }
+//   return lhs;
+// }

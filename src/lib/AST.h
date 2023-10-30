@@ -28,8 +28,8 @@ class AST {
    * infix form. TODO.
    */
   static AST *parse_infix(const std::vector<Token> &tokens);
-  static AST *parse_infix(const std::vector<Token> &tokens,
-                          int minP);
+  static AST *parse_infix(AST *lhs, int minP, const std::vector<Token> &tokens, size_t &start);
+  static AST *parse_primary(const std::vector<Token> &tokens, size_t &start);
 
   virtual ~AST(){};
 

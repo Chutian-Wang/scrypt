@@ -1,6 +1,7 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
+#include <map>
 #include <string>
 
 enum struct TokenType {
@@ -17,6 +18,8 @@ enum struct TokenType {
 
 class Token {
  public:
+  static const std::map<char, int> Precedence;
+
   TokenType type;
   std::string text;
   int row;
