@@ -10,7 +10,7 @@ struct Value {
     double _double;
     bool _bool;
   };
-  
+
   Value();
   Value(double num) {
     type = ValueType::DOUBLE;

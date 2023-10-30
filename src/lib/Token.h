@@ -13,8 +13,7 @@ enum struct TokenType {
   RCBRACE,     // }
   IDENTIFIER,  // Series of letters, numbers, and underscores. They must start
                // with letters or underscores.
-  TRUE,
-  FALSE,
+  BOOL,
   WHILE,
   IF,
   PRINT,
@@ -24,9 +23,9 @@ enum struct TokenType {
 };
 
 static const std::map<std::string, int> p_map{
-    {"=", 1}, {"==", 2}, {"!=", 2}, {"<", 2}, {"<=", 2}, 
-    {">", 2}, {">=", 2}, {"&", 2}, {"^", 2}, {"|", 2},
-    {"+", 3}, {"-", 3}, {"*", 4}, {"/", 4}, {"%", 4}};
+    {"=", 1}, {"==", 2}, {"!=", 2}, {"<", 2}, {"<=", 2},
+    {">", 2}, {">=", 2}, {"&", 2},  {"^", 2}, {"|", 2},
+    {"+", 3}, {"-", 3},  {"*", 4},  {"/", 4}, {"%", 4}};
 
 class Token {
  public:

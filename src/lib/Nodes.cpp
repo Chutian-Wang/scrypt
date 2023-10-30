@@ -1,10 +1,12 @@
+#include "Nodes.h"
+
 #include <cmath>
 #include <map>
 #include <sstream>
-#include "Nodes.h"
-#include "Value.h"
+
 #include "Errors.h"
 #include "Token.h"
+#include "Value.h"
 
 extern std::map<std::string, double> symbols;
 
@@ -27,6 +29,34 @@ Value Number::__eval() const { return this->val; }
 bool Number::is_legal() const { return true; }
 
 void Number::get_infix(std::ostream &oss) const { oss << this->val; }
+
+// Boolean implementations -----------------------------------
+Boolean::Boolean(const Token &tok) {
+  this->tok = tok;
+  if (tok.text == "true"){
+    this->boolean = true;
+  }
+  if (tok.text == "true"){
+    this->boolean = false;
+  }
+}
+
+Boolean::~Boolean() {
+  // Nothing on the heap
+}
+
+const Token &Boolean::get_token() const { return this->tok; }
+
+Value Boolean::eval() const { return this->__eval(); }
+
+Value Boolean::__eval() const { return this->boolean; }
+
+bool Boolean::is_legal() const { return true; }
+
+void Boolean::get_infix(std::ostream &oss) const { 
+    if (this->boolean){oss << "true";}
+    else {oss << "false";}
+    }
 
 // Operator implememtations ----------------------------------
 Operator::Operator(const Token &tok) {
@@ -52,6 +82,21 @@ void Operator::add_operand(std::shared_ptr<AST> node) {
 
 const Token &Operator::get_token() const { return this->tok; }
 
+bool Operator::valid_op(std::string op, std::vector<std::shared_ptr<AST>> operands) const{
+    if ((op == "==") || (op == "!=")){
+        bool boolean1 = (operands[0]->__eval().type == ValueType::BOOL) && (operands[1]->__eval().type == ValueType::BOOL);
+        bool boolean2 = (operands[0]->__eval().type == ValueType::DOUBLE) && (operands[1]->__eval().type == ValueType::DOUBLE);
+        return boolean1 || boolean2;
+    }
+    if ((op == "<") || (op == "<=") || (op == ">") || (op == ">=")){
+        return (operands[0]->__eval().type == ValueType::DOUBLE) && (operands[1]->__eval().type == ValueType::DOUBLE);
+    }
+    if ((op == "&") || (op == "^") || (op == "|")){
+        return (operands[0]->__eval().type == ValueType::BOOL) && (operands[1]->__eval().type == ValueType::BOOL);  
+    }
+    return 0;
+}
+
 Value Operator::eval() const {
   auto old_map = symbols;
   try {
@@ -65,44 +110,116 @@ Value Operator::eval() const {
 
 Value Operator::__eval() const {
   std::string str = (this->tok).text;
-  if (str == "+"){
+  if (str == "+") {
     Value ret(0.0);
     for (auto node : this->operands) {
+      if ((*node).__eval().type != ValueType::DOUBLE){
+        throw InvalidOperand();
+      } 
       ret._double += node->__eval()._double;
     }
     return ret;
-  } else if (str == "-"){
+  } else if (str == "-") {
     Value ret(this->operands[0]->__eval()._double);
-    for (auto node = (this->operands).begin() + 1;
-      node < this->operands.end(); node++) {
+    for (auto node = (this->operands).begin() + 1; node < this->operands.end();
+         node++) {
+      if ((*node) -> __eval().type != ValueType::DOUBLE){
+        throw InvalidOperand();
+      }
       ret._double -= (*node)->__eval()._double;
     }
     return ret;
-  } else if (str == "*"){
+  } else if (str == "*") {
     Value ret(1.0);
-      for (auto node : this->operands) {
-        ret._double *= node->__eval()._double;
+    for (auto node : this->operands) {
+      if ((*node).__eval().type != ValueType::DOUBLE){
+        throw InvalidOperand();
       }
+      ret._double *= node->__eval()._double;
+    }
     return ret;
-  } else if (str == "/"){
+  } else if (str == "/") {
     Value ret(this->operands[0]->__eval()._double);
-      for (auto node = (this->operands).begin() + 1;
-           node < this->operands.end(); node++) {
-        if ((*node)->__eval()._double == 0.) {
-          throw DivByZero();
-        }
-        ret._double /= (*node)->__eval()._double;
+    // why do we use a loop here??
+    for (auto node = (this->operands).begin() + 1; node < this->operands.end();
+         node++) {
+      if ((*node)->__eval()._double == 0.) {
+        throw DivByZero();
       }
+      if ((*node)->__eval().type != ValueType::DOUBLE){
+        throw InvalidOperand();
+      }
+      ret._double /= (*node)->__eval()._double;
+    }
+    return ret;
+  } else if (str == "%"){
+    Value ret(this->operands[0]->__eval()._double);
+    for (auto node = (this->operands).begin() + 1; node < this->operands.end();
+         node++) {
+      if ((*node)->__eval()._double == 0.) {
+        throw DivByZero();
+      }
+      if ((*node)->__eval().type != ValueType::DOUBLE){
+        throw InvalidOperand();
+      }
+      ret._double = std::fmod(ret._double, (*node)->__eval()._double);
+    }
     return ret;
   } else if (str == "=") {
     // get rhs value
-      Value ret((*((this->operands).end() - 1))->__eval()._double);
-      for (auto node = ((this->operands).end() - 2);
-           node >= ((this->operands).begin()); node--) {
-        ((Identifier *)(node->get()))->assign(ret);
-      }
+    Value ret((*((this->operands).end() - 1))->__eval()._double);
+    for (auto node = ((this->operands).end() - 2);
+         node >= ((this->operands).begin()); node--) {
+      ((Identifier *)(node->get()))->assign(ret);
+    }
     return ret;
-  }
+  } else if (str == "==") {
+    if (valid_op(str, this->operands)) {
+      Value ret((this->operands[0]->__eval()._double) == ((this->operands[1]->__eval()._double)));
+      return ret;
+    } 
+  } else if (str == "!=") {
+    if (valid_op(str, this->operands)) {
+      Value ret((this->operands[0]->__eval()._double) != ((this->operands[1]->__eval()._double)));
+      return ret;
+    } 
+  } else if (str == "<") {
+    if (valid_op(str, this->operands)) {
+      Value ret((this->operands[0]->__eval()._double) < ((this->operands[1]->__eval()._double)));
+      return ret;
+    } 
+  } else if (str == "<=") {
+    if (valid_op(str, this->operands)) {
+      Value ret((this->operands[0]->__eval()._double) <= ((this->operands[1]->__eval()._double)));
+      return ret;
+    } 
+  } else if (str == ">") {
+    if (valid_op(str, this->operands)) {
+      Value ret((this->operands[0]->__eval()._double) > ((this->operands[1]->__eval()._double)));
+      return ret;
+    } 
+  } else if (str == ">=") {
+    if (valid_op(str, this->operands)) {
+      Value ret((this->operands[0]->__eval()._double) >= ((this->operands[1]->__eval()._double)));
+      return ret;
+    } 
+  } else if (str == "&") {
+      if (valid_op(str, this->operands)) {
+      Value ret((this->operands[0]->__eval()._double) >= ((this->operands[1]->__eval()._double)));
+      return ret;
+    }}  else if (str == "^") {
+      if (valid_op(str, this->operands)) {
+      Value ret((this->operands[0]->__eval()._double) >= ((this->operands[1]->__eval()._double)));
+      return ret;
+    }} 
+    else if (str == "|") {
+      if (valid_op(str, this->operands)) {
+      Value ret((this->operands[0]->__eval()._double) >= ((this->operands[1]->__eval()._double)));
+      return ret;
+      }
+    } else {
+      throw InvalidOperand();
+    } 
   return Value(0.0);
 }
 
@@ -142,6 +259,10 @@ void Operator::get_infix(std::ostream &oss) const {
   oss << '(';
   for (auto node = this->operands.begin(); node < this->operands.end();
        node++) {
+    // problem is with constants true/false
+    // works with cases like (12+12)
+    // test case: (true + 12)
+    //std::cout << "node: " <<(*node)->get_token().text << std::endl;
     (*node)->get_infix(oss);
     if (this->operands.end() - node > 1) {
       oss << ' ' << (this->tok.text) << ' ';
@@ -172,13 +293,13 @@ Value Identifier::__eval() const {
 
 bool Identifier::is_legal() const { return this->assigned(); }
 
-void Identifier::assign(Value x) { 
-    if (x.type == ValueType::BOOL){
-        symbols[this->tok.text] = x._bool;
-    }
-    if (x.type == ValueType::DOUBLE){
-        symbols[this->tok.text] = x._double;
-    }
+void Identifier::assign(Value x) {
+  if (x.type == ValueType::BOOL) {
+    symbols[this->tok.text] = x._bool;
+  }
+  if (x.type == ValueType::DOUBLE) {
+    symbols[this->tok.text] = x._double;
+  }
 }
 
 bool Identifier::assigned() const {
