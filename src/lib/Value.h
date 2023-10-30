@@ -1,5 +1,6 @@
 #ifndef VALUE_H
 #define VALUE_H
+#include <iostream>
 
 enum struct ValueType { BOOL, DOUBLE, NONE };
 
@@ -11,19 +12,45 @@ struct Value {
     bool _bool;
   } _value;
 
-  Value() {
-    this->type = ValueType::NONE;
-    memset(&(this->_value), 0, sizeof(this->_value));
-  }
-  Value(double num) {
-    type = ValueType::DOUBLE;
-    _value._double = num;
-  }
+  Value();
+  Value(double num);
+  Value(bool boolean);
 
-  Value(bool boolean) {
-    type = ValueType::BOOL;
-    _value._bool = boolean;
-  }
+  Value& operator+=(const Value& rhs);
+  Value& operator-=(const Value& rhs);
+  Value& operator*=(const Value& rhs);
+  Value& operator/=(const Value& rhs);
+  Value& operator%=(const Value& rhs);
 };
+
+Value operator+(const Value& lhs, const Value& rhs);
+
+Value operator-(const Value& lhs, const Value& rhs);
+
+Value operator*(const Value& lhs, const Value& rhs);
+
+Value operator/(const Value& lhs, const Value& rhs);
+
+Value operator%(const Value& lhs, const Value& rhs);
+
+Value operator==(const Value& lhs, const Value& rhs);
+
+Value operator!=(const Value& lhs, const Value& rhs);
+
+Value operator<(const Value& lhs, const Value& rhs);
+
+Value operator<=(const Value& lhs, const Value& rhs);
+
+Value operator>(const Value& lhs, const Value& rhs);
+
+Value operator>=(const Value& lhs, const Value& rhs);
+
+Value operator&(const Value& lhs, const Value& rhs);
+
+Value operator^(const Value& lhs, const Value& rhs);
+
+Value operator|(const Value& lhs, const Value& rhs);
+
+std::ostream& operator<<(std::ostream& os, const Value& value);
 
 #endif

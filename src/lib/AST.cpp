@@ -16,6 +16,10 @@
 // declare as external in other files where needed
 std::map<std::string, Value> symbols{};
 
+/*************************************************************
+**                    Infix Scrypt Parser                   **
+*************************************************************/
+
 std::shared_ptr<AST> AST::parse_infix(const std::vector<Token> &tokens) {
   if (tokens[0].type == TokenType::END) {
     throw UnexpTokError(tokens[0]);
@@ -50,7 +54,8 @@ std::shared_ptr<AST> AST::parse_infix(
 std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
                                       std::shared_ptr<AST> lhs, int min_p) {
   std::shared_ptr<AST> rhs = nullptr;
-  if (head->type != TokenType::NUMBER && head->type != TokenType::IDENTIFIER && head->type != TokenType::BOOL) {
+  if (head->type != TokenType::NUMBER && head->type != TokenType::IDENTIFIER &&
+      head->type != TokenType::BOOL) {
     // Invalid first token in an expression
     if (!(head->type == TokenType::RPAREN && lhs.get() != nullptr))
       throw UnexpTokError(*head);
@@ -91,22 +96,19 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
 }
 
 std::shared_ptr<AST> AST::parse_primary(const Token &tok) {
-  if (tok.type == TokenType::NUMBER){
-    return std::shared_ptr<AST>(new Number(tok));
+  if (tok.type == TokenType::NUMBER || tok.type == TokenType::BOOL) {
+    return std::shared_ptr<AST>(new Constant(tok));
   } else if (tok.type == TokenType::IDENTIFIER) {
     return std::shared_ptr<AST>(new Identifier(tok));
-  } else if (tok.type == TokenType::BOOL){
-    return std::shared_ptr<AST>(new Boolean(tok));
   } else {
     throw UnexpTokError(tok);
   }
 }
 
-// ------------------------- S-parser -------------------------
+/************************** S-parser *************************
+**                         DEPRECIATED                      **
+**************************************************************
 
-// This is the super level S expression parser
-// returns all of the expressions as a vector of
-// std::shared_ptr<AST>.
 std::vector<std::shared_ptr<AST>> AST::parse_S_multiple(
     const std::vector<Token> &tokens) {
   std::vector<std::shared_ptr<AST>> expressions;
@@ -256,3 +258,4 @@ std::shared_ptr<AST> AST::parse_S(std::vector<Token>::const_iterator &head) {
   }
   return nullptr;
 }
+**************************************************************/
