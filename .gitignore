@@ -39,3 +39,4 @@ build/*
 
 # For vscode users
 .vscode
+*.txt

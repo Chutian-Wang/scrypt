@@ -19,7 +19,12 @@ int main() {
       std::cout << std::endl;
       Value result = parser->eval();
       if (result.type == ValueType::BOOL){
-        std::cout << result._bool << std::endl;
+        if (result._bool) {
+          std::cout << "true" << std::endl;
+        } else {
+          std::cout << "false" << std::endl;
+        }
+        
       }
       if (result.type == ValueType::DOUBLE){
         std::cout << result._double << std::endl;

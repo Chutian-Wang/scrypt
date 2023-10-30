@@ -9,7 +9,7 @@
 #include "Token.h"
 #include "Value.h"
 
-extern std::map<std::string, std::any> symbols;
+extern std::map<std::string, Value> symbols;
 
 /**
  * This is the base class for all Nodes.

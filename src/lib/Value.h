@@ -4,13 +4,6 @@
 enum struct ValueType { BOOL, DOUBLE };
 
 struct Value {
- public:
-  ValueType type;
-  union {
-    double _double;
-    bool _bool;
-  };
-
   Value();
   Value(double num) {
     type = ValueType::DOUBLE;
@@ -21,6 +14,13 @@ struct Value {
     type = ValueType::BOOL;
     _bool = boolean;
   }
+
+ public:
+  ValueType type;
+  union {
+    double _double;
+    bool _bool;
+  };
 };
 
 #endif

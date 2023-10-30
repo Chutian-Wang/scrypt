@@ -8,7 +8,8 @@ BUILDDIR = build
 EXEC = parse lex calc
 
 # Put dependent object builds here.
-OBJS = 	$(BUILDDIR)/Lexer.o	\
+OBJS = 	$(BUILDDIR)/Value.o	\
+		$(BUILDDIR)/Lexer.o	\
 		$(BUILDDIR)/AST.o \
 		$(BUILDDIR)/Nodes.o \
 		$(BUILDDIR)/Token.o \
