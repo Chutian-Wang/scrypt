@@ -1,6 +1,7 @@
 #include "Value.h"
 
 #include <cmath>
+#include <cstring>
 #include <iostream>
 
 #include "Errors.h"

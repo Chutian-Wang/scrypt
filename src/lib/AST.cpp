@@ -1,10 +1,7 @@
 #include "AST.h"
 
-#include <any>
-#include <cstring>
 #include <map>
 #include <memory>
-#include <stack>
 #include <string>
 #include <vector>
 
