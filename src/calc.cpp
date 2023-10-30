@@ -19,10 +19,10 @@ int main() {
       std::cout << std::endl;
       Value result = parser->eval();
       if (result.type == ValueType::BOOL){
-        std::cout << result._bool << std::endl;
+        std::cout << result._value._bool << std::endl;
       }
       if (result.type == ValueType::DOUBLE){
-        std::cout << result._double << std::endl;
+        std::cout << result._value._double << std::endl;
       }
     } catch (const ScryptError &err) {
       ScryptError::handle(std::cout, err);

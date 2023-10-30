@@ -115,17 +115,17 @@ Value Operator::__eval() const {
       if ((*node).__eval().type != ValueType::DOUBLE){
         throw InvalidOperand();
       } 
-      ret._double += node->__eval()._double;
+      ret._value._double += node->__eval()._value._double;
     }
     return ret;
   } else if (str == "-") {
-    Value ret(this->operands[0]->__eval()._double);
+    Value ret(this->operands[0]->__eval()._value._double);
     for (auto node = (this->operands).begin() + 1; node < this->operands.end();
          node++) {
       if ((*node) -> __eval().type != ValueType::DOUBLE){
         throw InvalidOperand();
       }
-      ret._double -= (*node)->__eval()._double;
+      ret._value._double -= (*node)->__eval()._value._double;
     }
     return ret;
   } else if (str == "*") {
@@ -134,39 +134,39 @@ Value Operator::__eval() const {
       if ((*node).__eval().type != ValueType::DOUBLE){
         throw InvalidOperand();
       }
-      ret._double *= node->__eval()._double;
+      ret._value._double *= node->__eval()._value._double;
     }
     return ret;
   } else if (str == "/") {
-    Value ret(this->operands[0]->__eval()._double);
+    Value ret(this->operands[0]->__eval()._value._double);
     // why do we use a loop here??
     for (auto node = (this->operands).begin() + 1; node < this->operands.end();
          node++) {
-      if ((*node)->__eval()._double == 0.) {
+      if ((*node)->__eval()._value._double == 0.) {
         throw DivByZero();
       }
       if ((*node)->__eval().type != ValueType::DOUBLE){
         throw InvalidOperand();
       }
-      ret._double /= (*node)->__eval()._double;
+      ret._value._double /= (*node)->__eval()._value._double;
     }
     return ret;
   } else if (str == "%"){
-    Value ret(this->operands[0]->__eval()._double);
+    Value ret(this->operands[0]->__eval()._value._double);
     for (auto node = (this->operands).begin() + 1; node < this->operands.end();
          node++) {
-      if ((*node)->__eval()._double == 0.) {
+      if ((*node)->__eval()._value._double == 0.) {
         throw DivByZero();
       }
       if ((*node)->__eval().type != ValueType::DOUBLE){
         throw InvalidOperand();
       }
-      ret._double = std::fmod(ret._double, (*node)->__eval()._double);
+      ret._value._double = std::fmod(ret._value._double, (*node)->__eval()._value._double);
     }
     return ret;
   } else if (str == "=") {
     // get rhs value
-    Value ret((*((this->operands).end() - 1))->__eval()._double);
+    Value ret((*((this->operands).end() - 1))->__eval()._value._double);
     for (auto node = ((this->operands).end() - 2);
          node >= ((this->operands).begin()); node--) {
       ((Identifier *)(node->get()))->assign(ret);
@@ -174,46 +174,46 @@ Value Operator::__eval() const {
     return ret;
   } else if (str == "==") {
     if (valid_op(str, this->operands)) {
-      Value ret((this->operands[0]->__eval()._double) == ((this->operands[1]->__eval()._double)));
+      Value ret((this->operands[0]->__eval()._value._double) == ((this->operands[1]->__eval()._value._double)));
       return ret;
     } 
   } else if (str == "!=") {
     if (valid_op(str, this->operands)) {
-      Value ret((this->operands[0]->__eval()._double) != ((this->operands[1]->__eval()._double)));
+      Value ret((this->operands[0]->__eval()._value._double) != ((this->operands[1]->__eval()._value._double)));
       return ret;
     } 
   } else if (str == "<") {
     if (valid_op(str, this->operands)) {
-      Value ret((this->operands[0]->__eval()._double) < ((this->operands[1]->__eval()._double)));
+      Value ret((this->operands[0]->__eval()._value._double) < ((this->operands[1]->__eval()._value._double)));
       return ret;
     } 
   } else if (str == "<=") {
     if (valid_op(str, this->operands)) {
-      Value ret((this->operands[0]->__eval()._double) <= ((this->operands[1]->__eval()._double)));
+      Value ret((this->operands[0]->__eval()._value._double) <= ((this->operands[1]->__eval()._value._double)));
       return ret;
     } 
   } else if (str == ">") {
     if (valid_op(str, this->operands)) {
-      Value ret((this->operands[0]->__eval()._double) > ((this->operands[1]->__eval()._double)));
+      Value ret((this->operands[0]->__eval()._value._double) > ((this->operands[1]->__eval()._value._double)));
       return ret;
     } 
   } else if (str == ">=") {
     if (valid_op(str, this->operands)) {
-      Value ret((this->operands[0]->__eval()._double) >= ((this->operands[1]->__eval()._double)));
+      Value ret((this->operands[0]->__eval()._value._double) >= ((this->operands[1]->__eval()._value._double)));
       return ret;
     } 
   } else if (str == "&") {
       if (valid_op(str, this->operands)) {
-      Value ret((this->operands[0]->__eval()._double) >= ((this->operands[1]->__eval()._double)));
+      Value ret((this->operands[0]->__eval()._value._double) >= ((this->operands[1]->__eval()._value._double)));
       return ret;
     }}  else if (str == "^") {
       if (valid_op(str, this->operands)) {
-      Value ret((this->operands[0]->__eval()._double) >= ((this->operands[1]->__eval()._double)));
+      Value ret((this->operands[0]->__eval()._value._double) >= ((this->operands[1]->__eval()._value._double)));
       return ret;
     }} 
     else if (str == "|") {
       if (valid_op(str, this->operands)) {
-      Value ret((this->operands[0]->__eval()._double) >= ((this->operands[1]->__eval()._double)));
+      Value ret((this->operands[0]->__eval()._value._double) >= ((this->operands[1]->__eval()._value._double)));
       return ret;
       }
     } else {
@@ -284,7 +284,7 @@ Value Identifier::eval() const { return this->__eval(); }
 
 Value Identifier::__eval() const {
   if (this->assigned()) {
-    return std::any_cast<Value>(symbols[this->tok.text]);
+    return symbols.at(this->tok.text);
   } else {
     throw UnknownIdent(this->tok);
   }
@@ -293,12 +293,7 @@ Value Identifier::__eval() const {
 bool Identifier::is_legal() const { return this->assigned(); }
 
 void Identifier::assign(Value x) {
-  if (x.type == ValueType::BOOL) {
-    symbols[this->tok.text] = x._bool;
-  }
-  if (x.type == ValueType::DOUBLE) {
-    symbols[this->tok.text] = x._double;
-  }
+  symbols[this->tok.text] = x;
 }
 
 bool Identifier::assigned() const {

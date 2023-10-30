@@ -1,7 +1,7 @@
 #ifndef VALUE_H
 #define VALUE_H
 
-enum struct ValueType { BOOL, DOUBLE };
+enum struct ValueType { BOOL, DOUBLE, NONE };
 
 struct Value {
  public:
@@ -9,17 +9,20 @@ struct Value {
   union {
     double _double;
     bool _bool;
-  };
+  } _value;
 
-  Value();
+  Value() {
+    this->type = ValueType::NONE;
+    memset(&(this->_value), 0, sizeof(this->_value));
+  }
   Value(double num) {
     type = ValueType::DOUBLE;
-    _double = num;
+    _value._double = num;
   }
 
   Value(bool boolean) {
     type = ValueType::BOOL;
-    _bool = boolean;
+    _value._bool = boolean;
   }
 };
 

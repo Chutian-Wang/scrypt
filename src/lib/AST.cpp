@@ -14,7 +14,7 @@
 
 // This global map tracks the variables
 // declare as external in other files where needed
-std::map<std::string, std::any> symbols{};
+std::map<std::string, Value> symbols{};
 
 std::shared_ptr<AST> AST::parse_infix(const std::vector<Token> &tokens) {
   if (tokens[0].type == TokenType::END) {
