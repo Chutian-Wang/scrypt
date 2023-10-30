@@ -18,7 +18,7 @@ int main() {
       parser = AST::parse_infix(lexer.get_tokens());
       parser->get_infix(std::cout);
       std::cout << std::endl;
-      // std::cout << parser->eval(). << std::endl;
+      std::cout << parser->eval()._bool << std::endl;
     } catch (const ScryptError &err) {
       ScryptError::handle(std::cout, err);
     }

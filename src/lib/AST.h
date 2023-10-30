@@ -1,12 +1,15 @@
 #ifndef AST_H
 #define AST_H
 
+#include <any>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "Token.h"
 #include "Value.h"
+
+extern std::map<std::string, std::any> symbols;
 
 /**
  * This is the base class for all Nodes.

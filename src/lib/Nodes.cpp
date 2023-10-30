@@ -1,5 +1,6 @@
 #include "Nodes.h"
 
+#include <any>
 #include <cmath>
 #include <map>
 #include <sstream>
@@ -7,8 +8,6 @@
 #include "Errors.h"
 #include "Token.h"
 #include "Value.h"
-
-extern std::map<std::string, double> symbols;
 
 // Number implementations ------------------------------------
 Number::Number(const Token &tok) {
@@ -214,7 +213,7 @@ Value Identifier::eval() const { return this->__eval(); }
 
 Value Identifier::__eval() const {
   if (this->assigned()) {
-    return symbols[this->tok.text];
+    return std::any_cast<Value>(symbols[this->tok.text]);
   } else {
     throw UnknownIdent(this->tok);
   }
