@@ -36,6 +36,7 @@ scrypt
     ├── README.md
     ├── build
     └── src
+        ├── calc.cpp
         ├── lex.cpp
         ├── lib
         │   ├── AST.cpp
@@ -74,7 +75,6 @@ Struct
         ├── OPERATOR
         ├── LPAREN
         ├── RPAREN
-        ├── ASSIGN
         ├── IDENTIFIER
         ├── END
         └── ERR
@@ -85,7 +85,7 @@ Macros
         ├── UNEXP_TOK       2
         ├── SCRYPT_RUNTIME  3
         ├── DIV_BY_ZERO     SCRYPT_RUNTIME
-        └── DIV_BY_ZERO     SCRYPT_RUNTIME
+        └── UNKNOWN_IDENT   SCRYPT_RUNTIME
 ```
 
 ## Code Format

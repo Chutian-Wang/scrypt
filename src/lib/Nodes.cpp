@@ -1,9 +1,13 @@
 #include "Nodes.h"
 
+#include <cmath>
+#include <map>
 #include <sstream>
 
 #include "Errors.h"
 #include "Token.h"
+
+extern std::map<std::string, double> symbols;
 
 // Number implementations ------------------------------------
 Number::Number(const Token &tok) {
@@ -17,15 +21,13 @@ Number::~Number() {
 
 const Token &Number::get_token() const { return this->tok; }
 
-double Number::eval() const { return this->val; }
+double Number::eval() const { return this->__eval(); }
+
+double Number::__eval() const { return this->val; }
 
 bool Number::is_legal() const { return true; }
 
-void Number::get_infix_S(std::ostringstream &oss) const { oss << this->val; }
-
-void Number::get_infix_infix(std::ostringstream &oss) const {
-  oss << this->val;
-}
+void Number::get_infix(std::ostream &oss) const { oss << this->val; }
 
 // Operator implememtations ----------------------------------
 Operator::Operator(const Token &tok) {
@@ -35,18 +37,16 @@ Operator::Operator(const Token &tok) {
 }
 
 Operator::~Operator() {
-  for (auto node : this->operands) {
-    delete node;
-  }
+  // smart pointer takes care...
 }
 
-void Operator::add_operand(std::vector<AST *> nodes) {
+void Operator::add_operand(std::vector<std::shared_ptr<AST>> nodes) {
   for (auto node : nodes) {
     this->add_operand(node);
   }
 }
 
-void Operator::add_operand(AST *node) {
+void Operator::add_operand(std::shared_ptr<AST> node) {
   this->validated = false;
   this->operands.push_back(node);
 }
@@ -54,20 +54,31 @@ void Operator::add_operand(AST *node) {
 const Token &Operator::get_token() const { return this->tok; }
 
 double Operator::eval() const {
+  auto old_map = symbols;
+  try {
+    return this->__eval();
+  } catch (const ScryptRuntimeError &err) {
+    // Restore variables
+    symbols = old_map;
+    throw;
+  }
+}
+
+double Operator::__eval() const {
   switch ((this->tok).text[0]) {
     case ('+'): {
       double ret = 0;
       for (auto node : this->operands) {
-        ret += node->eval();
+        ret += node->__eval();
       }
       return ret;
       break;
     }
     case ('-'): {
-      double ret = this->operands[0]->eval();
+      double ret = this->operands[0]->__eval();
       for (auto node = (this->operands).begin() + 1;
            node < this->operands.end(); node++) {
-        ret -= (*node)->eval();
+        ret -= (*node)->__eval();
       }
       return ret;
       break;
@@ -75,24 +86,33 @@ double Operator::eval() const {
     case ('*'): {
       double ret = 1;
       for (auto node : this->operands) {
-        ret *= node->eval();
+        ret *= node->__eval();
       }
       return ret;
       break;
     }
     case ('/'): {
-      double ret = this->operands[0]->eval();
+      double ret = this->operands[0]->__eval();
       for (auto node = (this->operands).begin() + 1;
            node < this->operands.end(); node++) {
-        if ((*node)->eval() == 0. && ret != 0.) {
+        if ((*node)->__eval() == 0.) {
           throw DivByZero();
         }
-        ret /= (*node)->eval();
+        ret /= (*node)->__eval();
       }
       return ret;
       break;
     }
-
+    case ('='): {
+      // get rhs value
+      double ret = (*((this->operands).end() - 1))->__eval();
+      for (auto node = ((this->operands).end() - 2);
+           node >= ((this->operands).begin()); node--) {
+        ((Identifier *)(node->get()))->assign(ret);
+      }
+      return ret;
+      break;
+    }
     default: {
       return 0;
       break;
@@ -102,21 +122,41 @@ double Operator::eval() const {
 
 bool Operator::is_legal() const {
   if (this->validated)
-    return this->legal;
+    return true;
   else {
     if (this->operands.size() < 2) return false;
-    for (auto node : this->operands) {
-      if (!(node->is_legal())) return false;
+    if ((this->tok).text[0] == '=') {
+      // Assignment
+      // Ensures all but rightmost arguments are identifiers
+      for (auto node = this->operands.begin(); node < this->operands.end();
+           node++) {
+        if (*node != this->operands.back() &&
+            (*node)->get_token().type != TokenType::IDENTIFIER) {
+          return false;
+        }
+      }
+      // Ensures right most node is legal
+      if (!operands.back()->is_legal()) {
+        return false;
+      }
+      return true;
+    } else {
+      // Regular node
+      for (auto node : this->operands) {
+        if (!(node->is_legal()) &&
+            node->get_token().type != TokenType::IDENTIFIER)
+          return false;
+      }
+      return true;
     }
-    return true;
   }
 }
 
-void Operator::get_infix_S(std::ostringstream &oss) const {
+void Operator::get_infix(std::ostream &oss) const {
   oss << '(';
   for (auto node = this->operands.begin(); node < this->operands.end();
        node++) {
-    (*node)->get_infix_S(oss);
+    (*node)->get_infix(oss);
     if (this->operands.end() - node > 1) {
       oss << ' ' << (this->tok.text) << ' ';
     } else {
@@ -125,17 +165,8 @@ void Operator::get_infix_S(std::ostringstream &oss) const {
   }
 }
 
-void Operator::get_infix_infix(std::ostringstream &oss) const {
-  oss << '(' << this->operands[0]->get_token().text << ' ' << this->tok.text
-      << ' ' << this->operands[1]->get_token().text << ')';
-}
-
 // Identifier implememtations ----------------------------------
-Identifier::Identifier(const Token &tok) {
-  this->tok = tok;
-  this->val = 0;
-  this->assigned = false;
-}
+Identifier::Identifier(const Token &tok) { this->tok = tok; }
 
 Identifier::~Identifier() {
   // Nothing on the heap
@@ -143,20 +174,22 @@ Identifier::~Identifier() {
 
 const Token &Identifier::get_token() const { return this->tok; }
 
-double Identifier::eval() const {
-  if (this->assigned) {
-    return this->val;
+double Identifier::eval() const { return this->__eval(); }
+
+double Identifier::__eval() const {
+  if (this->assigned()) {
+    return symbols[this->tok.text];
   } else {
     throw UnknownIdent(this->tok);
   }
 }
 
-bool Identifier::is_legal() const { return this->assigned; }
+bool Identifier::is_legal() const { return this->assigned(); }
 
-void Identifier::get_infix_S(std::ostringstream &oss) const {
-  oss << this->tok.text;
+void Identifier::assign(double x) { symbols[this->tok.text] = x; }
+
+bool Identifier::assigned() const {
+  return !(symbols.find(this->tok.text) == symbols.end());
 }
 
-void Identifier::get_infix_infix(std::ostringstream &oss) const {
-  oss << this->tok.text;
-}
+void Identifier::get_infix(std::ostream &oss) const { oss << this->tok.text; }

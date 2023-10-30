@@ -16,6 +16,6 @@ Token::Token(TokenType type, const std::string &text, int row, int column) {
   this->column = column;
 }
 
-static const std::map<char, int> Precedence = {
-    {'=', 0}, {'+', 2}, {'-', 2}, {'*', 3}, {'/', 3}, {'(', 1}, {')', 1},
-};
+bool Token::is_binary() const { return this->type == TokenType::OPERATOR; }
+
+int Token::get_p() const { return p_map.at(this->text[0]); }
