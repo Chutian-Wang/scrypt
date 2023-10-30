@@ -4,8 +4,9 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "Value.h"
+
 #include "Token.h"
+#include "Value.h"
 
 /**
  * This is the base class for all Nodes.

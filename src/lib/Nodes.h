@@ -3,8 +3,9 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include "Value.h"
+
 #include "AST.h"
+#include "Value.h"
 
 class Number : public AST {
  private:

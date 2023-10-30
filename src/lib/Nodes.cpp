@@ -1,10 +1,12 @@
+#include "Nodes.h"
+
 #include <cmath>
 #include <map>
 #include <sstream>
-#include "Nodes.h"
-#include "Value.h"
+
 #include "Errors.h"
 #include "Token.h"
+#include "Value.h"
 
 extern std::map<std::string, double> symbols;
 
@@ -65,42 +67,86 @@ Value Operator::eval() const {
 
 Value Operator::__eval() const {
   std::string str = (this->tok).text;
-  if (str == "+"){
+  if (str == "+") {
     Value ret(0.0);
     for (auto node : this->operands) {
       ret._double += node->__eval()._double;
     }
     return ret;
-  } else if (str == "-"){
+  } else if (str == "-") {
     Value ret(this->operands[0]->__eval()._double);
-    for (auto node = (this->operands).begin() + 1;
-      node < this->operands.end(); node++) {
+    for (auto node = (this->operands).begin() + 1; node < this->operands.end();
+         node++) {
       ret._double -= (*node)->__eval()._double;
     }
     return ret;
-  } else if (str == "*"){
+  } else if (str == "*") {
     Value ret(1.0);
-      for (auto node : this->operands) {
-        ret._double *= node->__eval()._double;
-      }
+    for (auto node : this->operands) {
+      ret._double *= node->__eval()._double;
+    }
     return ret;
-  } else if (str == "/"){
+  } else if (str == "/") {
     Value ret(this->operands[0]->__eval()._double);
-      for (auto node = (this->operands).begin() + 1;
-           node < this->operands.end(); node++) {
-        if ((*node)->__eval()._double == 0.) {
-          throw DivByZero();
-        }
-        ret._double /= (*node)->__eval()._double;
+    for (auto node = (this->operands).begin() + 1; node < this->operands.end();
+         node++) {
+      if ((*node)->__eval()._double == 0.) {
+        throw DivByZero();
       }
+      ret._double /= (*node)->__eval()._double;
+    }
     return ret;
   } else if (str == "=") {
     // get rhs value
-      Value ret((*((this->operands).end() - 1))->__eval()._double);
-      for (auto node = ((this->operands).end() - 2);
-           node >= ((this->operands).begin()); node--) {
-        ((Identifier *)(node->get()))->assign(ret);
+    Value ret((*((this->operands).end() - 1))->__eval()._double);
+    for (auto node = ((this->operands).end() - 2);
+         node >= ((this->operands).begin()); node--) {
+      ((Identifier *)(node->get()))->assign(ret);
+    }
+    return ret;
+  } else if (str == "==") {
+    Value ret(this->operands[0]->__eval());
+    for (auto node = (this->operands).begin() + 1; node < this->operands.end();
+         node++) {
+      if (((*node)->eval().type == ValueType::BOOL)) {
+        if (((*(node + 1))->eval().type == ValueType::BOOL)) {
+          ret._bool =
+              ((*node)->__eval()._bool == (*(node + 1))->__eval()._bool);
+        } else {
+          throw InvalidOperand();
+        }
       }
+      if ((*node)->eval().type == ValueType::DOUBLE) {
+        if ((*(node + 1))->eval().type == ValueType::BOOL) {
+          ret._bool =
+              ((*node)->__eval()._double == (*(node + 1))->__eval()._double);
+        } else {
+          throw InvalidOperand();
+        }
+      }
+    }
+    return ret;
+  } else if (str == "!=") {
+    Value ret(this->operands[0]->__eval());
+    for (auto node = (this->operands).begin() + 1; node < this->operands.end();
+         node++) {
+      if (((*node)->eval().type == ValueType::BOOL)) {
+        if (((*(node + 1))->eval().type == ValueType::BOOL)) {
+          ret._bool =
+              ((*node)->__eval()._bool != (*(node + 1))->__eval()._bool);
+        } else {
+          throw InvalidOperand();
+        }
+      }
+      if ((*node)->eval().type == ValueType::DOUBLE) {
+        if ((*(node + 1))->eval().type == ValueType::BOOL) {
+          ret._bool =
+              ((*node)->__eval()._double != (*(node + 1))->__eval()._double);
+        } else {
+          throw InvalidOperand();
+        }
+      }
+    }
     return ret;
   }
   return Value(0.0);
@@ -172,13 +218,13 @@ Value Identifier::__eval() const {
 
 bool Identifier::is_legal() const { return this->assigned(); }
 
-void Identifier::assign(Value x) { 
-    if (x.type == ValueType::BOOL){
-        symbols[this->tok.text] = x._bool;
-    }
-    if (x.type == ValueType::DOUBLE){
-        symbols[this->tok.text] = x._double;
-    }
+void Identifier::assign(Value x) {
+  if (x.type == ValueType::BOOL) {
+    symbols[this->tok.text] = x._bool;
+  }
+  if (x.type == ValueType::DOUBLE) {
+    symbols[this->tok.text] = x._double;
+  }
 }
 
 bool Identifier::assigned() const {

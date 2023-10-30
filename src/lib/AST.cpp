@@ -1,4 +1,5 @@
 #include "AST.h"
+
 #include <any>
 #include <cstring>
 #include <map>
@@ -6,9 +7,10 @@
 #include <stack>
 #include <string>
 #include <vector>
-#include "Value.h"
+
 #include "Errors.h"
 #include "Nodes.h"
+#include "Value.h"
 
 // This global map tracks the variables
 // declare as external in other files where needed
