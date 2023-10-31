@@ -1,10 +1,11 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include "lib/Value.h"
+
 #include "lib/AST.h"
 #include "lib/Errors.h"
 #include "lib/Lexer.h"
+#include "lib/Value.h"
 
 int main() {
   std::shared_ptr<AST> parser;
@@ -18,16 +19,11 @@ int main() {
       parser->get_infix(std::cout);
       std::cout << std::endl;
       Value result = parser->eval();
-      if (result.type == ValueType::BOOL){
-        if (result._bool) {
-          std::cout << "true" << std::endl;
-        } else {
-          std::cout << "false" << std::endl;
-        }
-        
+      if (result.type == ValueType::BOOL) {
+        std::cout << result._value._bool << std::endl;
       }
-      if (result.type == ValueType::DOUBLE){
-        std::cout << result._double << std::endl;
+      if (result.type == ValueType::DOUBLE) {
+        std::cout << result._value._double << std::endl;
       }
     } catch (const ScryptError &err) {
       ScryptError::handle(std::cout, err);

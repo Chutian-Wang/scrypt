@@ -49,6 +49,7 @@ scrypt
         │   ├── Nodes.h
         │   ├── Token.cpp
         │   ├── Token.h
+        │   ├── Value.cpp
         │   └── Value.h
         ├── parse.cpp
         └── scrypt.cpp
@@ -58,7 +59,7 @@ scrypt
 ```
 Class
     ├── AST (Virtual)
-    │   ├── Number
+    │   ├── Constant
     │   ├── Operator
     │   └── Identifer
     ├── std::exception
