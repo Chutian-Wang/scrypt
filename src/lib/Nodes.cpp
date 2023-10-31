@@ -94,14 +94,14 @@ Value Operator::__eval() const {
     }
     return ret;
   } else if (str == "/") {
-    Value ret(this->operands[0]->__eval()._value._double);
+    Value ret = this->operands[0]->__eval();
     for (auto node = (this->operands).begin() + 1; node < this->operands.end();
          node++) {
       ret /= (*node)->__eval();
     }
     return ret;
   } else if (str == "%") {
-    Value ret(this->operands[0]->__eval()._value._double);
+    Value ret = this->operands[0]->__eval();
     for (auto node = (this->operands).begin() + 1; node < this->operands.end();
          node++) {
       ret %= (*node)->__eval();

@@ -63,6 +63,7 @@ Value& Value::operator%=(const Value& rhs) {
   if (rhs._value._double == 0.) {
     throw DivByZero();
   }
+  std::cout << (this->type == ValueType::DOUBLE) << std::endl;
   this->_value._double = std::fmod(this->_value._double, rhs._value._double);
   return *this;
 }
