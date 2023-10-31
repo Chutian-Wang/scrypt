@@ -19,7 +19,7 @@ int main() {
       parser->get_infix(std::cout);
       std::cout << std::endl;
       Value result = parser->eval();
-      std::cout << result;
+      std::cout << result << std::endl;
     } catch (const ScryptError &err) {
       ScryptError::handle(std::cout, err);
     }
