@@ -1,6 +1,10 @@
 #include "Nodes.h"
 
+#include <any>
+#include <cmath>
 #include <map>
+#include <sstream>
+#include <string>
 
 #include "Errors.h"
 #include "Token.h"
@@ -9,7 +13,14 @@
 // Constant implementations ------------------------------------
 Constant::Constant(const Token &tok) {
   this->tok = tok;
-  this->val = std::stod(tok.text);
+  if (tok.type == TokenType::NUMBER) {
+    this->val = std::stod(tok.text);
+  } else {
+    std::istringstream is(tok.text);
+    bool b;
+    is >> std::boolalpha >> b;
+    this->val = b;
+  }
 }
 
 Constant::~Constant() {}
