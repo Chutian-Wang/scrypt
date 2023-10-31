@@ -1,6 +1,5 @@
 #include "Nodes.h"
 
-#include <any>
 #include <cmath>
 #include <map>
 #include <sstream>
@@ -15,7 +14,8 @@ Constant::Constant(const Token &tok) {
   this->tok = tok;
   if (tok.type == TokenType::NUMBER) {
     this->val = std::stod(tok.text);
-  } else {
+  }
+  if (tok.type == TokenType::BOOL) {
     std::istringstream is(tok.text);
     bool b;
     is >> std::boolalpha >> b;

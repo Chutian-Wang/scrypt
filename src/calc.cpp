@@ -19,17 +19,7 @@ int main() {
       parser->get_infix(std::cout);
       std::cout << std::endl;
       Value result = parser->eval();
-      if (result.type == ValueType::BOOL) {
-        if (result._value._bool) {
-          std::cout << "true\n";
-        }
-        if (!result._value._bool) {
-          std::cout << "false\n";
-        }
-      }
-      if (result.type == ValueType::DOUBLE) {
-        std::cout << result._value._double << std::endl;
-      }
+      std::cout << result;
     } catch (const ScryptError &err) {
       ScryptError::handle(std::cout, err);
     }
