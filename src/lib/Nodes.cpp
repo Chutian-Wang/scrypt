@@ -180,10 +180,6 @@ void Operator::get_infix(std::ostream &oss) const {
   oss << '(';
   for (auto node = this->operands.begin(); node < this->operands.end();
        node++) {
-    // problem is with constants true/false
-    // works with cases like (12+12)
-    // test case: (true + 12)
-    // std::cout << "node: " <<(*node)->get_token().text << std::endl;
     (*node)->get_infix(oss);
     if (this->operands.end() - node > 1) {
       oss << ' ' << (this->tok.text) << ' ';
