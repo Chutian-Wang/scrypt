@@ -2,9 +2,7 @@
 
 #include <algorithm>
 #include <cctype>
-#include <iomanip>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -33,6 +31,11 @@ bool Lexer::is_alpha_num(char c) {
   return is_alpha(c) || std::isdigit(c);
 }
 
+const std::unordered_map<std::string, TokenType> Lexer::keywords = {
+    {"false", TokenType::BOOL},  {"true", TokenType::BOOL},
+    {"if", TokenType::IF},       {"while", TokenType::WHILE},
+    {"print", TokenType::PRINT}, {"else", TokenType::ELSE}};
+
 void Lexer::read_identifier(char token, std::istream &input) {
   // read and add identifier to tokens
   std::string id;
@@ -44,7 +47,11 @@ void Lexer::read_identifier(char token, std::istream &input) {
     id += newToken;
     currCol++;
   }
-  add_token(TokenType::IDENTIFIER, id, currRow, pos);
+  if (keywords.find(id) == keywords.end()) {
+    add_token(TokenType::IDENTIFIER, id, currRow, pos);
+  } else {
+    add_token(keywords.at(id), id, currRow, pos);
+  }
 }
 
 void Lexer::read_num(char token, std::istream &input) {
@@ -111,6 +118,29 @@ void Lexer::validate_num(int pos, const std::string &number) {
   }
 }
 
+bool match(char expected, char curr) {
+  if (expected != curr) return false;
+  return true;
+}
+
+void Lexer::read_comparison(char token, std::istream &input) {
+  std::string str;
+  if (token == '>') {
+    str = match('=', input.peek()) ? ">=" : ">";
+  } else if (token == '<') {
+    str = match('=', input.peek()) ? "<=" : "<";
+  } else if (token == '=') {
+    str = match('=', input.peek()) ? "==" : "=";
+  }
+  if (str.length() == 2) {
+    add_token(TokenType::OPERATOR, str, currRow, currCol);
+    input.get();
+    currCol++;
+  } else {
+    add_token(TokenType::OPERATOR, str, currRow, currCol);
+  }
+}
+
 void Lexer::tokenize(std::istream &input) {
   // num stores number, e.g. 8.8, 134.45
   // str is used mainly for throwing exception since Token()
@@ -136,6 +166,10 @@ void Lexer::tokenize(std::istream &input) {
       add_token(TokenType::LPAREN, "(", currRow, currCol);
     } else if (token == ')') {
       add_token(TokenType::RPAREN, ")", currRow, currCol);
+    } else if (token == '}') {
+      add_token(TokenType::RCBRACE, "}", currRow, currCol);
+    } else if (token == '{') {
+      add_token(TokenType::LCBRACE, "{", currRow, currCol);
     } else if (token == '+') {
       add_token(TokenType::OPERATOR, "+", currRow, currCol);
     } else if (token == '-') {
@@ -144,8 +178,24 @@ void Lexer::tokenize(std::istream &input) {
       add_token(TokenType::OPERATOR, "*", currRow, currCol);
     } else if (token == '/') {
       add_token(TokenType::OPERATOR, "/", currRow, currCol);
+    } else if (token == '%') {
+      add_token(TokenType::OPERATOR, "%", currRow, currCol);
+    } else if (token == '!') {
+      input.get();
+      add_token(TokenType::OPERATOR, "!=", currRow, currCol);
+      currCol++;
     } else if (token == '=') {
-      add_token(TokenType::OPERATOR, "=", currRow, currCol);
+      read_comparison(token, input);
+    } else if (token == '<') {
+      read_comparison(token, input);
+    } else if (token == '>') {
+      read_comparison(token, input);
+    } else if (token == '&') {
+      add_token(TokenType::OPERATOR, "&", currRow, currCol);
+    } else if (token == '^') {
+      add_token(TokenType::OPERATOR, "^", currRow, currCol);
+    } else if (token == '|') {
+      add_token(TokenType::OPERATOR, "|", currRow, currCol);
     } else if (std::isdigit(token)) {
       read_num(token, input);
     } else if (is_alpha(token)) {

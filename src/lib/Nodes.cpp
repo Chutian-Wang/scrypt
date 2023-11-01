@@ -3,31 +3,38 @@
 #include <cmath>
 #include <map>
 #include <sstream>
+#include <string>
 
 #include "Errors.h"
 #include "Token.h"
+#include "Value.h"
 
-extern std::map<std::string, double> symbols;
-
-// Number implementations ------------------------------------
-Number::Number(const Token &tok) {
+// Constant implementations ------------------------------------
+Constant::Constant(const Token &tok) {
   this->tok = tok;
-  this->val = std::stod(tok.text);
+  if (tok.type == TokenType::NUMBER) {
+    this->val = std::stod(tok.text);
+  }
+  if (tok.type == TokenType::BOOL) {
+    std::istringstream is(tok.text);
+    bool b;
+    is >> std::boolalpha >> b;
+    this->val = b;
+  }
 }
 
-Number::~Number() {
-  // Nothing on the heap
-}
+Constant::~Constant() {}
 
-const Token &Number::get_token() const { return this->tok; }
+const Token &Constant::get_token() const { return this->tok; }
 
-double Number::eval() const { return this->__eval(); }
+Value Constant::eval() const { return this->__eval(); }
 
-double Number::__eval() const { return this->val; }
+Value Constant::__eval() const { return this->val; }
 
-bool Number::is_legal() const { return true; }
+// Deserted due to depreciation of S expression evaluation
+// bool Constant::is_legal() const { return true; }
 
-void Number::get_infix(std::ostream &oss) const { oss << this->val; }
+void Constant::get_infix(std::ostream &oss) const { oss << this->val; }
 
 // Operator implememtations ----------------------------------
 Operator::Operator(const Token &tok) {
@@ -53,7 +60,7 @@ void Operator::add_operand(std::shared_ptr<AST> node) {
 
 const Token &Operator::get_token() const { return this->tok; }
 
-double Operator::eval() const {
+Value Operator::eval() const {
   auto old_map = symbols;
   try {
     return this->__eval();
@@ -64,62 +71,78 @@ double Operator::eval() const {
   }
 }
 
-double Operator::__eval() const {
-  switch ((this->tok).text[0]) {
-    case ('+'): {
-      double ret = 0;
-      for (auto node : this->operands) {
-        ret += node->__eval();
-      }
-      return ret;
-      break;
-    }
-    case ('-'): {
-      double ret = this->operands[0]->__eval();
-      for (auto node = (this->operands).begin() + 1;
-           node < this->operands.end(); node++) {
-        ret -= (*node)->__eval();
-      }
-      return ret;
-      break;
-    }
-    case ('*'): {
-      double ret = 1;
-      for (auto node : this->operands) {
-        ret *= node->__eval();
-      }
-      return ret;
-      break;
-    }
-    case ('/'): {
-      double ret = this->operands[0]->__eval();
-      for (auto node = (this->operands).begin() + 1;
-           node < this->operands.end(); node++) {
-        if ((*node)->__eval() == 0.) {
-          throw DivByZero();
-        }
-        ret /= (*node)->__eval();
-      }
-      return ret;
-      break;
-    }
-    case ('='): {
-      // get rhs value
-      double ret = (*((this->operands).end() - 1))->__eval();
-      for (auto node = ((this->operands).end() - 2);
-           node >= ((this->operands).begin()); node--) {
-        ((Identifier *)(node->get()))->assign(ret);
-      }
-      return ret;
-      break;
-    }
-    default: {
-      return 0;
-      break;
-    }
-  }
-}
+Value Operator::__eval() const {
+  std::string str = (this->tok).text;
 
+  if (str == "+") {
+    Value ret(0.0);
+    for (auto node : this->operands) {
+      ret += node->__eval();
+    }
+    return ret;
+  } else if (str == "-") {
+    Value ret = this->operands[0]->__eval();
+    for (auto node = (this->operands).begin() + 1; node < this->operands.end();
+         node++) {
+      ret -= (*node)->__eval();
+    }
+    return ret;
+  } else if (str == "*") {
+    Value ret(1.0);
+    for (auto node : this->operands) {
+      ret *= node->__eval();
+    }
+    return ret;
+  } else if (str == "/") {
+    Value ret = this->operands[0]->__eval();
+    for (auto node = (this->operands).begin() + 1; node < this->operands.end();
+         node++) {
+      ret /= (*node)->__eval();
+    }
+    return ret;
+  } else if (str == "%") {
+    Value ret = this->operands[0]->__eval();
+    for (auto node = (this->operands).begin() + 1; node < this->operands.end();
+         node++) {
+      ret %= (*node)->__eval();
+    }
+    return ret;
+  } else if (str == "=") {
+    // Get rhs value
+    Value ret = (*((this->operands).end() - 1))->__eval();
+    // Assign to lhs'
+    for (auto node = ((this->operands).end() - 2);
+         node >= ((this->operands).begin()); node--) {
+      ((Identifier *)(node->get()))->assign(ret);
+    }
+    // Return rhs
+    return ret;
+    // The following operators do not support S expression
+    // tree structure.
+  } else if (str == "==") {
+    return this->operands[0]->__eval() == this->operands[1]->__eval();
+  } else if (str == "!=") {
+    return this->operands[0]->__eval() != this->operands[1]->__eval();
+  } else if (str == "<") {
+    return this->operands[0]->__eval() < this->operands[1]->__eval();
+  } else if (str == "<=") {
+    return this->operands[0]->__eval() <= this->operands[1]->__eval();
+  } else if (str == ">") {
+    return this->operands[0]->__eval() > this->operands[1]->__eval();
+  } else if (str == ">=") {
+    return this->operands[0]->__eval() >= this->operands[1]->__eval();
+  } else if (str == "&") {
+    return this->operands[0]->__eval() & this->operands[1]->__eval();
+  } else if (str == "^") {
+    return this->operands[0]->__eval() ^ this->operands[1]->__eval();
+  } else if (str == "|") {
+    return this->operands[0]->__eval() | this->operands[1]->__eval();
+  }
+  // If execution reaches here something has gone seriously wrong...
+  return Value();
+}
+// Deserted due to depreciation of S expression evaluation
+/*
 bool Operator::is_legal() const {
   if (this->validated)
     return true;
@@ -151,6 +174,7 @@ bool Operator::is_legal() const {
     }
   }
 }
+*/
 
 void Operator::get_infix(std::ostream &oss) const {
   oss << '(';
@@ -174,19 +198,20 @@ Identifier::~Identifier() {
 
 const Token &Identifier::get_token() const { return this->tok; }
 
-double Identifier::eval() const { return this->__eval(); }
+Value Identifier::eval() const { return this->__eval(); }
 
-double Identifier::__eval() const {
+Value Identifier::__eval() const {
   if (this->assigned()) {
-    return symbols[this->tok.text];
+    return symbols.at(this->tok.text);
   } else {
     throw UnknownIdent(this->tok);
   }
 }
 
-bool Identifier::is_legal() const { return this->assigned(); }
+// Deserted due to depreciation of S expression evaluation
+// bool Identifier::is_legal() const { return this->assigned(); }
 
-void Identifier::assign(double x) { symbols[this->tok.text] = x; }
+void Identifier::assign(Value x) { symbols[this->tok.text] = x; }
 
 bool Identifier::assigned() const {
   return !(symbols.find(this->tok.text) == symbols.end());
