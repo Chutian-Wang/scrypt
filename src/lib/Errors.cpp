@@ -42,7 +42,6 @@ const char *UnexpTokError::what() const noexcept { return this->msg; }
 
 DivByZero::DivByZero() {
   this->exit_code = DIV_BY_ZERO;
-  this->tok = tok;
   this->msg = nullptr;
 }
 
@@ -63,3 +62,21 @@ UnknownIdent::UnknownIdent(const Token &tok) {
 UnknownIdent::~UnknownIdent() { delete[] this->msg; }
 
 const char *UnknownIdent::what() const noexcept { return this->msg; }
+
+InvalidCond::InvalidCond() {
+  this->exit_code = INVALID_COND;
+  this->msg = nullptr;
+}
+
+const char *InvalidCond::what() const noexcept {
+  return "Runtime error: condition is not a bool.";
+}
+
+InvalidOperand::InvalidOperand() {
+  this->exit_code = INVALID_OPRAND;
+  this->msg = nullptr;
+}
+
+const char *InvalidOperand::what() const noexcept {
+  return "Runtime error: invalid operand type.";
+}

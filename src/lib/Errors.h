@@ -18,6 +18,8 @@
 #define SCRYPT_RUNTIME 3
 #define DIV_BY_ZERO SCRYPT_RUNTIME
 #define UNKNOWN_IDENT SCRYPT_RUNTIME
+#define INVALID_COND SCRYPT_RUNTIME
+#define INVALID_OPRAND SCRYPT_RUNTIME
 
 /**
  * Children of this custom Error class should be thrown
@@ -68,6 +70,22 @@ class UnknownIdent : public ScryptRuntimeError {
  public:
   UnknownIdent(const Token &tok);
   virtual ~UnknownIdent();
+  virtual const char *what() const noexcept;
+};
+
+class InvalidCond : public ScryptRuntimeError {
+ public:
+  InvalidCond();
+  virtual ~InvalidCond(){};
+  // what() is static, no need to write destructor
+  virtual const char *what() const noexcept;
+};
+
+class InvalidOperand : public ScryptRuntimeError {
+ public:
+  InvalidOperand();
+  virtual ~InvalidOperand(){};
+  // what() is static, no need to write destructor
   virtual const char *what() const noexcept;
 };
 

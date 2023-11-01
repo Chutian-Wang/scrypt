@@ -5,6 +5,7 @@
 #include "lib/AST.h"
 #include "lib/Errors.h"
 #include "lib/Lexer.h"
+#include "lib/Value.h"
 
 int main() {
   std::shared_ptr<AST> parser;
@@ -17,7 +18,8 @@ int main() {
       parser = AST::parse_infix(lexer.get_tokens());
       parser->get_infix(std::cout);
       std::cout << std::endl;
-      std::cout << parser->eval() << std::endl;
+      Value result = parser->eval();
+      std::cout << result << std::endl;
     } catch (const ScryptError &err) {
       ScryptError::handle(std::cout, err);
     }

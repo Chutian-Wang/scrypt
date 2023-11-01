@@ -6,17 +6,26 @@
 
 enum struct TokenType {
   NUMBER,
-  OPERATOR,    // +, -, *, /, =
+  OPERATOR,    // *, /, %, +, -, <, <=, >, >=, ==, !=, &, ^, |, =
   LPAREN,      // (
   RPAREN,      // )
+  LCBRACE,     // {
+  RCBRACE,     // }
   IDENTIFIER,  // Series of letters, numbers, and underscores. They must start
                // with letters or underscores.
+  BOOL,
+  WHILE,
+  IF,
+  PRINT,
+  ELSE,
   END,
   ERR  // Any other
 };
 
-static const std::map<char, int> p_map{
-    {'=', 1}, {'+', 2}, {'-', 2}, {'*', 3}, {'/', 3}};
+static const std::map<std::string, int> p_map{
+    {"=", 1},  {"|", 2}, {"^", 3},  {"&", 4}, {"==", 5},
+    {"!=", 5}, {"<", 6}, {"<=", 6}, {">", 6}, {">=", 6},
+    {"+", 7},  {"-", 7}, {"*", 8},  {"/", 8}, {"%", 8}};
 
 class Token {
  public:
