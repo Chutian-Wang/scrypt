@@ -1,78 +1,79 @@
-#include <memory>
 #include <vector>
+#include <memory>
 
 #include "AST.h"
 
 class Block {
- private:
-  std::vector<std::shared_ptr<Statement>> statements;
+private:
+    std::vector<std::shared_ptr<Statement>> statements;
 
- public:
-  Block();
-  virtual ~Block();
+public:
+    Block();
+    virtual ~Block();
 
-  static void run();
+    virtual void run();
 };
 
 class Statement {
- public:
-  Statement();
-  virtual ~Statement();
+public:
+    Statement();
+    virtual ~Statement();
 
-  static Block parse_block(const std::vector<Token> &tokens,
-                           std::vector<Token>::const_iterator &head);
-  virtual bool syntaxValid() = 0;
+    static Block parse_block(const std::vector<Token> &tokens, 
+                             std::vector<Token>::const_iterator &head);
+    virtual void run();
+    virtual bool syntax_valid() = 0;
 };
 
 class Expression : public Statement {
- public:
-  Expression();
-  virtual ~Expression();
+public:
+    Expression();
+    virtual ~Expression();
 
-  std::shared_ptr<AST> expr;
+    std::shared_ptr<AST> expr;
 
-  virtual bool syntaxValid() override;
+    virtual bool syntax_valid() override;
 };
 
 class IfStatement : public Statement {
- public:
-  IfStatement();
-  virtual ~IfStatement();
+public:
+    IfStatement();
+    virtual ~IfStatement();
 
-  Expression condExpr;
-  Block blockA;
-  Block blockB;
+    Expression condExpr;
+    Block blockA;
+    Block blockB;
 
-  virtual bool syntaxValid();
+    virtual bool syntax_valid();
 };
 
 class ElseStatement : public Statement {
- public:
-  ElseStatement();
-  virtual ~ElseStatement();
+public:
+    ElseStatement();
+    virtual ~ElseStatement();
 
-  Block eBlock;
+    Block eBlock;
 
-  virtual bool syntaxValid();
+    virtual bool syntax_valid();
 };
 
 class WhileStatement : public Statement {
- public:
-  WhileStatement();
-  virtual ~WhileStatement();
+public:
+    WhileStatement();
+    virtual ~WhileStatement();
 
-  Expression condExpr;
-  Block wBlock;
+    Expression condExpr;
+    Block wBlock;
 
-  virtual bool syntaxValid();
+    virtual bool syntax_valid();
 };
 
 class PrintStatement : public Statement {
- public:
-  PrintStatement();
-  virtual ~PrintStatement();
+public:
+    PrintStatement();
+    virtual ~PrintStatement();
 
-  Expression printee;
+    Expression printee;
 
-  virtual bool syntaxValid();
+    virtual bool syntax_valid();
 };
