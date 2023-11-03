@@ -1,13 +1,13 @@
 #include "AST.h"
 
 #include <cstring>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <stack>
 #include <string>
 #include <vector>
-#include <map>
-#include <iostream>
+
 #include "Errors.h"
 #include "Nodes.h"
 #include "Value.h"
