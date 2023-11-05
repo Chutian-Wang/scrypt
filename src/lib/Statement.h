@@ -14,6 +14,11 @@ class Block {
   Block();
   ~Block();
 
+  static std::unique_ptr<Block> parse_block(
+      const std::vector<Token>& tokens,
+      std::vector<Token>::const_iterator& head,
+      std::vector<std::unique_ptr<Statement>>& statements);
+
   void add_statement(std::unique_ptr<Statement>);
   void run();
   void print(std::ostream& os);
@@ -25,9 +30,6 @@ class Statement {
   Statement(){};
   virtual ~Statement();
 
-  static std::unique_ptr<Block> parse_block(
-      const std::vector<Token>& tokens,
-      std::vector<Token>::const_iterator& head);
   virtual bool syntax_valid() = 0;
   // This function runs  the statement and will
   // print something if it contains a print statement
