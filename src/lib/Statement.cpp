@@ -56,8 +56,8 @@ std::unique_ptr<Block> Block::parse_block(
         }
 
         block.add_statement(std::move(while_statement));
-      }
-      break;
+        }
+        break;
       case (TokenType::IF): {
           head++;
           std::unique_ptr<Expression> condition = ast.parse_infix(head);
@@ -87,7 +87,7 @@ std::unique_ptr<Block> Block::parse_block(
             }
           } 
           block.add_statement(std::move(if_statement));
-      }
+        }
         break;
       case (TokenType::PRINT): {
         head++;
@@ -95,12 +95,13 @@ std::unique_ptr<Block> Block::parse_block(
 
         std::unique_ptr<PrintStatement> print_statement = std::make_unique<PrintStatement>(std::move(printee));
         block.add_statement(std::move(print_statement));
-      }
+        }
         break;
       default:
         throw UnexpTokError(*head);
     }
   }
+  return block;
 }
 
 void Block::add_statement(std::unique_ptr<Statement> statement) {
