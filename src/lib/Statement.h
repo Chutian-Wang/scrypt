@@ -21,8 +21,7 @@ class Block {
 
   static std::unique_ptr<Block> parse_block(
       const std::vector<Token>& tokens,
-      std::vector<Token>::const_iterator& head,
-      std::vector<std::unique_ptr<Statement>>& statements);
+      std::vector<Token>::const_iterator& head);
 
   void add_statement(std::unique_ptr<Statement>);
   void run();
