@@ -22,12 +22,6 @@ int main() {
     std::vector<Token>::const_iterator head = tokens.begin();
     std::unique_ptr<Block> program = Block::parse_block(tokens, head);
 
-    std::cout << "Token list: ";
-    for (const auto& token : tokens) {
-        std::cout << token.text << " ";
-    }
-    std::cout << std::endl;
-
     program->print(std::cout, 0);
   } catch (const ScryptError &err) {
     ScryptError::handle(std::cerr, err);
