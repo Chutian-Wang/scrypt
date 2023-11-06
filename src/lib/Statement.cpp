@@ -1,48 +1,48 @@
 #ifndef STATEMENT_H
 #define STATEMENT_H
 
-#include <vector>
+#include "Statement.h"
+
 #include <memory>
 #include <string>
+#include <vector>
 
-#include "Statement.h"
-#include "Value.h"
-#include "AST.h" 
+#include "AST.h"
 #include "Errors.h"
 #include "Nodes.h"
+#include "Value.h"
 
-
-Block::Block() {
-  this->statements = std::vector<std::unique_ptr<Statement>>();
-}
+Block::Block() { this->statements = std::vector<std::unique_ptr<Statement>>(); }
 
 Block::~Block() {
   // Auto garbage collection
 }
 
 std::unique_ptr<Block> Block::parse_block(
-    const std::vector<Token>& tokens, std::vector<Token>::const_iterator& head) {
-  Block block;
-  AST ast;
+    const std::vector<Token>& tokens,
+    std::vector<Token>::const_iterator& head) {
+  std::unique_ptr<Block> block = std::make_unique<Block>();
+  std::unique_ptr<AST> ast = std::make_unique<AST>();
 
   while (head++->type != TokenType::END) {
     if (head->type != TokenType::WHILE && head->type != TokenType::IF &&
         head->type != TokenType::ELSE && head->type != TokenType::PRINT) {
-      block.add_statement(std::make_unique<Expression>(ast.parse_infix(head)));
+      block->add_statement(
+          std::make_unique<Expression>(ast->parse_infix(head)));
     }
     switch (head->type) {
       case (TokenType::WHILE): {
         head++;
-        std::unique_ptr<Expression> condition = ast.parse_infix(head);
+        std::unique_ptr<Expression> condition = ast->parse_infix(head);
 
         if (head->type == TokenType::LCBRACE) {
           head++;
-        }
-        else {
+        } else {
           throw UnexpTokError(*head);
         }
-          
-        std::unique_ptr<WhileStatement> while_statement = std::make_unique<WhileStatement>();
+
+        std::unique_ptr<WhileStatement> while_statement =
+            std::make_unique<WhileStatement>();
         while_statement->set_cond(std::move(condition));
 
         std::unique_ptr<Block> while_block = Block::parse_block(tokens, head);
@@ -50,58 +50,56 @@ std::unique_ptr<Block> Block::parse_block(
 
         if (head->type == TokenType::RCBRACE) {
           head++;
-        }
-        else {
+        } else {
           throw UnexpTokError(*head);
         }
 
-        block.add_statement(std::move(while_statement));
-        }
-        break;
+        block->add_statement(std::move(while_statement));
+      } break;
       case (TokenType::IF): {
+        head++;
+        std::unique_ptr<Expression> condition = ast->parse_infix(head);
+
+        if (head->type == TokenType::LCBRACE) {
           head++;
-          std::unique_ptr<Expression> condition = ast.parse_infix(head);
-
-          if (head->type == TokenType::LCBRACE) {
-            head++;
-          }
-          else {
-            throw UnexpTokError(*head);
-          }
-
-          std::unique_ptr<IfStatement> if_statement = std::make_unique<IfStatement>();
-          if_statement->set_cond(std::move(condition));
-         
-          std::unique_ptr<Block> if_block = Block::parse_block(tokens, head);
-          if_statement->set_if(std::move(if_block));
-
-          if (head->type == TokenType::ELSE) {
-            head++;
-            if(head->type == TokenType::IF) {
-              std::unique_ptr<Block> else_if_block = Block::parse_block(tokens, head);
-              if_statement->set_else(std::move(else_if_block));
-            }
-            else {
-              std::unique_ptr<Block> else_block = Block::parse_block(tokens, head);
-              if_statement->set_else(std::move(else_block));
-            }
-          } 
-          block.add_statement(std::move(if_statement));
+        } else {
+          throw UnexpTokError(*head);
         }
-        break;
+
+        std::unique_ptr<IfStatement> if_statement =
+            std::make_unique<IfStatement>();
+        if_statement->set_cond(std::move(condition));
+
+        std::unique_ptr<Block> if_block = Block::parse_block(tokens, head);
+        if_statement->set_if(std::move(if_block));
+
+        if (head->type == TokenType::ELSE) {
+          head++;
+          if (head->type == TokenType::IF) {
+            std::unique_ptr<Block> else_if_block =
+                Block::parse_block(tokens, head);
+            if_statement->set_else(std::move(else_if_block));
+          } else {
+            std::unique_ptr<Block> else_block =
+                Block::parse_block(tokens, head);
+            if_statement->set_else(std::move(else_block));
+          }
+        }
+        block->add_statement(std::move(if_statement));
+      } break;
       case (TokenType::PRINT): {
         head++;
-        std::unique_ptr<Expression> printee = ast.parse_infix(head);
+        std::unique_ptr<Expression> printee = ast->parse_infix(head);
 
-        std::unique_ptr<PrintStatement> print_statement = std::make_unique<PrintStatement>(std::move(printee));
-        block.add_statement(std::move(print_statement));
-        }
-        break;
+        std::unique_ptr<PrintStatement> print_statement =
+            std::make_unique<PrintStatement>(std::move(printee));
+        block->add_statement(std::move(print_statement));
+      } break;
       default:
         throw UnexpTokError(*head);
     }
   }
-  return block;
+  return std::move(block);
 }
 
 void Block::add_statement(std::unique_ptr<Statement> statement) {
@@ -111,13 +109,13 @@ void Block::add_statement(std::unique_ptr<Statement> statement) {
 
 void Block::run() {
   // Use const reference for unique pointer here
-  for (auto const &statement: this->statements) {
+  for (auto const& statement : this->statements) {
     statement->run();
   }
 }
 
 void Block::print(std::ostream& os, int depth) const {
-  for (auto const &statement: this->statements) {
+  for (auto const& statement : this->statements) {
     for (int i = 0; i < depth; i++) {
       os << "    ";
     }
@@ -125,17 +123,13 @@ void Block::print(std::ostream& os, int depth) const {
   }
 }
 
-Expression::Expression(std::shared_ptr<AST> expr) {
-  this->expr = expr;
-}
+Expression::Expression(std::shared_ptr<AST> expr) { this->expr = expr; }
 
 Expression::~Expression() {
   // Auto garbage collection
 }
 
-void Expression::run() {
-  this->expr->eval();
-}
+void Expression::run() { this->expr->eval(); }
 
 void Expression::print(std::ostream& os, int depth) const {
   for (int i = 0; i < depth; i++) {
@@ -145,18 +139,14 @@ void Expression::print(std::ostream& os, int depth) const {
   os << '\n';
 }
 
-Value Expression::eval() {
-  return this->expr->eval();
-}
+Value Expression::eval() { return this->expr->eval(); }
 
-void Expression::get_infix(std::ostream& os) {
-  this->expr->get_infix(os);
-}
+void Expression::get_infix(std::ostream& os) { this->expr->get_infix(os); }
 
 IfStatement::IfStatement() {
   this->condition = std::unique_ptr<Expression>();
-  this->if_block  = std::unique_ptr<Block>();
-  this->else_block  = std::unique_ptr<Block>();
+  this->if_block = std::unique_ptr<Block>();
+  this->else_block = std::unique_ptr<Block>();
 }
 
 IfStatement::~IfStatement() {
@@ -223,14 +213,13 @@ WhileStatement::~WhileStatement() {
   // Auto garbage collection
 }
 
-void WhileStatement::run(){
+void WhileStatement::run() {
   while (1) {
     Value truth = condition->eval();
     if (truth.type == ValueType::BOOL) {
       if (truth._value._bool) {
         this->while_block->run();
-      }
-      else {
+      } else {
         break;
       }
     } else {
@@ -262,7 +251,8 @@ void WhileStatement::set_while(std::unique_ptr<Block> block) {
 }
 
 PrintStatement::PrintStatement(std::unique_ptr<Expression> printee,
-  std::ostream& os): os (os) {
+                               std::ostream& os)
+    : os(os) {
   this->printee = std::move(printee);
 }
 
@@ -270,9 +260,7 @@ PrintStatement::~PrintStatement() {
   // Auto garbage collection
 }
 
-void PrintStatement::run() {
-  this->os << this->printee->eval() << '\n';
-}
+void PrintStatement::run() { this->os << this->printee->eval() << '\n'; }
 
 void PrintStatement::print(std::ostream& os, int depth) const {
   for (int i = 0; i < depth; i++) {
