@@ -43,10 +43,10 @@ std::unique_ptr<Block> Block::parse_block(
 
         std::unique_ptr<WhileStatement> while_statement =
             std::make_unique<WhileStatement>();
-        while_statement->set_cond(std::move(condition));
+        while_statement->set_cond(condition);
 
         std::unique_ptr<Block> while_block = Block::parse_block(tokens, head);
-        while_statement->set_while(std::move(while_block));
+        while_statement->set_while(while_block);
 
         if (head->type == TokenType::RCBRACE) {
           head++;
@@ -69,21 +69,21 @@ std::unique_ptr<Block> Block::parse_block(
 
         std::unique_ptr<IfStatement> if_statement =
             std::make_unique<IfStatement>();
-        if_statement->set_cond(std::move(condition));
+        if_statement->set_cond(condition);
 
         std::unique_ptr<Block> if_block = Block::parse_block(tokens, head);
-        if_statement->set_if(std::move(if_block));
+        if_statement->set_if(if_block);
 
         if (head->type == TokenType::ELSE) {
           head++;
           if (head->type == TokenType::IF) {
             std::unique_ptr<Block> else_if_block =
                 Block::parse_block(tokens, head);
-            if_statement->set_else(std::move(else_if_block));
+            if_statement->set_else(else_if_block);
           } else {
             std::unique_ptr<Block> else_block =
                 Block::parse_block(tokens, head);
-            if_statement->set_else(std::move(else_block));
+            if_statement->set_else(else_block);
           }
         }
         block->add_statement(std::move(if_statement));
@@ -94,7 +94,7 @@ std::unique_ptr<Block> Block::parse_block(
             std::make_unique<Expression>(Expression(AST::parse_infix(head)));
 
         auto print_statement =
-            std::make_unique<PrintStatement>(std::move(printee), std::cout);
+            std::make_unique<PrintStatement>(printee, std::cout);
         block->add_statement(std::move(print_statement));
       } break;
       default:
@@ -194,15 +194,15 @@ void IfStatement::print(std::ostream& os, int depth) const {
   os << '\n';
 }
 
-void IfStatement::set_cond(std::unique_ptr<Expression> cond) {
+void IfStatement::set_cond(std::unique_ptr<Expression>& cond) {
   this->condition = std::move(cond);
 }
 
-void IfStatement::set_if(std::unique_ptr<Block> block) {
+void IfStatement::set_if(std::unique_ptr<Block>& block) {
   this->if_block = std::move(block);
 }
 
-void IfStatement::set_else(std::unique_ptr<Block> block) {
+void IfStatement::set_else(std::unique_ptr<Block>& block) {
   this->else_block = std::move(block);
 }
 
@@ -244,15 +244,15 @@ void WhileStatement::print(std::ostream& os, int depth) const {
   os << "}\n";
 }
 
-void WhileStatement::set_cond(std::unique_ptr<Expression> cond) {
+void WhileStatement::set_cond(std::unique_ptr<Expression>& cond) {
   this->condition = std::move(cond);
 }
 
-void WhileStatement::set_while(std::unique_ptr<Block> block) {
+void WhileStatement::set_while(std::unique_ptr<Block>& block) {
   this->while_block = std::move(block);
 }
 
-PrintStatement::PrintStatement(std::unique_ptr<Expression> printee,
+PrintStatement::PrintStatement(std::unique_ptr<Expression>& printee,
                                std::ostream& os)
     : os(os) {
   this->printee = std::move(printee);

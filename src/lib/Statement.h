@@ -71,9 +71,9 @@ class IfStatement : public Statement {
   virtual void run();
   virtual void print(std::ostream& os, int depth = 0) const;
 
-  void set_cond(std::unique_ptr<Expression> cond);
-  void set_if(std::unique_ptr<Block> block);
-  void set_else(std::unique_ptr<Block> block);
+  void set_cond(std::unique_ptr<Expression>& cond);
+  void set_if(std::unique_ptr<Block>& block);
+  void set_else(std::unique_ptr<Block>& block);
 };
 
 class WhileStatement : public Statement {
@@ -88,8 +88,8 @@ class WhileStatement : public Statement {
   virtual void run();
   virtual void print(std::ostream& os, int depth = 0) const;
 
-  void set_cond(std::unique_ptr<Expression> cond);
-  void set_while(std::unique_ptr<Block> block);
+  void set_cond(std::unique_ptr<Expression>& cond);
+  void set_while(std::unique_ptr<Block>& block);
 };
 
 class PrintStatement : public Statement {
@@ -100,7 +100,7 @@ class PrintStatement : public Statement {
  public:
   // The print target ostream must be provided in
   // initializaer list.
-  PrintStatement(std::unique_ptr<Expression> printee, std::ostream& os);
+  PrintStatement(std::unique_ptr<Expression>& printee, std::ostream& os);
   virtual ~PrintStatement();
 
   // This function will push printee's evaluated
