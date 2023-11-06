@@ -3,6 +3,7 @@
 
 #include "Statement.h"
 
+#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -21,19 +22,18 @@ Block::~Block() {
 std::unique_ptr<Block> Block::parse_block(
     const std::vector<Token>& tokens,
     std::vector<Token>::const_iterator& head) {
-  std::unique_ptr<Block> block = std::make_unique<Block>();
-  std::unique_ptr<AST> ast = std::make_unique<AST>();
+  auto block = std::make_unique<Block>();
 
   while (head++->type != TokenType::END) {
     if (head->type != TokenType::WHILE && head->type != TokenType::IF &&
         head->type != TokenType::ELSE && head->type != TokenType::PRINT) {
       block->add_statement(
-          std::make_unique<Expression>(ast->parse_infix(head)));
+          std::make_unique<Expression>(AST::parse_infix(head)));
     }
     switch (head->type) {
       case (TokenType::WHILE): {
         head++;
-        std::unique_ptr<Expression> condition = ast->parse_infix(head);
+        auto condition = std::make_unique<Expression>(AST::parse_infix(head));
 
         if (head->type == TokenType::LCBRACE) {
           head++;
@@ -58,7 +58,8 @@ std::unique_ptr<Block> Block::parse_block(
       } break;
       case (TokenType::IF): {
         head++;
-        std::unique_ptr<Expression> condition = ast->parse_infix(head);
+        auto condition =
+            std::make_unique<Expression>(Expression(AST::parse_infix(head)));
 
         if (head->type == TokenType::LCBRACE) {
           head++;
@@ -89,10 +90,11 @@ std::unique_ptr<Block> Block::parse_block(
       } break;
       case (TokenType::PRINT): {
         head++;
-        std::unique_ptr<Expression> printee = ast->parse_infix(head);
+        auto printee =
+            std::make_unique<Expression>(Expression(AST::parse_infix(head)));
 
-        std::unique_ptr<PrintStatement> print_statement =
-            std::make_unique<PrintStatement>(std::move(printee));
+        auto print_statement =
+            std::make_unique<PrintStatement>(std::move(printee), std::cout);
         block->add_statement(std::move(print_statement));
       } break;
       default:
