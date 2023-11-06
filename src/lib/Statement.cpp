@@ -19,26 +19,32 @@ Block::~Block() {
   // Auto garbage collection
 }
 
+// This function will set head to one past the last token
+// read unless the last token is END, in which case it will
+// be set to END.
 std::unique_ptr<Block> Block::parse_block(
     const std::vector<Token>& tokens,
     std::vector<Token>::const_iterator& head) {
   auto block = std::make_unique<Block>();
 
   while ((head + 1)->type != TokenType::END) {
+  while (head->type != TokenType::END && head->type != TokenType::RCBRACE) {
     if (head->type != TokenType::WHILE && head->type != TokenType::IF &&
         head->type != TokenType::ELSE && head->type != TokenType::PRINT) {
       block->add_statement(
           std::make_unique<Expression>(AST::parse_infix(head)));
-    }
-    else {
+      head++;
+    } else {
       switch (head->type) {
         case (TokenType::WHILE): {
           head++;
           auto condition = std::make_unique<Expression>(AST::parse_infix(head));
+          head++;
 
-          if (head->type == TokenType::LCBRACE) {
+          if (head->type != TokenType::LCBRACE) {
             head++;
-          } else {
+          }
+          else {
             throw UnexpTokError(*head);
           }
 
@@ -61,7 +67,7 @@ std::unique_ptr<Block> Block::parse_block(
           head++;
           auto condition =
               std::make_unique<Expression>(Expression(AST::parse_infix(head)));
-
+          head++;
           if (head->type == TokenType::LCBRACE) {
             head++;
           } else {
@@ -77,15 +83,9 @@ std::unique_ptr<Block> Block::parse_block(
 
           if (head->type == TokenType::ELSE) {
             head++;
-            if (head->type == TokenType::IF) {
-              std::unique_ptr<Block> else_if_block =
-                  Block::parse_block(tokens, head);
-              if_statement->set_else(else_if_block);
-            } else {
-              std::unique_ptr<Block> else_block =
-                  Block::parse_block(tokens, head);
-              if_statement->set_else(else_block);
-            }
+            std::unique_ptr<Block> else_block =
+                Block::parse_block(tokens, head);
+            if_statement->set_else(else_block);
           }
           block->add_statement(std::move(if_statement));
         } break;
@@ -93,7 +93,7 @@ std::unique_ptr<Block> Block::parse_block(
           head++;
           auto printee =
               std::make_unique<Expression>(Expression(AST::parse_infix(head)));
-
+          head++;
           auto print_statement =
               std::make_unique<PrintStatement>(printee, std::cout);
           block->add_statement(std::move(print_statement));
@@ -103,6 +103,7 @@ std::unique_ptr<Block> Block::parse_block(
       }
     }
   }
+  if (head->type == TokenType::RCBRACE) head++;
   return block;
 }
 
