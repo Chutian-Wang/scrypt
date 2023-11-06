@@ -24,7 +24,7 @@ std::unique_ptr<Block> Block::parse_block(
     std::vector<Token>::const_iterator& head) {
   auto block = std::make_unique<Block>();
 
-  while (head++->type != TokenType::END) {
+  while ((head + 1)->type != TokenType::END) {
     if (head->type != TokenType::WHILE && head->type != TokenType::IF &&
         head->type != TokenType::ELSE && head->type != TokenType::PRINT) {
       block->add_statement(
