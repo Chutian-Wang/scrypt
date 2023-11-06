@@ -5,7 +5,7 @@ CCFLAGS = -std=c++17 -Wall -Wextra -Werror -g
 BUILDDIR = build
 
 # Put test executables and main executable here
-EXEC = lex calc
+EXEC = lex calc format scrypt
 
 # Put dependent object builds here.
 OBJS = 	$(BUILDDIR)/Value.o	\

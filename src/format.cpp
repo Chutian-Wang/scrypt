@@ -10,21 +10,14 @@
 int main() {
   try {
     Lexer lexer;
-    std::string input;
-    std::string line;
-    while (std::getline(std::cin, line)) {
-      input += line + '\n';
-      std::istringstream iss(line);
-      lexer.tokenize(iss);
-    }
-
-    std::vector<Token> tokens = lexer.get_tokens();
+    lexer.tokenize(std::cin);
+    auto tokens = lexer.get_tokens();
     std::vector<Token>::const_iterator head = tokens.begin();
     std::unique_ptr<Block> program = Block::parse_block(tokens, head);
 
     program->print(std::cout, 0);
   } catch (const ScryptError &err) {
-    ScryptError::handle(std::cerr, err);
+    ScryptError::handle(std::cout, err);
     return 1;
   }
   return 0;
