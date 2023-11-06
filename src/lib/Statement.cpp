@@ -105,6 +105,7 @@ std::unique_ptr<Block> Block::parse_block(
   }
   if (head->type == TokenType::RCBRACE) head++;
   return block;
+  }
 }
 
 void Block::add_statement(std::unique_ptr<Statement> statement) {
