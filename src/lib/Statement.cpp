@@ -30,75 +30,77 @@ std::unique_ptr<Block> Block::parse_block(
       block->add_statement(
           std::make_unique<Expression>(AST::parse_infix(head)));
     }
-    switch (head->type) {
-      case (TokenType::WHILE): {
-        head++;
-        auto condition = std::make_unique<Expression>(AST::parse_infix(head));
-
-        if (head->type == TokenType::LCBRACE) {
+    else {
+      switch (head->type) {
+        case (TokenType::WHILE): {
           head++;
-        } else {
-          throw UnexpTokError(*head);
-        }
+          auto condition = std::make_unique<Expression>(AST::parse_infix(head));
 
-        std::unique_ptr<WhileStatement> while_statement =
-            std::make_unique<WhileStatement>();
-        while_statement->set_cond(condition);
-
-        std::unique_ptr<Block> while_block = Block::parse_block(tokens, head);
-        while_statement->set_while(while_block);
-
-        if (head->type == TokenType::RCBRACE) {
-          head++;
-        } else {
-          throw UnexpTokError(*head);
-        }
-
-        block->add_statement(std::move(while_statement));
-      } break;
-      case (TokenType::IF): {
-        head++;
-        auto condition =
-            std::make_unique<Expression>(Expression(AST::parse_infix(head)));
-
-        if (head->type == TokenType::LCBRACE) {
-          head++;
-        } else {
-          throw UnexpTokError(*head);
-        }
-
-        std::unique_ptr<IfStatement> if_statement =
-            std::make_unique<IfStatement>();
-        if_statement->set_cond(condition);
-
-        std::unique_ptr<Block> if_block = Block::parse_block(tokens, head);
-        if_statement->set_if(if_block);
-
-        if (head->type == TokenType::ELSE) {
-          head++;
-          if (head->type == TokenType::IF) {
-            std::unique_ptr<Block> else_if_block =
-                Block::parse_block(tokens, head);
-            if_statement->set_else(else_if_block);
+          if (head->type == TokenType::LCBRACE) {
+            head++;
           } else {
-            std::unique_ptr<Block> else_block =
-                Block::parse_block(tokens, head);
-            if_statement->set_else(else_block);
+            throw UnexpTokError(*head);
           }
-        }
-        block->add_statement(std::move(if_statement));
-      } break;
-      case (TokenType::PRINT): {
-        head++;
-        auto printee =
-            std::make_unique<Expression>(Expression(AST::parse_infix(head)));
 
-        auto print_statement =
-            std::make_unique<PrintStatement>(printee, std::cout);
-        block->add_statement(std::move(print_statement));
-      } break;
-      default:
-        throw UnexpTokError(*head);
+          std::unique_ptr<WhileStatement> while_statement =
+              std::make_unique<WhileStatement>();
+          while_statement->set_cond(condition);
+
+          std::unique_ptr<Block> while_block = Block::parse_block(tokens, head);
+          while_statement->set_while(while_block);
+
+          if (head->type == TokenType::RCBRACE) {
+            head++;
+          } else {
+            throw UnexpTokError(*head);
+          }
+
+          block->add_statement(std::move(while_statement));
+        } break;
+        case (TokenType::IF): {
+          head++;
+          auto condition =
+              std::make_unique<Expression>(Expression(AST::parse_infix(head)));
+
+          if (head->type == TokenType::LCBRACE) {
+            head++;
+          } else {
+            throw UnexpTokError(*head);
+          }
+
+          std::unique_ptr<IfStatement> if_statement =
+              std::make_unique<IfStatement>();
+          if_statement->set_cond(condition);
+
+          std::unique_ptr<Block> if_block = Block::parse_block(tokens, head);
+          if_statement->set_if(if_block);
+
+          if (head->type == TokenType::ELSE) {
+            head++;
+            if (head->type == TokenType::IF) {
+              std::unique_ptr<Block> else_if_block =
+                  Block::parse_block(tokens, head);
+              if_statement->set_else(else_if_block);
+            } else {
+              std::unique_ptr<Block> else_block =
+                  Block::parse_block(tokens, head);
+              if_statement->set_else(else_block);
+            }
+          }
+          block->add_statement(std::move(if_statement));
+        } break;
+        case (TokenType::PRINT): {
+          head++;
+          auto printee =
+              std::make_unique<Expression>(Expression(AST::parse_infix(head)));
+
+          auto print_statement =
+              std::make_unique<PrintStatement>(printee, std::cout);
+          block->add_statement(std::move(print_statement));
+        } break;
+        default:
+          throw UnexpTokError(*head);
+      }
     }
   }
   return block;
