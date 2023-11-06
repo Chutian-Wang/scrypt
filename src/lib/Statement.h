@@ -32,7 +32,7 @@ class Block {
 class Statement {
  public:
   Statement(){};
-  virtual ~Statement() {};
+  virtual ~Statement(){};
 
   // This function runs  the statement and will
   // print something if it contains a print statement
@@ -100,8 +100,7 @@ class PrintStatement : public Statement {
  public:
   // The print target ostream must be provided in
   // initializaer list.
-  PrintStatement(std::unique_ptr<Expression> printee,
-    std::ostream& os);
+  PrintStatement(std::unique_ptr<Expression> printee, std::ostream& os);
   virtual ~PrintStatement();
 
   // This function will push printee's evaluated
