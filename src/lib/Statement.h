@@ -18,9 +18,13 @@ class Block {
  public:
   Block();
   ~Block();
-
+  
+  // This is the top level block parser.
+  static std::unique_ptr<Block> parse_block(const std::vector<Token>& tokens);
+  // This function will set head to one past the last token
+  // read unless the last token is END, in which case it will
+  // be set to END.
   static std::unique_ptr<Block> parse_block(
-      const std::vector<Token>& tokens,
       std::vector<Token>::const_iterator& head);
 
   void add_statement(std::unique_ptr<Statement>);

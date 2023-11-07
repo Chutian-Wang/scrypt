@@ -19,16 +19,28 @@ Block::~Block() {
   // Auto garbage collection
 }
 
-// This function will set head to one past the last token
-// read unless the last token is END, in which case it will
-// be set to END.
+std::unique_ptr<Block> Block::parse_block(const std::vector<Token>& tokens) {
+  auto head = tokens.begin();
+  auto block = Block::parse_block(head);
+  if (head->type != TokenType::END) {
+    throw UnexpTokError(*head);
+  }
+  return block;
+}
+
 std::unique_ptr<Block> Block::parse_block(
-    const std::vector<Token>& tokens,
     std::vector<Token>::const_iterator& head) {
   auto block = std::make_unique<Block>();
 
   while (head->type != TokenType::END && head->type != TokenType::RCBRACE) {
-    if (head->type != TokenType::WHILE && head->type != TokenType::IF &&
+    if (head->type == TokenType::LCBRACE) {
+      block = Block::parse_block(++head);
+      if (head->type != TokenType::RCBRACE) {
+        throw UnexpTokError(*head);
+      }
+      head++;
+      return block;
+    } else if (head->type != TokenType::WHILE && head->type != TokenType::IF &&
         head->type != TokenType::ELSE && head->type != TokenType::PRINT) {
       block->add_statement(
           std::make_unique<Expression>(AST::parse_infix(head)));
@@ -39,9 +51,7 @@ std::unique_ptr<Block> Block::parse_block(
           head++;
           auto condition = std::make_unique<Expression>(AST::parse_infix(head));
           head++;
-          if (head->type == TokenType::LCBRACE) {
-            head++;
-          } else {
+          if (head->type != TokenType::LCBRACE) {
             throw UnexpTokError(*head);
           }
 
@@ -49,14 +59,8 @@ std::unique_ptr<Block> Block::parse_block(
               std::make_unique<WhileStatement>();
           while_statement->set_cond(condition);
 
-          std::unique_ptr<Block> while_block = Block::parse_block(tokens, head);
+          std::unique_ptr<Block> while_block = Block::parse_block(head);
           while_statement->set_while(while_block);
-
-          if (head->type == TokenType::RCBRACE) {
-            head++;
-          } else {
-            throw UnexpTokError(*head);
-          }
 
           block->add_statement(std::move(while_statement));
         } break;
@@ -65,9 +69,7 @@ std::unique_ptr<Block> Block::parse_block(
           auto condition =
               std::make_unique<Expression>(Expression(AST::parse_infix(head)));
           head++;
-          if (head->type == TokenType::LCBRACE) {
-            head++;
-          } else {
+          if (head->type != TokenType::LCBRACE) {
             throw UnexpTokError(*head);
           }
 
@@ -75,13 +77,13 @@ std::unique_ptr<Block> Block::parse_block(
               std::make_unique<IfStatement>();
           if_statement->set_cond(condition);
 
-          std::unique_ptr<Block> if_block = Block::parse_block(tokens, head);
+          std::unique_ptr<Block> if_block = Block::parse_block(head);
           if_statement->set_if(if_block);
 
           if (head->type == TokenType::ELSE) {
             head++;
             std::unique_ptr<Block> else_block =
-                Block::parse_block(tokens, head);
+                Block::parse_block(head);
             if_statement->set_else(else_block);
           }
           block->add_statement(std::move(if_statement));
@@ -100,7 +102,7 @@ std::unique_ptr<Block> Block::parse_block(
       }
     }
   }
-  if (head->type == TokenType::RCBRACE) head++;
+  // if (head->type == TokenType::RCBRACE) head++;
   return block;
 }
 
@@ -118,9 +120,6 @@ void Block::run() {
 
 void Block::print(std::ostream& os, int depth) const {
   for (auto const& statement : this->statements) {
-    for (int i = 0; i < depth; i++) {
-      os << "    ";
-    }
     statement->print(os, depth);
   }
 }

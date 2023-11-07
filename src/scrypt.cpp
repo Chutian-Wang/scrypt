@@ -19,8 +19,7 @@ int main() {
     }
 
     std::vector<Token> tokens = lexer.get_tokens();
-    std::vector<Token>::const_iterator head = tokens.begin();
-    std::unique_ptr<Block> program = Block::parse_block(tokens, head);
+    std::unique_ptr<Block> program = Block::parse_block(tokens);
 
     program->run();
   } catch (const ScryptError &err) {
