@@ -41,7 +41,8 @@ std::unique_ptr<Block> Block::parse_block(
       head++;
       return block;
     } else if (head->type != TokenType::WHILE && head->type != TokenType::IF &&
-        head->type != TokenType::ELSE && head->type != TokenType::PRINT) {
+               head->type != TokenType::ELSE &&
+               head->type != TokenType::PRINT) {
       block->add_statement(
           std::make_unique<Expression>(AST::parse_infix(head)));
       head++;
@@ -82,8 +83,7 @@ std::unique_ptr<Block> Block::parse_block(
 
           if (head->type == TokenType::ELSE) {
             head++;
-            std::unique_ptr<Block> else_block =
-                Block::parse_block(head);
+            std::unique_ptr<Block> else_block = Block::parse_block(head);
             if_statement->set_else(else_block);
           }
           block->add_statement(std::move(if_statement));
@@ -181,16 +181,18 @@ void IfStatement::print(std::ostream& os, int depth) const {
   for (int i = 0; i < depth; i++) {
     os << "    ";
   }
-  os << "}";
+  os << "}\n";
   if (this->else_block.get() != nullptr) {
-    os << " else {\n";
+    for (int i = 0; i < depth; i++) {
+      os << "    ";
+    }
+    os << "else {\n";
     this->else_block->print(os, depth + 1);
     for (int i = 0; i < depth; i++) {
       os << "    ";
     }
-    os << "}";
+    os << "}\n";
   }
-  os << '\n';
 }
 
 void IfStatement::set_cond(std::unique_ptr<Expression>& cond) {

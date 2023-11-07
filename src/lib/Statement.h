@@ -18,7 +18,7 @@ class Block {
  public:
   Block();
   ~Block();
-  
+
   // This is the top level block parser.
   static std::unique_ptr<Block> parse_block(const std::vector<Token>& tokens);
   // This function will set head to one past the last token
