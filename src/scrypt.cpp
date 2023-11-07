@@ -19,4 +19,5 @@ int main() {
   } catch (const ScryptError &err) {
     return ScryptError::handle(std::cout, err);
   }
+  return 0;
 }
