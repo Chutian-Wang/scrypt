@@ -10,13 +10,7 @@
 int main() {
   try {
     Lexer lexer;
-    std::string input;
-    std::string line;
-    while (std::getline(std::cin, line)) {
-      input += line + '\n';
-      std::istringstream iss(line);
-      lexer.tokenize(iss);
-    }
+    lexer.tokenize(std::cin);
 
     std::vector<Token> tokens = lexer.get_tokens();
     std::unique_ptr<Block> program = Block::parse_block(tokens);
