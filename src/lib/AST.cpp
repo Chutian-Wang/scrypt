@@ -1,6 +1,7 @@
 #include "AST.h"
 
 #include <cstring>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <stack>

@@ -1,5 +1,7 @@
 #include "Token.h"
 
+#include <map>
+
 Token::Token() {
   this->type = TokenType::ERR;
   this->text = std::string();

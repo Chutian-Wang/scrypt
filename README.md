@@ -47,6 +47,8 @@ scrypt
         │   ├── Lexer.h
         │   ├── Nodes.cpp
         │   ├── Nodes.h
+        │   ├── Statement.cpp
+        │   ├── Statement.h
         │   ├── Token.cpp
         │   ├── Token.h
         │   ├── Value.cpp
@@ -62,6 +64,11 @@ Class
     │   ├── Constant
     │   ├── Operator
     │   └── Identifer
+    ├── Statement (Virtual)
+    │   ├── Expression
+    │   ├── IfStatement
+    │   ├── WhileStatement
+    │   └── PrintStatement
     ├── std::exception
     │   └── ScryptError (Virtual)
     │       ├── SyntaxError
@@ -71,6 +78,7 @@ Class
     │           ├── UnknownIdent
     │           ├── InvalidCond
     │           └── InvalidOperand
+    ├── Block (Base)
     ├── Lexer (Base)
     └── Token (Base)
 
@@ -80,7 +88,14 @@ Struct
         ├── OPERATOR
         ├── LPAREN
         ├── RPAREN
+        ├── LCBRACE
+        ├── RCBRACE
         ├── IDENTIFIER
+        ├── BOOL
+        ├── WHILE
+        ├── IF
+        ├── ELSE
+        ├── PRINT
         ├── END
         └── ERR
     

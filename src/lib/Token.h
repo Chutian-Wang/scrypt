@@ -29,6 +29,8 @@ static const std::map<std::string, int> p_map{
 
 class Token {
  public:
+  static const std::map<char, int> Precedence;
+
   TokenType type;
   std::string text;
   int row;
