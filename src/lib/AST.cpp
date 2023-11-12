@@ -59,6 +59,7 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
       head->type != TokenType::BOOL) {
     // Invalid first token in an expression
     if (!(head->type == TokenType::RPAREN && lhs.get() != nullptr))
+    // TODO: check for semicolon as head here and throw error if needed?
       throw UnexpTokError(*head);
   }
   auto peek = head + 1;
@@ -86,7 +87,7 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
     if (op->get_token().text == "=") {
       if (lhs->get_token().type != TokenType::IDENTIFIER) {
         // Only identifier is allowed on lhs for assignment
-        throw UnexpTokError(op->get_token());
+        throw InvalidAssignee();
       }
     }
     ((Operator *)op.get())->add_operand(lhs);
