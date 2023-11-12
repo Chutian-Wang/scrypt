@@ -11,6 +11,8 @@ enum struct TokenType {
   RPAREN,      // )
   LCBRACE,     // {
   RCBRACE,     // }
+  LSBRACE,     // [
+  RSBRACE,     // ]
   IDENTIFIER,  // Series of letters, numbers, and underscores. They must start
                // with letters or underscores.
   BOOL,

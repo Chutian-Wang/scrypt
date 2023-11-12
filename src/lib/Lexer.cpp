@@ -171,6 +171,10 @@ void Lexer::tokenize(std::istream &input) {
       add_token(TokenType::RCBRACE, "}", currRow, currCol);
     } else if (token == '{') {
       add_token(TokenType::LCBRACE, "{", currRow, currCol);
+    } else if (token == '[') {
+      add_token(TokenType::LSBRACE, "[", currRow, currCol);
+    } else if (token == ']') {
+      add_token(TokenType::RSBRACE, "]", currRow, currCol);
     } else if (token == '+') {
       add_token(TokenType::OPERATOR, "+", currRow, currCol);
     } else if (token == '-') {
