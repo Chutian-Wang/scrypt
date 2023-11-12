@@ -21,6 +21,7 @@ int main() {
       Value result = parser->eval();
       std::cout << result << std::endl;
     } catch (const ScryptError &err) {
+      std::cout << line << std::endl;
       ScryptError::handle(std::cout, err);
     }
   }

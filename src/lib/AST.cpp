@@ -60,7 +60,8 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
     // Invalid first token in an expression
     if (!(head->type == TokenType::RPAREN && lhs.get() != nullptr))
     // TODO: check for semicolon as head here and throw error if needed?
-      throw UnexpTokError(*head);
+      throw InvalidAssignee();
+      // throw UnexpTokError(*head);
   }
   auto peek = head + 1;
   // Same level loop
