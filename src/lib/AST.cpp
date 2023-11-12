@@ -48,7 +48,7 @@ std::shared_ptr<AST> AST::parse_infix(
              head->type == TokenType::BOOL) {
     // Invalid first token will get handled by parse_primary
     lhs = parse_primary(*head);
-  }
+  } 
   return parse_infix(head, lhs, 0);
 }
 

@@ -32,9 +32,10 @@ bool Lexer::is_alpha_num(char c) {
 }
 
 const std::unordered_map<std::string, TokenType> Lexer::keywords = {
-    {"false", TokenType::BOOL},  {"true", TokenType::BOOL},
-    {"if", TokenType::IF},       {"while", TokenType::WHILE},
-    {"print", TokenType::PRINT}, {"else", TokenType::ELSE}};
+    {"false", TokenType::BOOL},    {"true", TokenType::BOOL},
+    {"if", TokenType::IF},         {"while", TokenType::WHILE},
+    {"print", TokenType::PRINT},   {"else", TokenType::ELSE},
+    {"def", TokenType:: FUNCTION}, {"return", TokenType::RETURN}};
 
 void Lexer::read_identifier(char token, std::istream &input) {
   // read and add identifier to tokens
@@ -180,6 +181,10 @@ void Lexer::tokenize(std::istream &input) {
       add_token(TokenType::OPERATOR, "/", currRow, currCol);
     } else if (token == '%') {
       add_token(TokenType::OPERATOR, "%", currRow, currCol);
+    } else if (token == ',') {
+      add_token(TokenType::COMMA, ",", currRow, currCol);
+    } else if (token == ';') {
+      add_token(TokenType::SEMICOLON, ";", currRow, currCol);
     } else if (token == '!') {
       input.get();
       add_token(TokenType::OPERATOR, "!=", currRow, currCol);

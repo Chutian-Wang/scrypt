@@ -18,6 +18,10 @@ enum struct TokenType {
   IF,
   PRINT,
   ELSE,
+  COMMA,
+  SEMICOLON,
+  FUNCTION,
+  RETURN,
   END,
   ERR  // Any other
 };
