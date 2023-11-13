@@ -48,7 +48,9 @@ std::unique_ptr<Block> Block::parse_block(
           if ((head+1)->type == TokenType::SEMICOLON){
               // ignore semicolon
               head++;
-          }
+          } else{
+                  throw UnexpTokError(*(head+1));
+              }
       head++;
     } else {
       switch (head->type) {
@@ -99,6 +101,8 @@ std::unique_ptr<Block> Block::parse_block(
               if ((head+1)->type == TokenType::SEMICOLON){
               // ignore semicolon
               head++;
+              } else{
+                  throw UnexpTokError(*(head+1));
               }
           head++;
           auto print_statement =
