@@ -85,12 +85,12 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
       rhs = parse_infix(head, rhs, (peek)->get_p());
       peek = head + 1;
     }
-    if (op->get_token().text == "=") {
-      if (lhs->get_token().type != TokenType::IDENTIFIER) {
-        // Only identifier is allowed on lhs for assignment
-        throw InvalidAssignee();
-      }
-    }
+    // if (op->get_token().text == "=") {
+    //   // if (lhs->get_token().type != TokenType::IDENTIFIER) {
+    //   //   // Only identifier is allowed on lhs for assignment
+    //   //   throw InvalidAssignee();
+    //   // }
+    // }
     ((Operator *)op.get())->add_operand(lhs);
     ((Operator *)op.get())->add_operand(rhs);
     lhs = op;

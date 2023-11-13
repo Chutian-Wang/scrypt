@@ -61,12 +61,12 @@ void Operator::add_operand(std::shared_ptr<AST> node) {
 const Token &Operator::get_token() const { return this->tok; }
 
 Value Operator::eval() const {
-  auto old_map = symbols;
+  // auto old_map = symbols;
   try {
     return this->__eval();
   } catch (const ScryptRuntimeError &err) {
     // Restore variables
-    symbols = old_map;
+    // symbols = old_map;
     throw;
   }
 }
@@ -108,6 +108,9 @@ Value Operator::__eval() const {
     }
     return ret;
   } else if (str == "=") {
+    if ((this->operands[0]->get_token()).type != TokenType::IDENTIFIER) {
+      throw InvalidAssignee();
+    }
     // Get rhs value
     Value ret = (*((this->operands).end() - 1))->__eval();
     // Assign to lhs'
