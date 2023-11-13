@@ -35,7 +35,7 @@ const std::unordered_map<std::string, TokenType> Lexer::keywords = {
     {"false", TokenType::BOOL},    {"true", TokenType::BOOL},
     {"if", TokenType::IF},         {"while", TokenType::WHILE},
     {"print", TokenType::PRINT},   {"else", TokenType::ELSE},
-    {"def", TokenType:: FUNCTION}, {"return", TokenType::RETURN}};
+    {"def", TokenType::FUNCTION}, {"return", TokenType::RETURN}};
 
 void Lexer::read_identifier(char token, std::istream &input) {
   // read and add identifier to tokens
