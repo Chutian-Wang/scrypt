@@ -11,7 +11,6 @@ int main() {
   std::shared_ptr<AST> parser;
   std::string line;
   while (std::getline(std::cin, line)) {
-    std::cout << "line0: " << line << std::endl;
     try {
       auto iss = std::istringstream(line);
       Lexer lexer;
