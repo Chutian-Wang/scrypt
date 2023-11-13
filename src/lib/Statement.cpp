@@ -45,6 +45,10 @@ std::unique_ptr<Block> Block::parse_block(
                head->type != TokenType::PRINT) {
       block->add_statement(
           std::make_unique<Expression>(AST::parse_infix(head)));
+          if ((head+1)->type == TokenType::SEMICOLON){
+              // ignore semicolon
+              head++;
+          }
       head++;
     } else {
       switch (head->type) {
@@ -92,6 +96,10 @@ std::unique_ptr<Block> Block::parse_block(
           head++;
           auto printee =
               std::make_unique<Expression>(Expression(AST::parse_infix(head)));
+              if ((head+1)->type == TokenType::SEMICOLON){
+              // ignore semicolon
+              head++;
+              }
           head++;
           auto print_statement =
               std::make_unique<PrintStatement>(printee, std::cout);
@@ -137,7 +145,7 @@ void Expression::print(std::ostream& os, int depth) const {
     os << "    ";
   }
   this->expr->get_infix(os);
-  os << '\n';
+  os << ';' << '\n';
 }
 
 Value Expression::eval() { return this->expr->eval(); }
@@ -271,7 +279,7 @@ void PrintStatement::print(std::ostream& os, int depth) const {
   }
   os << "print ";
   this->printee->get_infix(os);
-  os << '\n';
+  os << ';' << '\n';
 }
 
 #endif
