@@ -114,3 +114,37 @@ class PrintStatement : public Statement {
   // to the passed in os, not this->os
   virtual void print(std::ostream& os, int depth = 0) const;
 };
+
+// class Function : public Statement {
+//  private:
+//   std::string name;
+//   std::vector<std::unique_ptr<Statement>> arguments;
+//   std::unique_ptr<Block> function_block;
+
+//  public:
+//   Function();
+//   virtual ~Function();
+
+//   virtual void run();
+//   virtual void print(std::ostream& os, int depth = 0) const;
+
+//   void set_funct_def(std::unique_ptr<Expression>& cond);
+//   void set_function(std::unique_ptr<Block>& block);
+// };
+
+// class Return : public Statement {
+//  private:
+//   std::string name;
+//   std::map<std::string, Value> funct_symbols{};
+//   std::unique_ptr<Block> function_block;
+
+//  public:
+//   Return();
+//   virtual ~Return();
+
+//   virtual void run();
+//   virtual void print(std::ostream& os, int depth = 0) const;
+
+//   void set_funct_def(std::unique_ptr<Expression>& cond);
+//   void set_function(std::unique_ptr<Block>& block);
+// };
