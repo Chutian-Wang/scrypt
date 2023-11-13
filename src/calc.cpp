@@ -20,8 +20,10 @@ int main() {
       std::cout << std::endl;
       Value result = parser->eval();
       std::cout << result << std::endl;
+    } catch (const InvalidAssignee &err) {
+        std::cout << line << std::endl;
+        InvalidAssignee::handle(std::cout, err);
     } catch (const ScryptError &err) {
-      std::cout << line << std::endl;
       ScryptError::handle(std::cout, err);
     }
   }
