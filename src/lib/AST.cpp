@@ -48,7 +48,7 @@ std::shared_ptr<AST> AST::parse_infix(
              head->type == TokenType::BOOL) {
     // Invalid first token will get handled by parse_primary
     lhs = parse_primary(*head);
-  }
+  } 
   return parse_infix(head, lhs, 0);
 }
 
@@ -58,8 +58,9 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
   if (head->type != TokenType::NUMBER && head->type != TokenType::IDENTIFIER &&
       head->type != TokenType::BOOL) {
     // Invalid first token in an expression
-    if (!(head->type == TokenType::RPAREN && lhs.get() != nullptr))
+    if (!(head->type == TokenType::RPAREN && lhs.get() != nullptr)){
       throw UnexpTokError(*head);
+    }
   }
   auto peek = head + 1;
   // Same level loop

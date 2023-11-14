@@ -27,7 +27,7 @@ class Block {
   static std::unique_ptr<Block> parse_block(
       std::vector<Token>::const_iterator& head);
 
-  void add_statement(std::unique_ptr<Statement>);
+  void add_statement(std::unique_ptr<Statement> statement);
   void run();
   void print(std::ostream& os, int depth = 0) const;
 };
@@ -113,4 +113,36 @@ class PrintStatement : public Statement {
   // This function will push the print expression
   // to the passed in os, not this->os
   virtual void print(std::ostream& os, int depth = 0) const;
+};
+
+class FunctStatement : public Statement {
+ private:
+  std::vector<std::shared_ptr<AST>> arguments;
+  std::shared_ptr<AST> name;
+  std::unique_ptr<Block> function_block;
+
+ public:
+  FunctStatement();
+  virtual ~FunctStatement();
+
+  virtual void run();
+  virtual void print(std::ostream& os, int depth = 0) const;
+
+  void add_argument(std::shared_ptr<AST>& arg);
+  void set_name(std::shared_ptr<AST>& def);
+  void set_function(std::unique_ptr<Block>& block);
+};
+
+class ReturnStatement : public Statement {
+ private:
+  std::unique_ptr<Expression> ret;
+
+ public:
+  ReturnStatement();
+  virtual ~ReturnStatement();
+
+  virtual void run();
+  virtual void print(std::ostream& os, int depth = 0) const;
+
+  void set_return(std::unique_ptr<Expression>& value);
 };
