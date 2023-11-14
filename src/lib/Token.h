@@ -46,7 +46,7 @@ class Token {
 
   Token();
   Token(TokenType type, const std::string &text, int row, int column);
-
+  
   bool is_binary() const;
   int get_p() const;
 };
