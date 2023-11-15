@@ -24,11 +24,6 @@ Value& Value::operator+=(const Value& rhs) {
     throw InvalidOperand();
   }
   _value = std::get<double>(_value) + std::get<double>(rhs._value);
-  // std::visit([this, &rhs](auto&& operand) {
-  //   if constexpr (std::is_same_v<decltype(operand), double>) {
-  //     this->_value = operand + std::get<double>(rhs._value);
-  //   }
-  // }, _value);
   return *this;
 }
 
@@ -37,11 +32,6 @@ Value& Value::operator-=(const Value& rhs) {
     throw InvalidOperand();
   }
   _value = std::get<double>(_value) - std::get<double>(rhs._value);
-  // std::visit([this, &rhs](auto&& operand) {
-  //   if constexpr (std::is_same_v<decltype(operand), double>) {
-  //     this->_value = operand - std::get<double>(rhs._value);
-  //   }
-  // }, _value);
   return *this;
 }
 
@@ -50,11 +40,6 @@ Value& Value::operator*=(const Value& rhs) {
     throw InvalidOperand();
   }
   _value = std::get<double>(_value) * std::get<double>(rhs._value);
-  // std::visit([this, &rhs](auto&& operand) {
-  //   if constexpr (std::is_same_v<decltype(operand), double>) {
-  //     this->_value = operand * std::get<double>(rhs._value);
-  //   }
-  // }, _value);
   return *this;
 }
 
@@ -66,11 +51,6 @@ Value& Value::operator/=(const Value& rhs) {
     throw DivByZero();
   }
   _value = std::get<double>(_value) / std::get<double>(rhs._value);
-  // std::visit([this, &rhs](auto&& operand) {
-  //   if constexpr (std::is_same_v<decltype(operand), double>) {
-  //     this->_value = operand / std::get<double>(rhs._value);
-  //   }
-  // }, _value);
   return *this;
 }
 
@@ -82,11 +62,6 @@ Value& Value::operator%=(const Value& rhs) {
     throw DivByZero();
   }
   _value = std::fmod(std::get<double>(_value), std::get<double>(rhs._value));
-  // std::visit([this, &rhs](auto&& operand) {
-  //   if constexpr (std::is_same_v<decltype(operand), double>) {
-  //     this->_value = std::fmod(operand, std::get<double>(rhs._value));
-  //   }
-  // }, _value);
   return *this;
 }
 
