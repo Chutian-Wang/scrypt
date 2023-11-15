@@ -110,35 +110,38 @@ Value operator==(const Value& lhs, const Value& rhs) {
   if (lhs.type != rhs.type) {
     return Value(false);
   }
-  if (lhs.type == ValueType::BOOL) {
-    return Value(std::get<bool>(lhs._value) == std::get<bool>(rhs._value));
-  }
-  else if (lhs.type == ValueType::DOUBLE) {
-    return Value(std::get<double>(lhs._value) == std::get<double>(rhs._value));
-  }
-  else if (lhs.type == ValueType::null) {
-    return Value(true);
-  }
-
-  return Value(false);
+  return Value(lhs.type == ValueType::BOOL 
+              ? std::get<bool>(lhs._value) == std::get<bool>(rhs._value)
+              : std::get<double>(lhs._value) == std::get<double>(rhs._value));
+  // if (lhs.type == ValueType::BOOL) {
+  //   return Value(std::get<bool>(lhs._value) == std::get<bool>(rhs._value));
+  // }
+  // else if (lhs.type == ValueType::DOUBLE) {
+  //   return Value(std::get<double>(lhs._value) == std::get<double>(rhs._value));
+  // }
+  // else if (lhs.type == ValueType::null) {
+  //   return Value(true);
+  // }
+  // return Value(false);
 }
 
 Value operator!=(const Value& lhs, const Value& rhs) {
   if (lhs.type != rhs.type) {
     return Value(true);
   }
-
-  if (lhs.type == ValueType::BOOL) {
-    return Value(std::get<bool>(lhs._value) != std::get<bool>(rhs._value));
-  }
-  else if (lhs.type == ValueType::DOUBLE) {
-    return Value(std::get<double>(lhs._value) != std::get<double>(rhs._value));
-  }
-  else if (lhs.type == ValueType::null) {
-    return Value(false);
-  }
-
-  return Value(true);
+  return Value(lhs.type == ValueType::BOOL 
+              ? std::get<bool>(lhs._value) != std::get<bool>(rhs._value)
+              : std::get<double>(lhs._value) != std::get<double>(rhs._value));
+  // if (lhs.type == ValueType::BOOL) {
+  //   return Value(std::get<bool>(lhs._value) != std::get<bool>(rhs._value));
+  // }
+  // else if (lhs.type == ValueType::DOUBLE) {
+  //   return Value(std::get<double>(lhs._value) != std::get<double>(rhs._value));
+  // }
+  // else if (lhs.type == ValueType::null) {
+  //   return Value(false);
+  // }
+  // return Value(true);
 }
 
 Value operator<(const Value& lhs, const Value& rhs) {
