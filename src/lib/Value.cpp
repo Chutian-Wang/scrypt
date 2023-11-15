@@ -27,9 +27,9 @@ Value& Value::operator+=(const Value& rhs) {
     if constexpr (std::is_same_v<decltype(op), double>) {
       this->_value = op + std::get<double>(rhs._value);
     }
-    else {
-      throw InvalidOperand();
-    }
+    // else {
+    //   throw InvalidOperand();
+    // }
   }, _value);
   return *this;
 }
@@ -42,9 +42,9 @@ Value& Value::operator-=(const Value& rhs) {
     if constexpr (std::is_same_v<decltype(op), double>) {
       this->_value = op - std::get<double>(rhs._value);
     }
-    else {
-      throw InvalidOperand();
-    }
+    // else {
+    //   throw InvalidOperand();
+    // }
   }, _value);
   return *this;
 }
@@ -57,9 +57,9 @@ Value& Value::operator*=(const Value& rhs) {
     if constexpr (std::is_same_v<decltype(op), double>) {
       this->_value = op * std::get<double>(rhs._value);
     }
-    else {
-      throw InvalidOperand();
-    }
+    // else {
+    //   throw InvalidOperand();
+    // }
   }, _value);
   return *this;
 }
@@ -75,9 +75,9 @@ Value& Value::operator/=(const Value& rhs) {
     if constexpr (std::is_same_v<decltype(op), double>) {
       this->_value = op / std::get<double>(rhs._value);
     }
-    else {
-      throw InvalidOperand();
-    }
+    // else {
+    //   throw InvalidOperand();
+    // }
   }, _value);
   return *this;
 }
@@ -93,9 +93,9 @@ Value& Value::operator%=(const Value& rhs) {
     if constexpr (std::is_same_v<decltype(op), double>) {
       this->_value = std::fmod(op, std::get<double>(rhs._value));
     }
-    else {
-      throw InvalidOperand();
-    }
+    // else {
+    //   throw InvalidOperand();
+    // }
   }, _value);
 
   return *this;
