@@ -12,6 +12,9 @@ int main() {
     Lexer lexer;
     lexer.tokenize(std::cin);
     auto tokens = lexer.get_tokens();
+    if (tokens.empty()) {
+      return 1;
+    }
     std::unique_ptr<Block> program = Block::parse_block(tokens);
     program->print(std::cout, 0);
   } catch (const ScryptError &err) {
