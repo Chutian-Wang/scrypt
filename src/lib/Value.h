@@ -3,6 +3,7 @@
 #include <iostream>
 #include <variant>
 #include <vector>
+#include <functional>
 
 enum struct ValueType { BOOL, DOUBLE, NONE, FUNCTION, null };
 
