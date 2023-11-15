@@ -7,10 +7,7 @@
 
 #include "Errors.h"
 
-Value::Value() {
-  this->type = ValueType::NONE;
-  memset(&(this->_value), 0, sizeof(this->_value));
-}
+Value::Value() : type(ValueType::NONE), _value() {}
 
 Value::Value(double num) : type(ValueType::DOUBLE), _value(num) {}
 
@@ -34,7 +31,6 @@ Value& Value::operator+=(const Value& rhs) {
       throw InvalidOperand();
     }
   }, _value);
-
   return *this;
 }
 
@@ -50,7 +46,6 @@ Value& Value::operator-=(const Value& rhs) {
       throw InvalidOperand();
     }
   }, _value);
-
   return *this;
 }
 
@@ -66,7 +61,6 @@ Value& Value::operator*=(const Value& rhs) {
       throw InvalidOperand();
     }
   }, _value);
-
   return *this;
 }
 
@@ -85,7 +79,6 @@ Value& Value::operator/=(const Value& rhs) {
       throw InvalidOperand();
     }
   }, _value);
-
   return *this;
 }
 
