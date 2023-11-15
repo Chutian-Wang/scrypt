@@ -11,6 +11,7 @@
 #include "Errors.h"
 #include "Nodes.h"
 #include "Value.h"
+#include "Token.h"
 
 // This global map tracks the variables
 // declare as external in other files where needed
@@ -20,15 +21,33 @@ std::map<std::string, Value> symbols{};
 **                    Infix Scrypt Parser                   **
 *************************************************************/
 
+void AST::consume(std::vector<Token>::const_iterator& head, TokenType target){
+    if (head->type == target){
+        head++;
+    } else{
+        throw UnexpTokError(*head);
+    }
+}
+
 std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head, int min_p) {
   std::shared_ptr<AST> lhs = parse_primary(head);
   
   auto peek = head + 1;
   // Same level loop
-  while (peek->is_binary() && peek->get_p() > min_p) {
+  while (p_map.count(peek->text) && peek->get_p() > min_p) {
     int precedence = peek->get_p();
     if (peek->text=="="){
+      // handles right-associative
       precedence -= 1;
+    }
+    if (peek->text=="("){
+      // parse function call
+      auto args = parse_comma(++peek, TokenType::RPAREN);
+      std::shared_ptr<AST> new_lhs(new FunctionCall(lhs, args));
+      lhs = new_lhs;
+      consume(++peek, TokenType::SEMICOLON);
+      head = peek;
+      break;
     }
     
     head = peek + 1;
@@ -38,7 +57,6 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head, 
     ((Operator *)op.get())->add_operand(lhs);
     ((Operator *)op.get())->add_operand(rhs);
     lhs = op;
-
     peek = head + 1;
   }
 
@@ -60,7 +78,19 @@ std::shared_ptr<AST> AST::parse_primary(std::vector<Token>::const_iterator &head
   }
 }
 
-
+std::vector<std::shared_ptr<AST>> AST::parse_comma(std::vector<Token>::const_iterator &head, TokenType end){
+  std::vector<std::shared_ptr<AST>> arguments;
+  while(head->type != end){
+    do{
+      if(head->type == TokenType::COMMA){head++;}
+      auto argument = AST::parse_primary(head);
+      arguments.push_back(std::move(argument));
+      head++;
+      if(head->type == TokenType::RPAREN){break;}
+  } while(head->type == TokenType::COMMA);
+  }
+  return arguments;
+}
 
 
 

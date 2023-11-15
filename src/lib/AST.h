@@ -66,6 +66,7 @@ class AST {
   // static std::shared_ptr<AST> parse_primary(const Token &tok);
   static std::shared_ptr<AST> parse_primary(
         std::vector<Token>::const_iterator &head);
+  static std::vector<std::shared_ptr<AST>> parse_comma(std::vector<Token>::const_iterator &head, TokenType end);
   virtual ~AST(){};
 
   /**
@@ -99,6 +100,8 @@ class AST {
    * This function pushes the subtree's infix form into oss
    */
   virtual void get_infix(std::ostream &oss) const = 0;
+
+  static void consume(std::vector<Token>::const_iterator& head, TokenType target);
 };
 
 #endif
