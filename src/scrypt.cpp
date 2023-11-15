@@ -12,9 +12,6 @@ int main() {
     Lexer lexer;
     lexer.tokenize(std::cin);
     std::vector<Token> tokens = lexer.get_tokens();
-    if (tokens.empty()) {
-      return 1;
-    }
     std::unique_ptr<Block> program = Block::parse_block(tokens);
     program->run();
   } catch (const ScryptError &err) {
