@@ -217,7 +217,7 @@ IfStatement::~IfStatement() {
 void IfStatement::run() {
   Value truth = condition->eval();
   if (truth.type == ValueType::BOOL) {
-    if (truth._value._bool) {
+    if (std::get<bool>(truth._value)) {
       this->if_block->run();
     } else {
       // Do else block only if it exists
@@ -280,7 +280,7 @@ void WhileStatement::run() {
   while (1) {
     Value truth = condition->eval();
     if (truth.type == ValueType::BOOL) {
-      if (truth._value._bool) {
+      if (std::get<bool>(truth._value)) {
         this->while_block->run();
       } else {
         break;
