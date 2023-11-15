@@ -24,6 +24,7 @@ enum struct TokenType {
   SEMICOLON,
   FUNCTION,
   RETURN,
+  null,
   END,
   ERR  // Any other
 };
@@ -31,7 +32,8 @@ enum struct TokenType {
 static const std::map<std::string, int> p_map{
     {"=", 1},  {"|", 2}, {"^", 3},  {"&", 4}, {"==", 5},
     {"!=", 5}, {"<", 6}, {"<=", 6}, {">", 6}, {">=", 6},
-    {"+", 7},  {"-", 7}, {"*", 8},  {"/", 8}, {"%", 8}};
+    {"+", 7},  {"-", 7}, {"*", 8},  {"/", 8}, {"%", 8},
+    {"(", 9}, {"[", 9}};
 
 class Token {
  public:
@@ -44,7 +46,7 @@ class Token {
 
   Token();
   Token(TokenType type, const std::string &text, int row, int column);
-
+  
   bool is_binary() const;
   int get_p() const;
 };
