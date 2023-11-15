@@ -106,23 +106,21 @@ Value operator+(const Value& lhs, const Value& rhs) {
     throw InvalidOperand();
   }
   std::cout << std::get<double>(lhs._value) + std::get<double>(rhs._value) << std::endl;
-  return Value(std::get<double>(lhs._value) + std::get<double>(rhs._value));
+  return std::get<double>(lhs._value) + std::get<double>(rhs._value);
 }
 
 Value operator-(const Value& lhs, const Value& rhs) {
   if (lhs.type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
     throw InvalidOperand();
   }
-  std::cout << std::get<double>(lhs._value) - std::get<double>(rhs._value) << std::endl;
-  return Value(std::get<double>(lhs._value) - std::get<double>(rhs._value));
+  return std::get<double>(lhs._value) - std::get<double>(rhs._value);
 }
 
 Value operator*(const Value& lhs, const Value& rhs) {
   if (lhs.type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
     throw InvalidOperand();
   }
-  std::cout << std::get<double>(lhs._value) * std::get<double>(rhs._value) << std::endl;
-  return Value(std::get<double>(lhs._value) * std::get<double>(rhs._value));
+  return std::get<double>(lhs._value) * std::get<double>(rhs._value);
 }
 
 Value operator/(const Value& lhs, const Value& rhs) {
@@ -132,8 +130,7 @@ Value operator/(const Value& lhs, const Value& rhs) {
   if (std::get<double>(rhs._value) == 0.) {
     throw DivByZero();
   }
-  std::cout << std::get<double>(lhs._value) / std::get<double>(rhs._value) << std::endl;
-  return Value(std::get<double>(lhs._value) / std::get<double>(rhs._value));
+  return std::get<double>(lhs._value) / std::get<double>(rhs._value);
 }
 
 Value operator%(const Value& lhs, const Value& rhs) {
@@ -143,8 +140,7 @@ Value operator%(const Value& lhs, const Value& rhs) {
   if (std::get<double>(rhs._value) == 0.) {
     throw DivByZero();
   }
-  std::cout << std::fmod(std::get<double>(lhs._value), std::get<double>(rhs._value)) << std::endl;
-  return Value(std::fmod(std::get<double>(lhs._value), std::get<double>(rhs._value)));
+  return std::fmod(std::get<double>(lhs._value), std::get<double>(rhs._value));
 }
 
 Value operator==(const Value& lhs, const Value& rhs) {
