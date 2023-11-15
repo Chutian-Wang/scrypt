@@ -53,13 +53,13 @@ std::unique_ptr<Block> Block::parse_block(
                head->type != TokenType::ELSE && head->type != TokenType::PRINT &&
                head->type != TokenType::FUNCTION && head->type != TokenType::RETURN) {
       block->add_statement(
-          std::make_unique<Expression>(AST::parse_infix(head)));
+          std::make_unique<Expression>(AST::parse_infix(head, 0)));
           consume(head, TokenType::SEMICOLON);
     } else {
       switch (head->type) {
         case (TokenType::WHILE): {
           head++;
-          auto condition = std::make_unique<Expression>(AST::parse_infix(head));
+          auto condition = std::make_unique<Expression>(AST::parse_infix(head, 0));
           head++;
           if (head->type != TokenType::LCBRACE) {
             throw UnexpTokError(*head);
@@ -77,7 +77,7 @@ std::unique_ptr<Block> Block::parse_block(
         case (TokenType::IF): {
           head++;
           auto condition =
-              std::make_unique<Expression>(Expression(AST::parse_infix(head)));
+              std::make_unique<Expression>(Expression(AST::parse_infix(head, 0)));
           head++;
           if (head->type != TokenType::LCBRACE) {
             throw UnexpTokError(*head);
@@ -100,7 +100,7 @@ std::unique_ptr<Block> Block::parse_block(
         case (TokenType::PRINT): {
           head++;
           auto printee =
-              std::make_unique<Expression>(Expression(AST::parse_infix(head)));
+              std::make_unique<Expression>(Expression(AST::parse_infix(head, 0)));
               consume(head, TokenType::SEMICOLON);
           auto print_statement =
               std::make_unique<PrintStatement>(printee, std::cout);
@@ -108,7 +108,7 @@ std::unique_ptr<Block> Block::parse_block(
         } break;
         case (TokenType::FUNCTION): {
             head++;
-            auto name = AST::parse_primary(*head);
+            auto name = AST::parse_primary(head);
             //head->foo
             head++;
             std::unique_ptr<FunctStatement> funct_statement =
@@ -119,7 +119,7 @@ std::unique_ptr<Block> Block::parse_block(
                 if(head->type != TokenType::RPAREN){
                     do{
                         if(head->type == TokenType::COMMA){head++;}
-                        auto argument = AST::parse_primary(*head);
+                        auto argument = AST::parse_primary(head);
                         funct_statement->add_argument(argument);
                         head++;
                         if(head->type == TokenType::RPAREN){break;}
@@ -140,7 +140,7 @@ std::unique_ptr<Block> Block::parse_block(
               head++;
               block->add_statement(std::move(return_statement));
             } else{
-                auto ret = std::make_unique<Expression>(AST::parse_infix(head));
+                auto ret = std::make_unique<Expression>(AST::parse_infix(head, 0));
                 return_statement->set_return(ret);
                 consume(head, TokenType::SEMICOLON);
                 block->add_statement(std::move(return_statement));

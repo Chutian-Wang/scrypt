@@ -41,27 +41,31 @@ class AST {
    * Call this function to construct a top level AST from
    * infix expressions.
    */
-  static std::shared_ptr<AST> parse_infix(const std::vector<Token> &tokens);
+  // static std::shared_ptr<AST> parse_infix(const std::vector<Token> &tokens);
   /**
    * Infix sub-expression parser. This function parses everything
    * enclosed by a pair of LPAREN and RPAREN or a free-standing
    * expression if properlly called.
    */
-  static std::shared_ptr<AST> parse_infix(
-      std::vector<Token>::const_iterator &head);
+//   static std::shared_ptr<AST> parse_infix(
+//       std::vector<Token>::const_iterator &head);
 
   /**
    * Base level operator precedance recursive parser.
    */
+//   static std::shared_ptr<AST> parse_infix(
+//       std::vector<Token>::const_iterator &head, std::shared_ptr<AST> lhs,
+//       int min_p);
   static std::shared_ptr<AST> parse_infix(
-      std::vector<Token>::const_iterator &head, std::shared_ptr<AST> lhs,
+      std::vector<Token>::const_iterator &head,
       int min_p);
 
   /**
    * This function handels Number / Identifier parsing.
    */
-  static std::shared_ptr<AST> parse_primary(const Token &tok);
-
+  // static std::shared_ptr<AST> parse_primary(const Token &tok);
+  static std::shared_ptr<AST> parse_primary(
+        std::vector<Token>::const_iterator &head);
   virtual ~AST(){};
 
   /**
