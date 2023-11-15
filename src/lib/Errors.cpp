@@ -80,3 +80,12 @@ InvalidOperand::InvalidOperand() {
 const char *InvalidOperand::what() const noexcept {
   return "Runtime error: invalid operand type.";
 }
+
+InvalidAssignee::InvalidAssignee() {
+  this->exit_code = INVALID_OPRAND;
+  this->msg = nullptr;
+}
+
+const char *InvalidAssignee::what() const noexcept {
+  return "Runtime error: invalid assignee.";
+}

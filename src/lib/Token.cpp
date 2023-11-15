@@ -1,4 +1,5 @@
 #include "Token.h"
+#include "Errors.h"
 
 #include <map>
 

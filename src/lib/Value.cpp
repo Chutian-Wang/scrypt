@@ -144,7 +144,7 @@ Value operator%(const Value& lhs, const Value& rhs) {
 
 Value operator==(const Value& lhs, const Value& rhs) {
   if (lhs.type != rhs.type) {
-    throw InvalidOperand();
+    return Value(false);
   }
   return Value(lhs.type == ValueType::BOOL
                    ? std::get<bool>(lhs._value) == std::get<bool>(rhs._value)
@@ -153,7 +153,7 @@ Value operator==(const Value& lhs, const Value& rhs) {
 
 Value operator!=(const Value& lhs, const Value& rhs) {
   if (lhs.type != rhs.type) {
-    throw InvalidOperand();
+    return Value(false);
   }
   return Value(lhs.type == ValueType::BOOL
                    ? std::get<bool>(lhs._value) != std::get<bool>(rhs._value)

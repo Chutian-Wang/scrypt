@@ -28,6 +28,15 @@ std::unique_ptr<Block> Block::parse_block(const std::vector<Token>& tokens) {
   return block;
 }
 
+void consume(std::vector<Token>::const_iterator& head, TokenType target){
+    if ((head+1)->type == target){
+        head++;
+        head++;
+    } else{
+        throw UnexpTokError(*(head+1));
+    }
+}
+
 std::unique_ptr<Block> Block::parse_block(
     std::vector<Token>::const_iterator& head) {
   auto block = std::make_unique<Block>();
@@ -45,19 +54,13 @@ std::unique_ptr<Block> Block::parse_block(
                head->type != TokenType::ELSE && head->type != TokenType::PRINT &&
                head->type != TokenType::FUNCTION && head->type != TokenType::RETURN) {
       block->add_statement(
-          std::make_unique<Expression>(AST::parse_infix(head)));
-          if ((head+1)->type == TokenType::SEMICOLON){
-              // ignore semicolon
-              head++;
-          } else{
-                  throw UnexpTokError(*(head+1));
-              }
-      head++;
+          std::make_unique<Expression>(AST::parse_infix(head, 0)));
+          consume(head, TokenType::SEMICOLON);
     } else {
       switch (head->type) {
         case (TokenType::WHILE): {
           head++;
-          auto condition = std::make_unique<Expression>(AST::parse_infix(head));
+          auto condition = std::make_unique<Expression>(AST::parse_infix(head, 0));
           head++;
           if (head->type != TokenType::LCBRACE) {
             throw UnexpTokError(*head);
@@ -75,7 +78,7 @@ std::unique_ptr<Block> Block::parse_block(
         case (TokenType::IF): {
           head++;
           auto condition =
-              std::make_unique<Expression>(Expression(AST::parse_infix(head)));
+              std::make_unique<Expression>(Expression(AST::parse_infix(head, 0)));
           head++;
           if (head->type != TokenType::LCBRACE) {
             throw UnexpTokError(*head);
@@ -104,21 +107,15 @@ std::unique_ptr<Block> Block::parse_block(
         case (TokenType::PRINT): {
           head++;
           auto printee =
-              std::make_unique<Expression>(Expression(AST::parse_infix(head)));
-              if ((head+1)->type == TokenType::SEMICOLON){
-              // ignore semicolon
-              head++;
-              } else{
-                  throw UnexpTokError(*(head+1));
-              }
-          head++;
+              std::make_unique<Expression>(Expression(AST::parse_infix(head, 0)));
+              consume(head, TokenType::SEMICOLON);
           auto print_statement =
               std::make_unique<PrintStatement>(printee, std::cout);
           block->add_statement(std::move(print_statement));
         } break;
         case (TokenType::FUNCTION): {
             head++;
-            auto name = AST::parse_primary(*head);
+            auto name = AST::parse_primary(head);
             //head->foo
             head++;
             std::unique_ptr<FunctStatement> funct_statement =
@@ -129,7 +126,7 @@ std::unique_ptr<Block> Block::parse_block(
                 if(head->type != TokenType::RPAREN){
                     do{
                         if(head->type == TokenType::COMMA){head++;}
-                        auto argument = AST::parse_primary(*head);
+                        auto argument = AST::parse_primary(head);
                         funct_statement->add_argument(argument);
                         head++;
                         if(head->type == TokenType::RPAREN){break;}
@@ -144,17 +141,17 @@ std::unique_ptr<Block> Block::parse_block(
         case (TokenType::RETURN): {
             head++;
             std::unique_ptr<ReturnStatement> return_statement =
-              std::make_unique<ReturnStatement>();
-            auto ret = std::make_unique<Expression>(AST::parse_infix(head));
-            return_statement->set_return(ret);
-            head++;
+                std::make_unique<ReturnStatement>();
             if (head->type == TokenType::SEMICOLON){
-              // ignore semicolon
+            // return;
               head++;
+              block->add_statement(std::move(return_statement));
             } else{
-                  throw UnexpTokError(*(head+1));
-              }
-            block->add_statement(std::move(return_statement));
+                auto ret = std::make_unique<Expression>(AST::parse_infix(head, 0));
+                return_statement->set_return(ret);
+                consume(head, TokenType::SEMICOLON);
+                block->add_statement(std::move(return_statement));
+            }
         } break;
         default:
           throw UnexpTokError(*head);
@@ -366,14 +363,16 @@ void FunctStatement::print(std::ostream& os, int depth) const {
   os << "def ";
   this->name->get_infix(os);
   os << '(';
-  this->arguments.at(0)->get_infix(os);
-  bool first = true;
-  for (auto const& arg : this->arguments){
+  if (this->arguments.size() != 0){
+    this->arguments.at(0)->get_infix(os);
+    bool first = true;
+    for (auto const& arg : this->arguments){
       if(first){
           first = false;
           continue;}
       os << ", ";
       arg->get_infix(os);
+  }
   }
   os << ") {\n";
   this->function_block->print(os, depth + 1);
@@ -384,7 +383,7 @@ void FunctStatement::print(std::ostream& os, int depth) const {
 }
 
 ReturnStatement::ReturnStatement() {
-  return;
+  this->ret = std::unique_ptr<Expression>();
 }
 
 ReturnStatement::~ReturnStatement() {
@@ -399,8 +398,11 @@ void ReturnStatement::print(std::ostream& os, int depth) const{
     for (int i = 0; i < depth; i++) {
         os << "    ";
     }
-    os << "return ";
-    this->ret->get_infix(os);
+    os << "return";
+    if (this->ret){
+        os << ' ';
+        this->ret->get_infix(os);
+    }
     os << ';' << '\n';
 }
 
