@@ -72,7 +72,8 @@ class FunctionCall : public AST {
   std::vector<std::shared_ptr<AST>> value;
 
  public:
-  FunctionCall(std::shared_ptr<AST> node, std::vector<std::shared_ptr<AST>> value);
+  FunctionCall(std::shared_ptr<AST> node,
+               std::vector<std::shared_ptr<AST>> value);
   virtual ~FunctionCall();
 
   virtual const Token &get_token() const;

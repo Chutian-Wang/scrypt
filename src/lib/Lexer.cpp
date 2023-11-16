@@ -32,10 +32,10 @@ bool Lexer::is_alpha_num(char c) {
 }
 
 const std::unordered_map<std::string, TokenType> Lexer::keywords = {
-    {"false", TokenType::BOOL},    {"true", TokenType::BOOL},
-    {"if", TokenType::IF},         {"while", TokenType::WHILE},
-    {"print", TokenType::PRINT},   {"else", TokenType::ELSE},
-    {"def", TokenType::FUNCTION},  {"return", TokenType::RETURN},
+    {"false", TokenType::BOOL},   {"true", TokenType::BOOL},
+    {"if", TokenType::IF},        {"while", TokenType::WHILE},
+    {"print", TokenType::PRINT},  {"else", TokenType::ELSE},
+    {"def", TokenType::FUNCTION}, {"return", TokenType::RETURN},
     {"null", TokenType::null}};
 
 void Lexer::read_identifier(char token, std::istream &input) {

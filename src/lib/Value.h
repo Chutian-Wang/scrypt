@@ -1,21 +1,18 @@
 #ifndef VALUE_H
 #define VALUE_H
+#include <functional>
 #include <iostream>
 #include <variant>
 #include <vector>
-#include <functional>
 
 enum struct ValueType { BOOL, DOUBLE, NONE, FUNCTION, null };
 
 struct Value {
  public:
   ValueType type;
-  std::variant<
-    double, 
-    bool, 
-    std::nullptr_t,
-    std::function<Value(const std::vector<Value>&)>
-  > _value;
+  std::variant<double, bool, std::nullptr_t,
+               std::function<Value(const std::vector<Value>&)> >
+      _value;
 
   Value();
   Value(double num);
