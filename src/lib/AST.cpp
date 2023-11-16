@@ -32,32 +32,28 @@ void AST::consume(std::vector<Token>::const_iterator& head, TokenType target){
 std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head, int min_p) {
   std::shared_ptr<AST> lhs = parse_primary(head);
   
-  auto peek = head + 1;
-  // Same level loop
-  while (p_map.count(peek->text) && peek->get_p() > min_p) {
-    int precedence = peek->get_p();
-    if (peek->text=="="){
+  // Check precedence
+  while (p_map.count((head+1)->text) && ((head+1)->get_p() > min_p)) {
+    head++;
+    int precedence = head->get_p();
+    if (head->text=="="){
       // handles right-associative
       precedence -= 1;
     }
-    if (peek->text=="("){
+    if (head->text=="("){
       // parse function call
-      auto args = parse_comma(++peek, TokenType::RPAREN);
+      auto args = parse_comma(++head, TokenType::RPAREN);
       std::shared_ptr<AST> new_lhs(new FunctionCall(lhs, args));
       lhs = new_lhs;
-      consume(++peek, TokenType::SEMICOLON);
-      head = peek;
-      break;
+      continue;
     }
     
-    head = peek + 1;
-    std::shared_ptr<AST> op(new Operator(*peek));
-    std::shared_ptr<AST> rhs = parse_infix(head, precedence);
+    std::shared_ptr<AST> op(new Operator(*head));
+    std::shared_ptr<AST> rhs = parse_infix(++head, precedence);
 
     ((Operator *)op.get())->add_operand(lhs);
     ((Operator *)op.get())->add_operand(rhs);
     lhs = op;
-    peek = head + 1;
   }
 
   return lhs;
@@ -67,6 +63,7 @@ std::shared_ptr<AST> AST::parse_primary(std::vector<Token>::const_iterator &head
   if (head->type == TokenType::NUMBER || head->type == TokenType::BOOL || head->type == TokenType::null) {
     return std::shared_ptr<AST>(new Constant(*head));
   } else if (head->type == TokenType::IDENTIFIER) {
+      //std::cout<<"id "<<head->text<<std::endl;
     return std::shared_ptr<AST>(new Identifier(*head));
   } else if (head->type == TokenType::LPAREN) {
     head++; // consume (
@@ -79,16 +76,15 @@ std::shared_ptr<AST> AST::parse_primary(std::vector<Token>::const_iterator &head
 }
 
 std::vector<std::shared_ptr<AST>> AST::parse_comma(std::vector<Token>::const_iterator &head, TokenType end){
+  // head-> arguments[0]
   std::vector<std::shared_ptr<AST>> arguments;
   while(head->type != end){
-    do{
-      if(head->type == TokenType::COMMA){head++;}
-      auto argument = AST::parse_primary(head);
-      arguments.push_back(std::move(argument));
-      head++;
-      if(head->type == TokenType::RPAREN){break;}
-  } while(head->type == TokenType::COMMA);
+    auto argument = AST::parse_infix(head, 0);
+    arguments.push_back(std::move(argument));
+    head++;
+    if(head->type == TokenType::COMMA){head++;}
   }
+  // head -> )
   return arguments;
 }
 
