@@ -15,9 +15,8 @@ Value::Value(bool boolean) : type(ValueType::BOOL), _value(boolean) {}
 
 Value::Value(std::nullptr_t n) : type(ValueType::null), _value(n) {}
 
-Value::Value(std::function<Value(const std::vector<Value>&)> function) 
-  : type(ValueType::FUNCTION), 
-  _value(function) {}
+Value::Value(std::function<Value(const std::vector<Value>&)> function)
+    : type(ValueType::FUNCTION), _value(function) {}
 
 Value& Value::operator+=(const Value& rhs) {
   if (this->type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
@@ -103,25 +102,44 @@ Value operator%(const Value& lhs, const Value& rhs) {
   if (std::get<double>(rhs._value) == 0.) {
     throw DivByZero();
   }
-  return Value(std::fmod(std::get<double>(lhs._value), std::get<double>(rhs._value)));
+  return Value(
+      std::fmod(std::get<double>(lhs._value), std::get<double>(rhs._value)));
 }
 
 Value operator==(const Value& lhs, const Value& rhs) {
   if (lhs.type != rhs.type) {
     return Value(false);
   }
-  return Value(lhs.type == ValueType::BOOL 
-              ? std::get<bool>(lhs._value) == std::get<bool>(rhs._value)
-              : std::get<double>(lhs._value) == std::get<double>(rhs._value));
+  if (lhs.type == ValueType::BOOL) {
+    return Value(std::get<bool>(lhs._value) == std::get<bool>(rhs._value));
+  } else if (lhs.type == ValueType::DOUBLE) {
+    return Value(std::get<double>(lhs._value) == std::get<double>(rhs._value));
+  } else if (lhs.type == ValueType::null) {
+    return Value(true);
+  }
+  return Value(false);
+  // return Value(lhs.type == ValueType::BOOL
+  //             ? std::get<bool>(lhs._value) == std::get<bool>(rhs._value)
+  //             : std::get<double>(lhs._value) ==
+  //             std::get<double>(rhs._value));
 }
 
 Value operator!=(const Value& lhs, const Value& rhs) {
   if (lhs.type != rhs.type) {
     return Value(true);
   }
-  return Value(lhs.type == ValueType::BOOL 
-              ? std::get<bool>(lhs._value) != std::get<bool>(rhs._value)
-              : std::get<double>(lhs._value) != std::get<double>(rhs._value));
+  if (lhs.type == ValueType::BOOL) {
+    return Value(std::get<bool>(lhs._value) != std::get<bool>(rhs._value));
+  } else if (lhs.type == ValueType::DOUBLE) {
+    return Value(std::get<double>(lhs._value) != std::get<double>(rhs._value));
+  } else if (lhs.type == ValueType::null) {
+    return Value(false);
+  }
+  return Value(true);
+  // return Value(lhs.type == ValueType::BOOL
+  //             ? std::get<bool>(lhs._value) != std::get<bool>(rhs._value)
+  //             : std::get<double>(lhs._value) !=
+  //             std::get<double>(rhs._value));
 }
 
 Value operator<(const Value& lhs, const Value& rhs) {
