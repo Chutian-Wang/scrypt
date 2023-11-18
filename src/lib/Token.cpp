@@ -1,7 +1,8 @@
 #include "Token.h"
-#include "Errors.h"
 
 #include <map>
+
+#include "Errors.h"
 
 Token::Token() {
   this->type = TokenType::ERR;

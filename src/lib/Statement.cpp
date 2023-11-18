@@ -28,15 +28,6 @@ std::unique_ptr<Block> Block::parse_block(const std::vector<Token>& tokens) {
   return block;
 }
 
-void consume(std::vector<Token>::const_iterator& head, TokenType target){
-    if ((head+1)->type == target){
-        head++;
-        head++;
-    } else{
-        throw UnexpTokError(*(head+1));
-    }
-}
-
 std::unique_ptr<Block> Block::parse_block(
     std::vector<Token>::const_iterator& head) {
   auto block = std::make_unique<Block>();
@@ -51,16 +42,19 @@ std::unique_ptr<Block> Block::parse_block(
       head++;
       return block;
     } else if (head->type != TokenType::WHILE && head->type != TokenType::IF &&
-               head->type != TokenType::ELSE && head->type != TokenType::PRINT &&
-               head->type != TokenType::FUNCTION && head->type != TokenType::RETURN) {
+               head->type != TokenType::ELSE &&
+               head->type != TokenType::PRINT &&
+               head->type != TokenType::FUNCTION &&
+               head->type != TokenType::RETURN) {
       block->add_statement(
           std::make_unique<Expression>(AST::parse_infix(head, 0)));
-          consume(head, TokenType::SEMICOLON);
+      AST::consume(++head, TokenType::SEMICOLON);
     } else {
       switch (head->type) {
         case (TokenType::WHILE): {
           head++;
-          auto condition = std::make_unique<Expression>(AST::parse_infix(head, 0));
+          auto condition =
+              std::make_unique<Expression>(AST::parse_infix(head, 0));
           head++;
           if (head->type != TokenType::LCBRACE) {
             throw UnexpTokError(*head);
@@ -77,8 +71,8 @@ std::unique_ptr<Block> Block::parse_block(
         } break;
         case (TokenType::IF): {
           head++;
-          auto condition =
-              std::make_unique<Expression>(Expression(AST::parse_infix(head, 0)));
+          auto condition = std::make_unique<Expression>(
+              Expression(AST::parse_infix(head, 0)));
           head++;
           if (head->type != TokenType::LCBRACE) {
             throw UnexpTokError(*head);
@@ -106,52 +100,47 @@ std::unique_ptr<Block> Block::parse_block(
         } break;
         case (TokenType::PRINT): {
           head++;
-          auto printee =
-              std::make_unique<Expression>(Expression(AST::parse_infix(head, 0)));
-              consume(head, TokenType::SEMICOLON);
+          auto printee = std::make_unique<Expression>(
+              Expression(AST::parse_infix(head, 0)));
+          AST::consume(++head, TokenType::SEMICOLON);
           auto print_statement =
               std::make_unique<PrintStatement>(printee, std::cout);
           block->add_statement(std::move(print_statement));
         } break;
         case (TokenType::FUNCTION): {
-            head++;
-            auto name = AST::parse_primary(head);
-            //head->foo
-            head++;
-            std::unique_ptr<FunctStatement> funct_statement =
+          head++;
+          auto name = AST::parse_primary(head);
+          // head->foo
+          head++;
+          std::unique_ptr<FunctStatement> funct_statement =
               std::make_unique<FunctStatement>();
-            funct_statement->set_name(name);
-            if (head->type == TokenType::LPAREN){
-                head++;
-                if(head->type != TokenType::RPAREN){
-                    do{
-                        if(head->type == TokenType::COMMA){head++;}
-                        auto argument = AST::parse_primary(head);
-                        funct_statement->add_argument(argument);
-                        head++;
-                        if(head->type == TokenType::RPAREN){break;}
-                    } while(head->type == TokenType::COMMA);
-                } 
-            }
+          funct_statement->set_name(name);
+          if (head->type == TokenType::LPAREN) {
             head++;
-            std::unique_ptr<Block> funct_block = Block::parse_block(head);
-            funct_statement->set_function(funct_block);
-            block->add_statement(std::move(funct_statement));
+            std::vector<std::shared_ptr<AST>> arguments =
+                AST::parse_call(head, TokenType::RPAREN);
+            funct_statement->set_argument(arguments);
+          }
+          head++;
+          std::unique_ptr<Block> funct_block = Block::parse_block(head);
+          funct_statement->set_function(funct_block);
+          block->add_statement(std::move(funct_statement));
         } break;
         case (TokenType::RETURN): {
-            head++;
-            std::unique_ptr<ReturnStatement> return_statement =
-                std::make_unique<ReturnStatement>();
-            if (head->type == TokenType::SEMICOLON){
+          head++;
+          std::unique_ptr<ReturnStatement> return_statement =
+              std::make_unique<ReturnStatement>();
+          if (head->type == TokenType::SEMICOLON) {
             // return;
-              head++;
-              block->add_statement(std::move(return_statement));
-            } else{
-                auto ret = std::make_unique<Expression>(AST::parse_infix(head, 0));
-                return_statement->set_return(ret);
-                consume(head, TokenType::SEMICOLON);
-                block->add_statement(std::move(return_statement));
-            }
+            head++;
+            block->add_statement(std::move(return_statement));
+          } else {
+            // return null; or return anything else
+            auto ret = std::make_unique<Expression>(AST::parse_infix(head, 0));
+            return_statement->set_return(ret);
+            AST::consume(++head, TokenType::SEMICOLON);
+            block->add_statement(std::move(return_statement));
+          }
         } break;
         default:
           throw UnexpTokError(*head);
@@ -340,21 +329,19 @@ FunctStatement::~FunctStatement() {
   // Auto garbage collection
 }
 
-void FunctStatement::add_argument(std::shared_ptr<AST>& arg){
-    this->arguments.push_back(std::move(arg));
+void FunctStatement::set_argument(std::vector<std::shared_ptr<AST>>& arg) {
+  this->arguments = std::move(arg);
 }
 
-void FunctStatement::set_name(std::shared_ptr<AST>& def){
-    this->name = std::move(def);
+void FunctStatement::set_name(std::shared_ptr<AST>& def) {
+  this->name = std::move(def);
 }
 
-void FunctStatement::set_function(std::unique_ptr<Block>& block){
-    this->function_block = std::move(block);
+void FunctStatement::set_function(std::unique_ptr<Block>& block) {
+  this->function_block = std::move(block);
 }
 
-void FunctStatement::run() {
-  return;
-}
+void FunctStatement::run() { return; }
 
 void FunctStatement::print(std::ostream& os, int depth) const {
   for (int i = 0; i < depth; i++) {
@@ -363,16 +350,17 @@ void FunctStatement::print(std::ostream& os, int depth) const {
   os << "def ";
   this->name->get_infix(os);
   os << '(';
-  if (this->arguments.size() != 0){
+  if (this->arguments.size() != 0) {
     this->arguments.at(0)->get_infix(os);
     bool first = true;
-    for (auto const& arg : this->arguments){
-      if(first){
-          first = false;
-          continue;}
+    for (auto const& arg : this->arguments) {
+      if (first) {
+        first = false;
+        continue;
+      }
       os << ", ";
       arg->get_infix(os);
-  }
+    }
   }
   os << ") {\n";
   this->function_block->print(os, depth + 1);
@@ -390,24 +378,22 @@ ReturnStatement::~ReturnStatement() {
   // Auto garbage collection
 }
 
-void ReturnStatement::run(){
-    return;
+void ReturnStatement::run() { return; }
+
+void ReturnStatement::print(std::ostream& os, int depth) const {
+  for (int i = 0; i < depth; i++) {
+    os << "    ";
+  }
+  os << "return";
+  if (this->ret) {
+    os << ' ';
+    this->ret->get_infix(os);
+  }
+  os << ';' << '\n';
 }
 
-void ReturnStatement::print(std::ostream& os, int depth) const{
-    for (int i = 0; i < depth; i++) {
-        os << "    ";
-    }
-    os << "return";
-    if (this->ret){
-        os << ' ';
-        this->ret->get_infix(os);
-    }
-    os << ';' << '\n';
-}
-
-void ReturnStatement::set_return(std::unique_ptr<Expression>& value){
-    this->ret = std::move(value);
+void ReturnStatement::set_return(std::unique_ptr<Expression>& value) {
+  this->ret = std::move(value);
 }
 
 #endif

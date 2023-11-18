@@ -15,7 +15,7 @@ Value::Value(bool boolean) : type(ValueType::BOOL), _value(boolean) {}
 
 Value::Value(std::nullptr_t n) : type(ValueType::null), _value(n) {}
 
-Value::Value(std::function<Value(const std::vector<Value>&)> function)
+Value::Value(std::function<Value(const std::vector<Value>&)> function) 
   : type(ValueType::FUNCTION), 
   _value(function) {}
 
@@ -179,6 +179,9 @@ std::ostream& operator<<(std::ostream& os, const Value& value) {
   }
   if (value.type == ValueType::DOUBLE) {
     return os << (std::get<double>(value._value));
+  }
+  if (value.type == ValueType::null) {
+    return os << "null";
   }
   return os;
 }

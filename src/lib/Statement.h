@@ -128,7 +128,7 @@ class FunctStatement : public Statement {
   virtual void run();
   virtual void print(std::ostream& os, int depth = 0) const;
 
-  void add_argument(std::shared_ptr<AST>& arg);
+  void set_argument(std::vector<std::shared_ptr<AST>>& arg);
   void set_name(std::shared_ptr<AST>& def);
   void set_function(std::unique_ptr<Block>& block);
 };

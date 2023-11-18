@@ -66,4 +66,23 @@ class Identifier : public AST {
   virtual void get_infix(std::ostream &oss) const;
 };
 
+class FunctionCall : public AST {
+ private:
+  Token tok;
+  std::vector<std::shared_ptr<AST>> value;
+
+ public:
+  FunctionCall(std::shared_ptr<AST> node,
+               std::vector<std::shared_ptr<AST>> value);
+  virtual ~FunctionCall();
+
+  virtual const Token &get_token() const;
+  const std::vector<std::shared_ptr<AST>> &get_value() const;
+  virtual Value eval() const;
+  virtual Value __eval() const;
+  // Deserted due to depreciation of S expression evaluation
+  // virtual bool is_legal() const;
+  virtual void get_infix(std::ostream &oss) const;
+};
+
 #endif

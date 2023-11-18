@@ -1,9 +1,9 @@
 #ifndef VALUE_H
 #define VALUE_H
+#include <functional>
 #include <iostream>
 #include <variant>
 #include <vector>
-#include <functional>
 
 enum struct ValueType { BOOL, DOUBLE, NONE, FUNCTION, null };
 
