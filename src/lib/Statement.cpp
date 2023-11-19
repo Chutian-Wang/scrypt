@@ -32,7 +32,7 @@ std::unique_ptr<Block> Block::parse_block(
     std::vector<Token>::const_iterator& head) {
   auto block = std::make_unique<Block>();
 
-  while ((head + 1)->type != TokenType::END) {
+  // while ((head + 1)->type != TokenType::END) {
     while (head->type != TokenType::END && head->type != TokenType::RCBRACE) {
       if (head->type == TokenType::LCBRACE) {
         block = Block::parse_block(++head);
@@ -85,11 +85,11 @@ std::unique_ptr<Block> Block::parse_block(
             std::unique_ptr<Block> if_block = Block::parse_block(head);
             if_statement->set_if(if_block);
 
-            if (head->type == TokenType::RCBRACE) {
-              head++;
-            } else {
-              throw UnexpTokError(*head);
-            }
+            // if (head->type == TokenType::RCBRACE) {
+            //   head++;
+            // } else {
+            //   throw UnexpTokError(*head);
+            // }
 
             if (head->type == TokenType::ELSE) {
               head++;
@@ -148,7 +148,7 @@ std::unique_ptr<Block> Block::parse_block(
         }
       }
     }
-  }
+  // }
   // if (head->type == TokenType::RCBRACE) head++;
   return block;
 }
