@@ -123,7 +123,7 @@ Value operator==(const Value& lhs, const Value& rhs) {
 
 Value operator!=(const Value& lhs, const Value& rhs) {
   if (lhs.type != rhs.type) {
-    throw InvalidOperand();
+    return Value(true);
   }
 
   if (lhs.type == ValueType::BOOL) {
