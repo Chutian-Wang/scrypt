@@ -2,13 +2,14 @@
 
 #include "Errors.h"
 
-// #include <memory>
-// #include <map>
-
 Function::Function(std::weak_ptr<AST> functionAST) : funct(functionAST) {}
 
 std::map<std::string, Value> Function::getScope() const {
   return my_scope;
+}
+
+void Function::setScopeStack(std::stack<std::shared_ptr<Function>>& stack) {
+    scopeStack = stack;
 }
 
 void Function::addVariable(const std::string& name, const Value& value) {

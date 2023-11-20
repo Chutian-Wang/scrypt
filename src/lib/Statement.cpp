@@ -341,6 +341,8 @@ void FunctStatement::set_function(std::unique_ptr<Block>& block) {
 
 void FunctStatement::run() {
   auto functionScope = std::make_shared<Function>();
+  functionScope->setScopeStack(scopeStack);
+
   scopeStack.push(functionScope);
 
   auto parameters = arguments;

@@ -5,12 +5,14 @@
 #include <variant>
 #include <vector>
 
+#include "Function.h"
+
 enum struct ValueType { BOOL, DOUBLE, NONE, FUNCTION, null };
 
 struct Value {
  public:
   ValueType type;
-  std::variant<double, bool, std::nullptr_t,
+  std::variant<double, bool, std::nullptr_t, std::shared_ptr<Function>,
                std::function<Value(const std::vector<Value>&)> >
       _value;
 
@@ -18,6 +20,7 @@ struct Value {
   Value(double num);
   Value(bool boolean);
   Value(std::nullptr_t n);
+  Value(std::shared_ptr<Function> func);
   Value(std::function<Value(const std::vector<Value>&)> function);
 
   Value& operator+=(const Value& rhs);
