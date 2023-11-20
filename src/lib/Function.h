@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "AST.h"
+#include "Value.h"
 
 class Function {
  private:
@@ -13,7 +14,13 @@ class Function {
   std::weak_ptr<AST> funct;
 
  public:
-  std::map<std::string, Value> get_scope(std::string scope);
+  Function(){};
+  Function(std::weak_ptr<AST> functionAST);
+  std::map<std::string, Value> getScope() const;
+
+  void addVariable(const std::string& name, const Value& value);
+  void setRet(const Value& value);
+  Value getVariable(const std::string& name) const;
 };
 
 #endif

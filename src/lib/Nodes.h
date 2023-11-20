@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "AST.h"
+#include "Function.h"
 #include "Value.h"
 
 class Constant : public AST {

@@ -118,10 +118,6 @@ Value operator==(const Value& lhs, const Value& rhs) {
     return Value(true);
   }
   return Value(false);
-  // return Value(lhs.type == ValueType::BOOL
-  //             ? std::get<bool>(lhs._value) == std::get<bool>(rhs._value)
-  //             : std::get<double>(lhs._value) ==
-  //             std::get<double>(rhs._value));
 }
 
 Value operator!=(const Value& lhs, const Value& rhs) {
@@ -136,10 +132,6 @@ Value operator!=(const Value& lhs, const Value& rhs) {
     return Value(false);
   }
   return Value(true);
-  // return Value(lhs.type == ValueType::BOOL
-  //             ? std::get<bool>(lhs._value) != std::get<bool>(rhs._value)
-  //             : std::get<double>(lhs._value) !=
-  //             std::get<double>(rhs._value));
 }
 
 Value operator<(const Value& lhs, const Value& rhs) {
