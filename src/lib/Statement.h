@@ -1,13 +1,16 @@
 #include <iostream>
 #include <memory>
+#include <stack>
 #include <vector>
 
 #include "AST.h"
+#include "Function.h"
 
 // Avoid referencing compiler error
 // We might want to rethink our design choices...
 class Block;
 class Statement;
+class Function;
 
 // A collection of statements which can be run as a whole
 // An entire scrypt program can and should be a block
@@ -34,8 +37,12 @@ class Block {
 
 // Statement virtual base class
 class Statement {
+ protected:
+  std::stack<std::shared_ptr<Function>> scopeStack;
+
  public:
   Statement(){};
+  Statement(std::stack<std::shared_ptr<Function>> scopeStack);
   virtual ~Statement(){};
 
   // This function runs  the statement and will

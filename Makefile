@@ -15,6 +15,7 @@ OBJS = 	$(BUILDDIR)/Value.o	\
 		$(BUILDDIR)/Token.o \
 		$(BUILDDIR)/Errors.o \
 		$(BUILDDIR)/Statement.o \
+		$(BUILDDIR)/Function.o \
 
 .PHONY: clean
 

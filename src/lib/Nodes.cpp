@@ -6,6 +6,7 @@
 #include <string>
 
 #include "Errors.h"
+#include "Statement.h"
 #include "Token.h"
 #include "Value.h"
 
@@ -64,12 +65,12 @@ void Operator::add_operand(std::shared_ptr<AST> node) {
 const Token &Operator::get_token() const { return this->tok; }
 
 Value Operator::eval() const {
-  // auto old_map = symbols;
+  auto old_map = symbols;
   try {
     return this->__eval();
   } catch (const ScryptRuntimeError &err) {
     // Restore variables
-    // symbols = old_map;
+    symbols = old_map;
     throw;
   }
 }

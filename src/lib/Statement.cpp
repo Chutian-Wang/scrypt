@@ -10,6 +10,7 @@
 
 #include "AST.h"
 #include "Errors.h"
+#include "Function.h"
 #include "Nodes.h"
 #include "Value.h"
 
@@ -32,6 +33,7 @@ std::unique_ptr<Block> Block::parse_block(
     std::vector<Token>::const_iterator& head) {
   auto block = std::make_unique<Block>();
 
+  // while ((head + 1)->type != TokenType::END) {
   while (head->type != TokenType::END && head->type != TokenType::RCBRACE) {
     if (head->type == TokenType::LCBRACE) {
       block = Block::parse_block(++head);
@@ -161,6 +163,9 @@ void Block::print(std::ostream& os, int depth) const {
     statement->print(os, depth);
   }
 }
+
+Statement::Statement(std::stack<std::shared_ptr<Function>> scopeStack)
+    : scopeStack(scopeStack) {}
 
 Expression::Expression(std::shared_ptr<AST> expr) { this->expr = expr; }
 
@@ -314,6 +319,7 @@ void PrintStatement::print(std::ostream& os, int depth) const {
 
 FunctStatement::FunctStatement() {
   this->name = std::shared_ptr<AST>();
+  this->arguments = std::vector<std::shared_ptr<AST>>();
   this->function_block = std::unique_ptr<Block>();
 }
 
@@ -333,7 +339,24 @@ void FunctStatement::set_function(std::unique_ptr<Block>& block) {
   this->function_block = std::move(block);
 }
 
-void FunctStatement::run() { return; }
+void FunctStatement::run() {
+  auto functionScope = std::make_shared<Function>();
+  scopeStack.push(functionScope);
+
+  auto parameters = arguments;
+  for (const auto& parameter : parameters) {
+    std::shared_ptr<Identifier> identifier =
+        std::dynamic_pointer_cast<Identifier>(parameter);
+    if (identifier) {
+      scopeStack.top()->addVariable(identifier->get_token().text, Value());
+    } else {
+      // Invalid function parameters
+      throw InvalidFunc();
+    }
+  }
+  function_block->run();
+  scopeStack.pop();
+}
 
 void FunctStatement::print(std::ostream& os, int depth) const {
   for (int i = 0; i < depth; i++) {
@@ -370,7 +393,15 @@ ReturnStatement::~ReturnStatement() {
   // Auto garbage collection
 }
 
-void ReturnStatement::run() { return; }
+void ReturnStatement::run() {
+  if (scopeStack.empty()) {
+    // Return statement used outside function
+    throw UnexpReturn();
+  }
+  Value returnValue = (ret) ? ret->eval() : Value();
+  // set the return value in the current scope
+  scopeStack.top()->setRet(returnValue);
+}
 
 void ReturnStatement::print(std::ostream& os, int depth) const {
   for (int i = 0; i < depth; i++) {
