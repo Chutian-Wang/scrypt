@@ -10,6 +10,7 @@
 
 #include "Errors.h"
 #include "Nodes.h"
+#include "Token.h"
 #include "Value.h"
 
 // This global map tracks the variables
@@ -20,51 +21,78 @@ std::map<std::string, Value> symbols{};
 **                    Infix Scrypt Parser                   **
 *************************************************************/
 
-std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head, int min_p) {
+void AST::consume(std::vector<Token>::const_iterator &head, TokenType target) {
+  if (head->type == target) {
+    head++;
+  } else {
+    throw UnexpTokError(*head);
+  }
+}
+
+std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
+                                      int min_p) {
   std::shared_ptr<AST> lhs = parse_primary(head);
-  
-  auto peek = head + 1;
-  // Same level loop
-  while (peek->is_binary() && peek->get_p() > min_p) {
-    int precedence = peek->get_p();
-    if (peek->text=="="){
+
+  // Check precedence
+  while (p_map.count((head + 1)->text) && ((head + 1)->get_p() > min_p)) {
+    head++;
+    int precedence = head->get_p();
+    if (head->text == "=") {
+      // handles right-associative
       precedence -= 1;
     }
-    
-    head = peek + 1;
-    std::shared_ptr<AST> op(new Operator(*peek));
-    std::shared_ptr<AST> rhs = parse_infix(head, precedence);
+    if (head->text == "(") {
+      // parse function call
+      auto args = parse_call(++head, TokenType::RPAREN);
+      std::shared_ptr<AST> new_lhs(new FunctionCall(lhs, args));
+      lhs = new_lhs;
+      continue;
+    }
+
+    std::shared_ptr<AST> op(new Operator(*head));
+    std::shared_ptr<AST> rhs = parse_infix(++head, precedence);
 
     ((Operator *)op.get())->add_operand(lhs);
     ((Operator *)op.get())->add_operand(rhs);
     lhs = op;
-
-    peek = head + 1;
   }
 
   return lhs;
 }
 
-std::shared_ptr<AST> AST::parse_primary(std::vector<Token>::const_iterator &head) {
-  if (head->type == TokenType::NUMBER || head->type == TokenType::BOOL || head->type == TokenType::null) {
+std::shared_ptr<AST> AST::parse_primary(
+    std::vector<Token>::const_iterator &head) {
+  if (head->type == TokenType::NUMBER || head->type == TokenType::BOOL ||
+      head->type == TokenType::null) {
     return std::shared_ptr<AST>(new Constant(*head));
   } else if (head->type == TokenType::IDENTIFIER) {
+    // std::cout<<"id "<<head->text<<std::endl;
     return std::shared_ptr<AST>(new Identifier(*head));
   } else if (head->type == TokenType::LPAREN) {
-    head++; // consume (
+    head++;  // consume (
     std::shared_ptr<AST> node = parse_infix(head, 0);
-    head++; // consume )
+    head++;  // consume )
     return node;
   } else {
     throw UnexpTokError(*head);
   }
 }
 
-
-
-
-
-
+std::vector<std::shared_ptr<AST>> AST::parse_call(
+    std::vector<Token>::const_iterator &head, TokenType end) {
+  // head-> arguments[0]
+  std::vector<std::shared_ptr<AST>> arguments;
+  while (head->type != end) {
+    auto argument = AST::parse_infix(head, 0);
+    arguments.push_back(std::move(argument));
+    head++;
+    if (head->type == TokenType::COMMA) {
+      head++;
+    }
+  }
+  // head -> )
+  return arguments;
+}
 
 // std::shared_ptr<AST> AST::parse_infix(const std::vector<Token> &tokens) {
 //   if (tokens[0].type == TokenType::END) {
@@ -94,14 +122,16 @@ std::shared_ptr<AST> AST::parse_primary(std::vector<Token>::const_iterator &head
 //              head->type == TokenType::BOOL) {
 //     // Invalid first token will get handled by parse_primary
 //     lhs = parse_primary(*head);
-//   } 
+//   }
 //   return parse_infix(head, lhs, 0);
 // }
 
-// std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
+// std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator
+// &head,
 //                                       std::shared_ptr<AST> lhs, int min_p) {
 //   std::shared_ptr<AST> rhs = nullptr;
-//   if (head->type != TokenType::NUMBER && head->type != TokenType::IDENTIFIER &&
+//   if (head->type != TokenType::NUMBER && head->type != TokenType::IDENTIFIER
+//   &&
 //       head->type != TokenType::BOOL) {
 //     // Invalid first token in an expression
 //     if (!(head->type == TokenType::RPAREN && lhs.get() != nullptr)){
@@ -125,7 +155,8 @@ std::shared_ptr<AST> AST::parse_primary(std::vector<Token>::const_iterator &head
 //     }
 //     peek = head + 1;
 //     // Higher level loop
-//     while (((peek)->is_binary() && (peek)->get_p() > op->get_token().get_p()) /*||
+//     while (((peek)->is_binary() && (peek)->get_p() > op->get_token().get_p())
+//     /*||
 //            peek->text == "="*/) {
 
 //       int precedence = (peek)->get_p();
@@ -133,7 +164,7 @@ std::shared_ptr<AST> AST::parse_primary(std::vector<Token>::const_iterator &head
 //           // It's right associative
 //           precedence = 1;
 //       }
-//       rhs = parse_infix(head, rhs, precedence); 
+//       rhs = parse_infix(head, rhs, precedence);
 //       peek = head + 1;
 //     }
 //     // if (op->get_token().text == "=") {
@@ -150,7 +181,8 @@ std::shared_ptr<AST> AST::parse_primary(std::vector<Token>::const_iterator &head
 // }
 
 // std::shared_ptr<AST> AST::parse_primary(const Token &tok) {
-//   if (tok.type == TokenType::NUMBER || tok.type == TokenType::BOOL || tok.type == TokenType::null) {
+//   if (tok.type == TokenType::NUMBER || tok.type == TokenType::BOOL ||
+//   tok.type == TokenType::null) {
 //     return std::shared_ptr<AST>(new Constant(tok));
 //   } else if (tok.type == TokenType::IDENTIFIER) {
 //     return std::shared_ptr<AST>(new Identifier(tok));
@@ -158,8 +190,6 @@ std::shared_ptr<AST> AST::parse_primary(std::vector<Token>::const_iterator &head
 //     throw UnexpTokError(tok);
 //   }
 // }
-
-
 
 /************************** S-parser *************************
 **                         DEPRECIATED                      **

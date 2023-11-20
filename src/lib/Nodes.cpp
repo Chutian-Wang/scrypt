@@ -21,6 +21,9 @@ Constant::Constant(const Token &tok) {
     is >> std::boolalpha >> b;
     this->val = b;
   }
+  if (tok.type == TokenType::null) {
+    this->val = nullptr;
+  }
 }
 
 Constant::~Constant() {}
@@ -221,3 +224,40 @@ bool Identifier::assigned() const {
 }
 
 void Identifier::get_infix(std::ostream &oss) const { oss << this->tok.text; }
+
+// FunctionCall implememtations ----------------------------------
+FunctionCall::FunctionCall(std::shared_ptr<AST> node,
+                           std::vector<std::shared_ptr<AST>> value) {
+  this->tok = node->get_token();
+  this->value = value;
+}
+
+FunctionCall::~FunctionCall() {
+  // Nothing on the heap
+}
+
+const Token &FunctionCall::get_token() const { return this->tok; }
+
+Value FunctionCall::eval() const { return this->__eval(); }
+
+Value FunctionCall::__eval() const { return Value(); }
+
+void FunctionCall::get_infix(std::ostream &oss) const {
+  oss << this->tok.text << "(";
+  if (value.size() != 0) {
+    auto node = this->value.begin();
+    do {
+      (*node)->get_infix(oss);
+      if (node + 1 == value.end()) {
+        break;
+      }
+      oss << ", ";
+      node++;
+    } while (node != value.end());
+  }
+  oss << ")";
+}
+
+const std::vector<std::shared_ptr<AST>> &FunctionCall::get_value() const {
+  return value;
+}
