@@ -9,6 +9,7 @@
 #include "Statement.h"
 #include "Token.h"
 #include "Value.h"
+#include "Function.h"
 
 // Constant implementations ------------------------------------
 Constant::Constant(const Token &tok) {
@@ -31,7 +32,10 @@ Constant::~Constant() {}
 
 const Token &Constant::get_token() const { return this->tok; }
 
-Value Constant::eval() const { return this->__eval(); }
+Value Constant::eval(std::shared_ptr<Function> currentFunc) const { 
+  (void)currentFunc; //unused parameter
+  return this->__eval(); 
+}
 
 Value Constant::__eval() const { return this->val; }
 
@@ -64,15 +68,20 @@ void Operator::add_operand(std::shared_ptr<AST> node) {
 
 const Token &Operator::get_token() const { return this->tok; }
 
-Value Operator::eval() const {
+Value Operator::eval(std::shared_ptr<Function> currentFunc) const {
   auto old_map = symbols;
+
+  if (currentFunc) {
+    symbols = currentFunc->getLocalScope();
+  }
+
   try {
     return this->__eval();
   } catch (const ScryptRuntimeError &err) {
     // Restore variables
     symbols = old_map;
     throw;
-  }
+  } 
 }
 
 Value Operator::__eval() const {
@@ -205,12 +214,16 @@ Identifier::~Identifier() {
 
 const Token &Identifier::get_token() const { return this->tok; }
 
-Value Identifier::eval() const { return this->__eval(); }
+Value Identifier::eval(std::shared_ptr<Function> currentFunc) const { 
+  (void)currentFunc; //unused parameter
+  return this->__eval(); 
+}
 
 Value Identifier::__eval() const {
-  if (this->assigned()) {
+  if(symbols.find(this->tok.text) != symbols.end()) {
     return symbols.at(this->tok.text);
-  } else {
+  }
+  else {
     throw UnknownIdent(this->tok);
   }
 }
@@ -239,7 +252,10 @@ FunctionCall::~FunctionCall() {
 
 const Token &FunctionCall::get_token() const { return this->tok; }
 
-Value FunctionCall::eval() const { return this->__eval(); }
+Value FunctionCall::eval(std::shared_ptr<Function> currentFunc) const { 
+  (void)currentFunc; //unused parameter
+  return this->__eval(); 
+}
 
 Value FunctionCall::__eval() const { return Value(); }
 

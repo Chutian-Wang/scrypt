@@ -46,7 +46,7 @@ class AST {
    * This function will revert identifiers to their previous
    * values if evaluation fails
    */
-  virtual Value eval() const = 0;
+  virtual Value eval(std::shared_ptr<Function> currentFunc) const = 0;
 
   /**
    * Internal function to evaluate the subtree:

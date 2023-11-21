@@ -10,6 +10,9 @@
 int main() {
   std::shared_ptr<AST> parser;
   std::string line;
+  Function globalScope;
+  std::stack<std::shared_ptr<Function>> scopeStack;
+  globalScope.setScopeStack(scopeStack);
   while (std::getline(std::cin, line)) {
     try {
       auto iss = std::istringstream(line);
@@ -20,7 +23,7 @@ int main() {
       parser = AST::parse_infix(head, 0);
       parser->get_infix(std::cout);
       std::cout << std::endl;
-      Value result = parser->eval();
+      Value result = parser->eval(std::make_shared<Function>(globalScope));
       std::cout << result << std::endl;
     } catch (const ScryptError &err) {
       ScryptError::handle(std::cout, err);

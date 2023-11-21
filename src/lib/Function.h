@@ -19,6 +19,7 @@ class Function {
   Function(){};
   Function(std::weak_ptr<AST> functionAST);
   std::map<std::string, Value> getScope() const;
+  const std::map<std::string, Value>& getLocalScope() const;
   
   void setScopeStack(std::stack<std::shared_ptr<Function>>& stack);
   void addVariable(const std::string& name, const Value& value);

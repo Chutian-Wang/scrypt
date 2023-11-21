@@ -6,10 +6,14 @@
 #include "lib/AST.h"
 #include "lib/Errors.h"
 #include "lib/Lexer.h"
+#include "lib/Function.h"
 
 int main() {
   std::vector<std::shared_ptr<AST>> expressions;
   int return_code = 0;
+  Function globalScope;
+  std::stack<std::shared_ptr<Function>> scopeStack;
+  globalScope.setScopeStack(scopeStack);
   try {
     Lexer lexer;
     lexer.tokenize(std::cin);
@@ -20,7 +24,7 @@ int main() {
       expr->get_infix(oss);
       std::cout << oss.str() << '\n';
       try {
-        std::cout << expr->eval() << std::endl;
+        std::cout << expr->eval(std::make_shared<Function>(globalScope)) << std::endl;
       } catch (const ScryptError &err) {
         return_code = ScryptError::handle(std::cout, err);
       }

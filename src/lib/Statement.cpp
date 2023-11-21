@@ -151,10 +151,10 @@ void Block::add_statement(std::unique_ptr<Statement> statement) {
   this->statements.push_back(std::move(statement));
 }
 
-void Block::run() {
+void Block::run(std::shared_ptr<Function> currentScope) {
   // Use const reference for unique pointer here
   for (auto const& statement : this->statements) {
-    statement->run();
+    statement->run(currentScope);
   }
 }
 
@@ -173,7 +173,7 @@ Expression::~Expression() {
   // Auto garbage collection
 }
 
-void Expression::run() { this->expr->eval(); }
+void Expression::run(std::shared_ptr<Function> currentScope) { this->expr->eval(currentScope); }
 
 void Expression::print(std::ostream& os, int depth) const {
   for (int i = 0; i < depth; i++) {
@@ -183,7 +183,7 @@ void Expression::print(std::ostream& os, int depth) const {
   os << ';' << '\n';
 }
 
-Value Expression::eval() { return this->expr->eval(); }
+Value Expression::eval(std::shared_ptr<Function> currentScope) { return this->expr->eval(currentScope); }
 
 void Expression::get_infix(std::ostream& os) { this->expr->get_infix(os); }
 
@@ -197,15 +197,15 @@ IfStatement::~IfStatement() {
   // Auto garbage collection
 }
 
-void IfStatement::run() {
-  Value truth = condition->eval();
+void IfStatement::run(std::shared_ptr<Function> currentScope) {
+  Value truth = condition->eval(currentScope);
   if (truth.type == ValueType::BOOL) {
     if (std::get<bool>(truth._value)) {
-      this->if_block->run();
+      this->if_block->run(currentScope);
     } else {
       // Do else block only if it exists
       if (this->else_block.get() != nullptr) {
-        this->else_block->run();
+        this->else_block->run(currentScope);
       }
     }
   } else {
@@ -259,12 +259,12 @@ WhileStatement::~WhileStatement() {
   // Auto garbage collection
 }
 
-void WhileStatement::run() {
+void WhileStatement::run(std::shared_ptr<Function> currentScope) {
   while (1) {
-    Value truth = condition->eval();
+    Value truth = condition->eval(currentScope);
     if (truth.type == ValueType::BOOL) {
       if (std::get<bool>(truth._value)) {
-        this->while_block->run();
+        this->while_block->run(currentScope);
       } else {
         break;
       }
@@ -306,7 +306,7 @@ PrintStatement::~PrintStatement() {
   // Auto garbage collection
 }
 
-void PrintStatement::run() { this->os << this->printee->eval() << '\n'; }
+void PrintStatement::run(std::shared_ptr<Function> currentScope) { this->os << this->printee->eval(currentScope) << '\n'; }
 
 void PrintStatement::print(std::ostream& os, int depth) const {
   for (int i = 0; i < depth; i++) {
@@ -339,7 +339,7 @@ void FunctStatement::set_function(std::unique_ptr<Block>& block) {
   this->function_block = std::move(block);
 }
 
-void FunctStatement::run() {
+void FunctStatement::run(std::shared_ptr<Function> currentScope) {
   auto functionScope = std::make_shared<Function>();
   functionScope->setScopeStack(scopeStack);
 
@@ -356,7 +356,7 @@ void FunctStatement::run() {
       throw InvalidFunc();
     }
   }
-  function_block->run();
+  function_block->run(currentScope);
   scopeStack.pop();
 }
 
@@ -395,14 +395,19 @@ ReturnStatement::~ReturnStatement() {
   // Auto garbage collection
 }
 
-void ReturnStatement::run() {
+void ReturnStatement::run(std::shared_ptr<Function> currentScope) {
   if (scopeStack.empty()) {
     // Return statement used outside function
     throw UnexpReturn();
   }
-  Value returnValue = (ret) ? ret->eval() : Value();
+  Value returnValue = (ret) ? ret->eval(currentScope) : Value();
   // set the return value in the current scope
   scopeStack.top()->setRet(returnValue);
+
+  if (scopeStack.size() > 1) {
+    scopeStack.pop();
+    scopeStack.top()->setRet(returnValue);
+  }
 }
 
 void ReturnStatement::print(std::ostream& os, int depth) const {
