@@ -1,4 +1,5 @@
 #include "Value.h"
+#include "Function.h"
 
 #include <cmath>
 #include <cstring>
@@ -14,6 +15,8 @@ Value::Value(double num) : type(ValueType::DOUBLE), _value(num) {}
 Value::Value(bool boolean) : type(ValueType::BOOL), _value(boolean) {}
 
 Value::Value(std::nullptr_t n) : type(ValueType::null), _value(n) {}
+
+Value::Value(std::shared_ptr<Function> func) : type(ValueType::FUNCTION), _value(func) {}
 
 Value::Value(std::function<Value(const std::vector<Value>&)> function)
     : type(ValueType::FUNCTION), _value(function) {}

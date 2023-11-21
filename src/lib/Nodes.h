@@ -18,7 +18,7 @@ class Constant : public AST {
   virtual ~Constant();
 
   virtual const Token &get_token() const;
-  virtual Value eval() const;
+  virtual Value eval(std::shared_ptr<Function> currentFunc) const;
   virtual Value __eval() const;
   // Deserted due to depreciation of S expression evaluation
   // virtual bool is_legal() const;
@@ -41,7 +41,7 @@ class Operator : public AST {
   void add_operand(std::shared_ptr<AST> node);
 
   virtual const Token &get_token() const;
-  virtual Value eval() const;
+  virtual Value eval(std::shared_ptr<Function> currentFunc) const;
   virtual Value __eval() const;
   // Deserted due to depreciation of S expression evaluation
   // virtual bool is_legal() const;
@@ -60,7 +60,7 @@ class Identifier : public AST {
   bool assigned() const;
 
   virtual const Token &get_token() const;
-  virtual Value eval() const;
+  virtual Value eval(std::shared_ptr<Function> currentFunc) const;
   virtual Value __eval() const;
   // Deserted due to depreciation of S expression evaluation
   // virtual bool is_legal() const;
@@ -79,7 +79,7 @@ class FunctionCall : public AST {
 
   virtual const Token &get_token() const;
   const std::vector<std::shared_ptr<AST>> &get_value() const;
-  virtual Value eval() const;
+  virtual Value eval(std::shared_ptr<Function> currentFunc) const;
   virtual Value __eval() const;
   // Deserted due to depreciation of S expression evaluation
   // virtual bool is_legal() const;

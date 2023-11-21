@@ -6,7 +6,9 @@
 #include <vector>
 
 #include "Token.h"
-#include "Value.h"
+
+struct Value;
+class Function; 
 
 extern std::map<std::string, Value> symbols;
 
@@ -17,19 +19,19 @@ class AST {
  public:
   virtual ~AST(){};
   /**
-   * This function handels infix parsing.
+   * This function handles infix parsing.
    */
   static std::shared_ptr<AST> parse_infix(
       std::vector<Token>::const_iterator &head, int min_p);
 
   /**
-   * This function handels primary parsing.
+   * This function handles primary parsing.
    */
   static std::shared_ptr<AST> parse_primary(
       std::vector<Token>::const_iterator &head);
 
   /**
-   * This function handels function call parsing.
+   * This function handles function call parsing.
    */
   static std::vector<std::shared_ptr<AST>> parse_call(
       std::vector<Token>::const_iterator &head, TokenType end);
@@ -44,7 +46,7 @@ class AST {
    * This function will revert identifiers to their previous
    * values if evaluation fails
    */
-  virtual Value eval() const = 0;
+  virtual Value eval(std::shared_ptr<Function> currentFunc) const = 0;
 
   /**
    * Internal function to evaluate the subtree:
