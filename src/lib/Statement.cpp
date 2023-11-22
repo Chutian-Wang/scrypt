@@ -390,7 +390,13 @@ ReturnStatement::~ReturnStatement() {
 }
 
 void ReturnStatement::run(std::map<std::string, Value>& scope) { 
-    throw this->ret->eval(scope); }
+    if (this->ret == nullptr){
+        throw Value(nullptr);
+    }
+    else{
+        throw this->ret->eval(scope);
+    }
+    }
 
 void ReturnStatement::print(std::ostream& os, int depth) const {
   for (int i = 0; i < depth; i++) {
