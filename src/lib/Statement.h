@@ -4,26 +4,14 @@
 #include <vector>
 
 #include "AST.h"
-#include "Function.h"
 
-enum struct StatementType {
-  DEFAULT,
-  EXPRES,
-  IF,
-  WHILE,
-  PRINT,
-  FUNCT,
-  RETURN
-};
-
+enum struct StatementType { DEFAULT, EXPRES, IF, WHILE, PRINT, FUNCT, RETURN };
 
 // Avoid referencing compiler error
 // We might want to rethink our design choices...
 class Block;
 class Statement;
 class Function;
-
-// extern std::map<std::string, FunctStatement> function_map;
 
 // A collection of statements which can be run as a whole
 // An entire scrypt program can and should be a block
@@ -140,11 +128,11 @@ class FunctStatement : public Statement {
  private:
   std::vector<std::shared_ptr<AST>> arguments;
   std::shared_ptr<AST> name;
-  std::unique_ptr<Block> function_block;
 
  public:
   FunctStatement();
   virtual ~FunctStatement();
+  std::shared_ptr<Block> function_block;
 
   virtual void run(std::shared_ptr<Function> currentScope);
   virtual void print(std::ostream& os, int depth = 0) const;

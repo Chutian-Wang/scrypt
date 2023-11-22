@@ -6,10 +6,10 @@
 #include <string>
 
 #include "Errors.h"
+#include "Function.h"
 #include "Statement.h"
 #include "Token.h"
 #include "Value.h"
-#include "Function.h"
 
 // Constant implementations ------------------------------------
 Constant::Constant(const Token &tok) {
@@ -32,9 +32,9 @@ Constant::~Constant() {}
 
 const Token &Constant::get_token() const { return this->tok; }
 
-Value Constant::eval(std::shared_ptr<Function> currentFunc) const { 
-  (void)currentFunc; //unused parameter
-  return this->__eval(); 
+Value Constant::eval(std::shared_ptr<Function> currentFunc) const {
+  (void)currentFunc;  // unused parameter
+  return this->__eval();
 }
 
 Value Constant::__eval() const { return this->val; }
@@ -81,7 +81,7 @@ Value Operator::eval(std::shared_ptr<Function> currentFunc) const {
     // Restore variables
     symbols = old_map;
     throw;
-  } 
+  }
 }
 
 Value Operator::__eval() const {
@@ -214,16 +214,15 @@ Identifier::~Identifier() {
 
 const Token &Identifier::get_token() const { return this->tok; }
 
-Value Identifier::eval(std::shared_ptr<Function> currentFunc) const { 
-  (void)currentFunc; //unused parameter
-  return this->__eval(); 
+Value Identifier::eval(std::shared_ptr<Function> currentFunc) const {
+  (void)currentFunc;  // unused parameter
+  return this->__eval();
 }
 
 Value Identifier::__eval() const {
-  if(symbols.find(this->tok.text) != symbols.end()) {
+  if (symbols.find(this->tok.text) != symbols.end()) {
     return symbols.at(this->tok.text);
-  }
-  else {
+  } else {
     throw UnknownIdent(this->tok);
   }
 }
@@ -252,15 +251,15 @@ FunctionCall::~FunctionCall() {
 
 const Token &FunctionCall::get_token() const { return this->tok; }
 
-Value FunctionCall::eval(std::shared_ptr<Function> currentFunc) const { 
-  (void)currentFunc; //unused parameter
-  return this->__eval(); 
+Value FunctionCall::eval(std::shared_ptr<Function> currentFunc) const {
+  (void)currentFunc;  // unused parameter
+  return this->__eval();
 }
 
-Value FunctionCall::__eval() const { 
-  //TODO: need to eval expression
-  return Value(); 
-  }
+Value FunctionCall::__eval() const {
+  // TODO: need to eval expression
+  return Value();
+}
 
 void FunctionCall::get_infix(std::ostream &oss) const {
   oss << this->tok.text << "(";

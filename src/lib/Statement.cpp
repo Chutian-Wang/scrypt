@@ -4,10 +4,10 @@
 #include "Statement.h"
 
 #include <iostream>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
-#include <map>
 
 #include "AST.h"
 #include "Errors.h"
@@ -15,7 +15,7 @@
 #include "Nodes.h"
 #include "Value.h"
 
-// std::map<std::string, FunctStatement> function_map{};
+std::map<std::string, std::shared_ptr<FunctStatement>> functionMap;
 
 Block::Block() { this->statements = std::vector<std::unique_ptr<Statement>>(); }
 
@@ -157,13 +157,8 @@ void Block::add_statement(std::unique_ptr<Statement> statement) {
 void Block::run(std::shared_ptr<Function> currentScope) {
   // Use const reference for unique pointer here
   for (auto const& statement : this->statements) {
-    (void)currentScope; // currently unused, unvoid later
-    if (statement->type == StatementType::FUNCT) {
-      // TODO
-    } else {
-      // (&function_map["chloe"])->run(currentScope);
-      // statement->run(currentScope);
-    }
+    (void)currentScope;  // currently unused, unvoid later
+    statement->run(currentScope);
   }
 }
 
@@ -185,7 +180,12 @@ Expression::~Expression() {
   // Auto garbage collection
 }
 
-void Expression::run(std::shared_ptr<Function> currentScope) { this->expr->eval(currentScope); }
+void Expression::run(std::shared_ptr<Function> currentScope) {
+  FunctStatement* funct_statement =
+      functionMap[this->expr->get_token().text].get();
+  funct_statement->run(currentScope);
+  this->expr->eval(currentScope);
+}
 
 void Expression::print(std::ostream& os, int depth) const {
   for (int i = 0; i < depth; i++) {
@@ -195,7 +195,9 @@ void Expression::print(std::ostream& os, int depth) const {
   os << ';' << '\n';
 }
 
-Value Expression::eval(std::shared_ptr<Function> currentScope) { return this->expr->eval(currentScope); }
+Value Expression::eval(std::shared_ptr<Function> currentScope) {
+  return this->expr->eval(currentScope);
+}
 
 void Expression::get_infix(std::ostream& os) { this->expr->get_infix(os); }
 
@@ -321,7 +323,9 @@ PrintStatement::~PrintStatement() {
   // Auto garbage collection
 }
 
-void PrintStatement::run(std::shared_ptr<Function> currentScope) { this->os << this->printee->eval(currentScope) << '\n'; }
+void PrintStatement::run(std::shared_ptr<Function> currentScope) {
+  this->os << this->printee->eval(currentScope) << '\n';
+}
 
 void PrintStatement::print(std::ostream& os, int depth) const {
   for (int i = 0; i < depth; i++) {
@@ -356,7 +360,7 @@ void FunctStatement::set_function(std::unique_ptr<Block>& block) {
 }
 
 void FunctStatement::run(std::shared_ptr<Function> currentScope) {
-  (void) currentScope; // currently unused, unvoid later
+  (void)currentScope;  // currently unused, unvoid later
   auto functionScope = std::make_shared<Function>();
   functionScope->setScopeStack(scopeStack);
 
@@ -373,8 +377,19 @@ void FunctStatement::run(std::shared_ptr<Function> currentScope) {
       throw InvalidFunc();
     }
   }
-  // function_block->run(currentScope); FUNCT STATEMENTS SHOULD NOT BE RUNNING
-  // scopeStack.pop(); DO WE NEED POP??
+  FunctStatement* funct_statement = functionMap[name->get_token().text].get();
+  if (funct_statement) {
+    // TODO: Unknown identifier when using symbols, might be the wrong scope
+    // function_block->run(currentScope);
+    // funct_statement->function_block->run(currentScope);
+    funct_statement->function_block->run(funct_statement->scopeStack.top());
+
+  } else {
+    functionMap[name->get_token().text] =
+        std::make_shared<FunctStatement>(*this);
+  }
+
+  scopeStack.pop();
 }
 
 void FunctStatement::print(std::ostream& os, int depth) const {
