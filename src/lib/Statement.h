@@ -6,11 +6,24 @@
 #include "AST.h"
 #include "Function.h"
 
+enum struct StatementType {
+  DEFAULT,
+  EXPRES,
+  IF,
+  WHILE,
+  PRINT,
+  FUNCT,
+  RETURN
+};
+
+
 // Avoid referencing compiler error
 // We might want to rethink our design choices...
 class Block;
 class Statement;
 class Function;
+
+// extern std::map<std::string, FunctStatement> function_map;
 
 // A collection of statements which can be run as a whole
 // An entire scrypt program can and should be a block
@@ -42,8 +55,9 @@ class Statement {
 
  public:
   Statement(){};
-  Statement(std::stack<std::shared_ptr<Function>> scopeStack);
+  Statement(std::stack<std::shared_ptr<Function>> anyScopeStack);
   virtual ~Statement(){};
+  StatementType type;
 
   // This function runs  the statement and will
   // print something if it contains a print statement

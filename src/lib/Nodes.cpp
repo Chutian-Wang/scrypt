@@ -257,7 +257,10 @@ Value FunctionCall::eval(std::shared_ptr<Function> currentFunc) const {
   return this->__eval(); 
 }
 
-Value FunctionCall::__eval() const { return Value(); }
+Value FunctionCall::__eval() const { 
+  //TODO: need to eval expression
+  return Value(); 
+  }
 
 void FunctionCall::get_infix(std::ostream &oss) const {
   oss << this->tok.text << "(";

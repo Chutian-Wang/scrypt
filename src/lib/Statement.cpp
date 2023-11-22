@@ -7,12 +7,15 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <map>
 
 #include "AST.h"
 #include "Errors.h"
 #include "Function.h"
 #include "Nodes.h"
 #include "Value.h"
+
+// std::map<std::string, FunctStatement> function_map{};
 
 Block::Block() { this->statements = std::vector<std::unique_ptr<Statement>>(); }
 
@@ -154,7 +157,13 @@ void Block::add_statement(std::unique_ptr<Statement> statement) {
 void Block::run(std::shared_ptr<Function> currentScope) {
   // Use const reference for unique pointer here
   for (auto const& statement : this->statements) {
-    statement->run(currentScope);
+    (void)currentScope; // currently unused, unvoid later
+    if (statement->type == StatementType::FUNCT) {
+      // TODO
+    } else {
+      // (&function_map["chloe"])->run(currentScope);
+      // statement->run(currentScope);
+    }
   }
 }
 
@@ -167,7 +176,10 @@ void Block::print(std::ostream& os, int depth) const {
 Statement::Statement(std::stack<std::shared_ptr<Function>> scopeStack)
     : scopeStack(scopeStack) {}
 
-Expression::Expression(std::shared_ptr<AST> expr) { this->expr = expr; }
+Expression::Expression(std::shared_ptr<AST> expr) {
+  this->expr = expr;
+  this->type = StatementType::EXPRES;
+}
 
 Expression::~Expression() {
   // Auto garbage collection
@@ -191,6 +203,7 @@ IfStatement::IfStatement() {
   this->condition = std::unique_ptr<Expression>();
   this->if_block = std::unique_ptr<Block>();
   this->else_block = std::unique_ptr<Block>();
+  this->type = StatementType::IF;
 }
 
 IfStatement::~IfStatement() {
@@ -253,6 +266,7 @@ void IfStatement::set_else(std::unique_ptr<Block>& block) {
 WhileStatement::WhileStatement() {
   this->condition = std::unique_ptr<Expression>();
   this->while_block = std::unique_ptr<Block>();
+  this->type = StatementType::WHILE;
 }
 
 WhileStatement::~WhileStatement() {
@@ -300,6 +314,7 @@ PrintStatement::PrintStatement(std::unique_ptr<Expression>& printee,
                                std::ostream& os)
     : os(os) {
   this->printee = std::move(printee);
+  this->type = StatementType::PRINT;
 }
 
 PrintStatement::~PrintStatement() {
@@ -321,6 +336,7 @@ FunctStatement::FunctStatement() {
   this->name = std::shared_ptr<AST>();
   this->arguments = std::vector<std::shared_ptr<AST>>();
   this->function_block = std::unique_ptr<Block>();
+  this->type = StatementType::FUNCT;
 }
 
 FunctStatement::~FunctStatement() {
@@ -340,6 +356,7 @@ void FunctStatement::set_function(std::unique_ptr<Block>& block) {
 }
 
 void FunctStatement::run(std::shared_ptr<Function> currentScope) {
+  (void) currentScope; // currently unused, unvoid later
   auto functionScope = std::make_shared<Function>();
   functionScope->setScopeStack(scopeStack);
 
@@ -356,8 +373,8 @@ void FunctStatement::run(std::shared_ptr<Function> currentScope) {
       throw InvalidFunc();
     }
   }
-  function_block->run(currentScope);
-  scopeStack.pop();
+  // function_block->run(currentScope); FUNCT STATEMENTS SHOULD NOT BE RUNNING
+  // scopeStack.pop(); DO WE NEED POP??
 }
 
 void FunctStatement::print(std::ostream& os, int depth) const {
@@ -389,6 +406,7 @@ void FunctStatement::print(std::ostream& os, int depth) const {
 
 ReturnStatement::ReturnStatement() {
   this->ret = std::unique_ptr<Expression>();
+  this->type = StatementType::RETURN;
 }
 
 ReturnStatement::~ReturnStatement() {
