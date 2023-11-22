@@ -4,6 +4,7 @@
 #include <iostream>
 #include <variant>
 #include <vector>
+#include <memory>
 
 class Function;
 
