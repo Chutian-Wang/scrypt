@@ -89,3 +89,30 @@ InvalidAssignee::InvalidAssignee() {
 const char *InvalidAssignee::what() const noexcept {
   return "Runtime error: invalid assignee.";
 }
+
+NotAFunction::NotAFunction() {
+  this->exit_code = NOT_A_FUNCTION;
+  this->msg = nullptr;
+}
+
+const char *NotAFunction::what() const noexcept {
+  return "Runtime error: not a function.";
+}
+
+IncorrentArg::IncorrentArg() {
+  this->exit_code = INCORRECT_ARG;
+  this->msg = nullptr;
+}
+
+const char *IncorrentArg::what() const noexcept {
+  return "Runtime error: incorrect argument count.";
+}
+
+UnexpectedReturn::UnexpectedReturn() {
+  this->exit_code = UNEXPECT_RETURN;
+  this->msg = nullptr;
+}
+
+const char *UnexpectedReturn::what() const noexcept {
+  return "Runtime error: unexpected return.";
+}

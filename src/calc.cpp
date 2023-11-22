@@ -20,7 +20,8 @@ int main() {
       parser = AST::parse_infix(head, 0);
       parser->get_infix(std::cout);
       std::cout << std::endl;
-      Value result = parser->eval();
+      std::map<std::string, Value> symbols{};
+      Value result = parser->eval(symbols);
       std::cout << result << std::endl;
     } catch (const ScryptError &err) {
       ScryptError::handle(std::cout, err);

@@ -13,10 +13,6 @@
 #include "Token.h"
 #include "Value.h"
 
-// This global map tracks the variables
-// declare as external in other files where needed
-std::map<std::string, Value> symbols{};
-
 /*************************************************************
 **                    Infix Scrypt Parser                   **
 *************************************************************/
@@ -66,7 +62,6 @@ std::shared_ptr<AST> AST::parse_primary(
       head->type == TokenType::null) {
     return std::shared_ptr<AST>(new Constant(*head));
   } else if (head->type == TokenType::IDENTIFIER) {
-    // std::cout<<"id "<<head->text<<std::endl;
     return std::shared_ptr<AST>(new Identifier(*head));
   } else if (head->type == TokenType::LPAREN) {
     head++;  // consume (

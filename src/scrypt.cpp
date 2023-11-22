@@ -12,10 +12,13 @@ int main() {
     Lexer lexer;
     lexer.tokenize(std::cin);
     std::vector<Token> tokens = lexer.get_tokens();
+    // This global map tracks the variables
+    // declare as external in other files where needed
+    std::map<std::string, Value> symbols{};
     std::unique_ptr<Block> program = Block::parse_block(tokens);
-    program->run();
+    program->run(symbols);
   } catch (const ScryptError &err) {
     return ScryptError::handle(std::cout, err);
-  }
+  } 
   return 0;
 }
