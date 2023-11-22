@@ -347,11 +347,11 @@ void FunctStatement::run(std::map<std::string, Value>& scope) {
     std::shared_ptr<Function> definition = std::make_shared<Function>(fname, args, scope, this->function_block.get());
     Value funct(definition);
     scope[fname] = funct;
-    try {
-        this->function_block->run(scope);
-    }
-    catch(Value& value) {
-    }
+    // try {
+    //     this->function_block->run(scope);
+    // }
+    // catch(Value& value) {
+    // }
 }
 
 void FunctStatement::print(std::ostream& os, int depth) const {
