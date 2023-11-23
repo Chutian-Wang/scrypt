@@ -27,8 +27,8 @@ class Block {
   static std::unique_ptr<Block> parse_block(
       std::vector<Token>::const_iterator& head);
 
-  void add_statement(std::unique_ptr<Statement>);
-  void run();
+  void add_statement(std::unique_ptr<Statement> statement);
+  void run(std::map<std::string, Value>& scope);
   void print(std::ostream& os, int depth = 0) const;
 };
 
@@ -40,7 +40,7 @@ class Statement {
 
   // This function runs  the statement and will
   // print something if it contains a print statement
-  virtual void run() = 0;
+  virtual void run(std::map<std::string, Value>& scope) = 0;
   // This function prints the statement itself
   virtual void print(std::ostream& os, int depth = 0) const = 0;
 };
@@ -54,10 +54,10 @@ class Expression : public Statement {
   Expression(std::shared_ptr<AST> expr);
   ~Expression();
 
-  virtual void run();
+  virtual void run(std::map<std::string, Value>& scope);
   virtual void print(std::ostream& os, int depth = 0) const;
 
-  Value eval();
+  Value eval(std::map<std::string, Value>& scope);
   void get_infix(std::ostream& os);
 };
 
@@ -72,7 +72,7 @@ class IfStatement : public Statement {
   IfStatement();
   virtual ~IfStatement();
 
-  virtual void run();
+  virtual void run(std::map<std::string, Value>& scope);
   virtual void print(std::ostream& os, int depth = 0) const;
 
   void set_cond(std::unique_ptr<Expression>& cond);
@@ -89,7 +89,7 @@ class WhileStatement : public Statement {
   WhileStatement();
   virtual ~WhileStatement();
 
-  virtual void run();
+  virtual void run(std::map<std::string, Value>& scope);
   virtual void print(std::ostream& os, int depth = 0) const;
 
   void set_cond(std::unique_ptr<Expression>& cond);
@@ -109,8 +109,40 @@ class PrintStatement : public Statement {
 
   // This function will push printee's evaluated
   // value to this->os
-  virtual void run();
+  virtual void run(std::map<std::string, Value>& scope);
   // This function will push the print expression
   // to the passed in os, not this->os
   virtual void print(std::ostream& os, int depth = 0) const;
+};
+
+class FunctStatement : public Statement {
+ private:
+  std::vector<std::shared_ptr<AST>> arguments;
+  std::shared_ptr<AST> name;
+  std::unique_ptr<Block> function_block;
+
+ public:
+  FunctStatement();
+  virtual ~FunctStatement();
+
+  virtual void run(std::map<std::string, Value>& scope);
+  virtual void print(std::ostream& os, int depth = 0) const;
+
+  void set_argument(std::vector<std::shared_ptr<AST>>& arg);
+  void set_name(std::shared_ptr<AST>& def);
+  void set_function(std::unique_ptr<Block>& block);
+};
+
+class ReturnStatement : public Statement {
+ private:
+  std::unique_ptr<Expression> ret;
+
+ public:
+  ReturnStatement();
+  virtual ~ReturnStatement();
+
+  virtual void run(std::map<std::string, Value>& scope);
+  virtual void print(std::ostream& os, int depth = 0) const;
+
+  void set_return(std::unique_ptr<Expression>& value);
 };

@@ -80,3 +80,30 @@ InvalidOperand::InvalidOperand() {
 const char *InvalidOperand::what() const noexcept {
   return "Runtime error: invalid operand type.";
 }
+
+InvalidAssignee::InvalidAssignee() {
+  this->exit_code = INVALID_OPRAND;
+  this->msg = nullptr;
+}
+
+const char *InvalidAssignee::what() const noexcept {
+  return "Runtime error: invalid assignee.";
+}
+
+NotAFunction::NotAFunction() {
+  this->exit_code = NOT_A_FUNCTION;
+  this->msg = nullptr;
+}
+
+const char *NotAFunction::what() const noexcept {
+  return "Runtime error: not a function.";
+}
+
+IncorrentArg::IncorrentArg() {
+  this->exit_code = INCORRECT_ARG;
+  this->msg = nullptr;
+}
+
+const char *IncorrentArg::what() const noexcept {
+  return "Runtime error: incorrect argument count.";
+}

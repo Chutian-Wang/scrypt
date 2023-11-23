@@ -2,6 +2,8 @@
 
 #include <map>
 
+#include "Errors.h"
+
 Token::Token() {
   this->type = TokenType::ERR;
   this->text = std::string();

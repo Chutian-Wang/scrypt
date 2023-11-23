@@ -1,7 +1,7 @@
 #ifndef STATEMENT_H
 #define STATEMENT_H
 
-#include "Statement.h"
+// #include "Statement.h"
 
 #include <iostream>
 #include <memory>
@@ -10,6 +10,7 @@
 
 #include "AST.h"
 #include "Errors.h"
+#include "Function.h"
 #include "Nodes.h"
 #include "Value.h"
 
@@ -42,15 +43,18 @@ std::unique_ptr<Block> Block::parse_block(
       return block;
     } else if (head->type != TokenType::WHILE && head->type != TokenType::IF &&
                head->type != TokenType::ELSE &&
-               head->type != TokenType::PRINT) {
+               head->type != TokenType::PRINT &&
+               head->type != TokenType::FUNCTION &&
+               head->type != TokenType::RETURN) {
       block->add_statement(
-          std::make_unique<Expression>(AST::parse_infix(head)));
-      head++;
+          std::make_unique<Expression>(AST::parse_infix(head, 0)));
+      AST::consume(++head, TokenType::SEMICOLON);
     } else {
       switch (head->type) {
         case (TokenType::WHILE): {
           head++;
-          auto condition = std::make_unique<Expression>(AST::parse_infix(head));
+          auto condition =
+              std::make_unique<Expression>(AST::parse_infix(head, 0));
           head++;
           if (head->type != TokenType::LCBRACE) {
             throw UnexpTokError(*head);
@@ -67,8 +71,8 @@ std::unique_ptr<Block> Block::parse_block(
         } break;
         case (TokenType::IF): {
           head++;
-          auto condition =
-              std::make_unique<Expression>(Expression(AST::parse_infix(head)));
+          auto condition = std::make_unique<Expression>(
+              Expression(AST::parse_infix(head, 0)));
           head++;
           if (head->type != TokenType::LCBRACE) {
             throw UnexpTokError(*head);
@@ -90,12 +94,47 @@ std::unique_ptr<Block> Block::parse_block(
         } break;
         case (TokenType::PRINT): {
           head++;
-          auto printee =
-              std::make_unique<Expression>(Expression(AST::parse_infix(head)));
-          head++;
+          auto printee = std::make_unique<Expression>(
+              Expression(AST::parse_infix(head, 0)));
+          AST::consume(++head, TokenType::SEMICOLON);
           auto print_statement =
               std::make_unique<PrintStatement>(printee, std::cout);
           block->add_statement(std::move(print_statement));
+        } break;
+        case (TokenType::FUNCTION): {
+          head++;
+          auto name = AST::parse_primary(head);
+          // head->foo
+          head++;
+          std::unique_ptr<FunctStatement> funct_statement =
+              std::make_unique<FunctStatement>();
+          funct_statement->set_name(name);
+          if (head->type == TokenType::LPAREN) {
+            head++;
+            std::vector<std::shared_ptr<AST>> arguments =
+                AST::parse_call(head, TokenType::RPAREN);
+            funct_statement->set_argument(arguments);
+          }
+          head++;
+          std::unique_ptr<Block> funct_block = Block::parse_block(head);
+          funct_statement->set_function(funct_block);
+          block->add_statement(std::move(funct_statement));
+        } break;
+        case (TokenType::RETURN): {
+          head++;
+          std::unique_ptr<ReturnStatement> return_statement =
+              std::make_unique<ReturnStatement>();
+          if (head->type == TokenType::SEMICOLON) {
+            // return;
+            head++;
+            block->add_statement(std::move(return_statement));
+          } else {
+            // return null; or return anything else
+            auto ret = std::make_unique<Expression>(AST::parse_infix(head, 0));
+            return_statement->set_return(ret);
+            AST::consume(++head, TokenType::SEMICOLON);
+            block->add_statement(std::move(return_statement));
+          }
         } break;
         default:
           throw UnexpTokError(*head);
@@ -111,10 +150,10 @@ void Block::add_statement(std::unique_ptr<Statement> statement) {
   this->statements.push_back(std::move(statement));
 }
 
-void Block::run() {
+void Block::run(std::map<std::string, Value>& scope) {
   // Use const reference for unique pointer here
   for (auto const& statement : this->statements) {
-    statement->run();
+    statement->run(scope);
   }
 }
 
@@ -130,17 +169,21 @@ Expression::~Expression() {
   // Auto garbage collection
 }
 
-void Expression::run() { this->expr->eval(); }
+void Expression::run(std::map<std::string, Value>& scope) {
+  this->expr->eval(scope);
+}
 
 void Expression::print(std::ostream& os, int depth) const {
   for (int i = 0; i < depth; i++) {
     os << "    ";
   }
   this->expr->get_infix(os);
-  os << '\n';
+  os << ';' << '\n';
 }
 
-Value Expression::eval() { return this->expr->eval(); }
+Value Expression::eval(std::map<std::string, Value>& scope) {
+  return this->expr->eval(scope);
+}
 
 void Expression::get_infix(std::ostream& os) { this->expr->get_infix(os); }
 
@@ -154,15 +197,15 @@ IfStatement::~IfStatement() {
   // Auto garbage collection
 }
 
-void IfStatement::run() {
-  Value truth = condition->eval();
+void IfStatement::run(std::map<std::string, Value>& scope) {
+  Value truth = condition->eval(scope);
   if (truth.type == ValueType::BOOL) {
-    if (truth._value._bool) {
-      this->if_block->run();
+    if (std::get<bool>(truth._value)) {
+      this->if_block->run(scope);
     } else {
       // Do else block only if it exists
       if (this->else_block.get() != nullptr) {
-        this->else_block->run();
+        this->else_block->run(scope);
       }
     }
   } else {
@@ -216,12 +259,12 @@ WhileStatement::~WhileStatement() {
   // Auto garbage collection
 }
 
-void WhileStatement::run() {
+void WhileStatement::run(std::map<std::string, Value>& scope) {
   while (1) {
-    Value truth = condition->eval();
+    Value truth = condition->eval(scope);
     if (truth.type == ValueType::BOOL) {
-      if (truth._value._bool) {
-        this->while_block->run();
+      if (std::get<bool>(truth._value)) {
+        this->while_block->run(scope);
       } else {
         break;
       }
@@ -263,7 +306,9 @@ PrintStatement::~PrintStatement() {
   // Auto garbage collection
 }
 
-void PrintStatement::run() { this->os << this->printee->eval() << '\n'; }
+void PrintStatement::run(std::map<std::string, Value>& scope) {
+  this->os << this->printee->eval(scope) << '\n';
+}
 
 void PrintStatement::print(std::ostream& os, int depth) const {
   for (int i = 0; i < depth; i++) {
@@ -271,7 +316,104 @@ void PrintStatement::print(std::ostream& os, int depth) const {
   }
   os << "print ";
   this->printee->get_infix(os);
-  os << '\n';
+  os << ';' << '\n';
+}
+
+FunctStatement::FunctStatement() {
+  this->name = std::shared_ptr<AST>();
+  this->function_block = std::unique_ptr<Block>();
+}
+
+FunctStatement::~FunctStatement() {
+  // Auto garbage collection
+}
+
+void FunctStatement::set_argument(std::vector<std::shared_ptr<AST>>& arg) {
+  this->arguments = std::move(arg);
+}
+
+void FunctStatement::set_name(std::shared_ptr<AST>& def) {
+  this->name = std::move(def);
+}
+
+void FunctStatement::set_function(std::unique_ptr<Block>& block) {
+  this->function_block = std::move(block);
+}
+
+void FunctStatement::run(std::map<std::string, Value>& scope) {
+  std::vector<std::string> args;
+  for (auto arg : this->arguments) {
+    // put function parameters in the map
+    std::string name = arg->get_token().text;
+    args.push_back(name);
+    scope[name] = Value();
+  }
+  std::string fname = this->name->get_token().text;
+  std::shared_ptr<Function> definition = std::make_shared<Function>(
+      fname, args, scope, this->function_block.get());
+  Value funct(definition);
+  // put function name in map
+  scope[fname] = funct;
+}
+
+void FunctStatement::print(std::ostream& os, int depth) const {
+  for (int i = 0; i < depth; i++) {
+    os << "    ";
+  }
+  os << "def ";
+  this->name->get_infix(os);
+  os << '(';
+  if (this->arguments.size() != 0) {
+    this->arguments.at(0)->get_infix(os);
+    bool first = true;
+    for (auto const& arg : this->arguments) {
+      if (first) {
+        first = false;
+        continue;
+      }
+      os << ", ";
+      arg->get_infix(os);
+    }
+  }
+  os << ") {\n";
+  this->function_block->print(os, depth + 1);
+  for (int i = 0; i < depth; i++) {
+    os << "    ";
+  }
+  os << "}\n";
+}
+
+ReturnStatement::ReturnStatement() {
+  this->ret = std::unique_ptr<Expression>();
+}
+
+ReturnStatement::~ReturnStatement() {
+  // Auto garbage collection
+}
+
+void ReturnStatement::run(std::map<std::string, Value>& scope) {
+  if (this->ret == nullptr) {
+    // handles return;
+    throw Value(nullptr);
+  } else {
+    throw this->ret->eval(scope);
+  }
+}
+
+void ReturnStatement::print(std::ostream& os, int depth) const {
+  for (int i = 0; i < depth; i++) {
+    os << "    ";
+  }
+  os << "return";
+  if (this->ret) {
+    os << ' ';
+    this->ret->get_infix(os);
+  }
+  os << ';' << '\n';
+}
+
+void ReturnStatement::set_return(std::unique_ptr<Expression>& value) {
+  this->ret = std::move(value);
 }
 
 #endif

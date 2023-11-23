@@ -20,6 +20,9 @@
 #define UNKNOWN_IDENT SCRYPT_RUNTIME
 #define INVALID_COND SCRYPT_RUNTIME
 #define INVALID_OPRAND SCRYPT_RUNTIME
+#define INVALID_ASSIGNEE SCRYPT_RUNTIME
+#define NOT_A_FUNCTION SCRYPT_RUNTIME
+#define INCORRECT_ARG SCRYPT_RUNTIME
 
 /**
  * Children of this custom Error class should be thrown
@@ -85,6 +88,30 @@ class InvalidOperand : public ScryptRuntimeError {
  public:
   InvalidOperand();
   virtual ~InvalidOperand(){};
+  // what() is static, no need to write destructor
+  virtual const char *what() const noexcept;
+};
+
+class InvalidAssignee : public ScryptRuntimeError {
+ public:
+  InvalidAssignee();
+  virtual ~InvalidAssignee(){};
+  // what() is static, no need to write destructor
+  virtual const char *what() const noexcept;
+};
+
+class NotAFunction : public ScryptRuntimeError {
+ public:
+  NotAFunction();
+  virtual ~NotAFunction(){};
+  // what() is static, no need to write destructor
+  virtual const char *what() const noexcept;
+};
+
+class IncorrentArg : public ScryptRuntimeError {
+ public:
+  IncorrentArg();
+  virtual ~IncorrentArg(){};
   // what() is static, no need to write destructor
   virtual const char *what() const noexcept;
 };
