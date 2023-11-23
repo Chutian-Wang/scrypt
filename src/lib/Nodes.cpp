@@ -31,11 +31,11 @@ Constant::~Constant() {}
 
 const Token &Constant::get_token() const { return this->tok; }
 
-Value Constant::eval(std::map<std::string, Value> &scope) const {
+Value Constant::eval(std::map<std::string, Value> &scope) {
   return this->__eval(scope);
 }
 
-Value Constant::__eval(std::map<std::string, Value> &) const {
+Value Constant::__eval(std::map<std::string, Value> &) {
   return this->val;
 }
 
@@ -68,7 +68,7 @@ void Operator::add_operand(std::shared_ptr<AST> node) {
 
 const Token &Operator::get_token() const { return this->tok; }
 
-Value Operator::eval(std::map<std::string, Value> &scope) const {
+Value Operator::eval(std::map<std::string, Value> &scope) {
   auto old_map = scope;
   try {
     return this->__eval(scope);
@@ -79,7 +79,7 @@ Value Operator::eval(std::map<std::string, Value> &scope) const {
   }
 }
 
-Value Operator::__eval(std::map<std::string, Value> &scope) const {
+Value Operator::__eval(std::map<std::string, Value> &scope) {
   std::string str = (this->tok).text;
 
   if (str == "+") {
@@ -175,11 +175,11 @@ Identifier::~Identifier() {
 
 const Token &Identifier::get_token() const { return this->tok; }
 
-Value Identifier::eval(std::map<std::string, Value> &scope) const {
+Value Identifier::eval(std::map<std::string, Value> &scope) {
   return this->__eval(scope);
 }
 
-Value Identifier::__eval(std::map<std::string, Value> &scope) const {
+Value Identifier::__eval(std::map<std::string, Value> &scope) {
   if (this->assigned(scope)) {
     return scope.at(this->tok.text);
   } else {
@@ -213,7 +213,7 @@ FunctionCall::~FunctionCall() {
 
 const Token &FunctionCall::get_token() const { return lhs->get_token(); }
 
-Value FunctionCall::eval(std::map<std::string, Value> &scope) const {
+Value FunctionCall::eval(std::map<std::string, Value> &scope) {
   auto funct = lhs->__eval(scope);
   if (funct.type != ValueType::FUNCTION) {
     throw NotAFunction();
@@ -221,7 +221,7 @@ Value FunctionCall::eval(std::map<std::string, Value> &scope) const {
   return this->__eval(scope);
 }
 
-Value FunctionCall::__eval(std::map<std::string, Value> &scope) const {
+Value FunctionCall::__eval(std::map<std::string, Value> &scope) {
   Value funct = scope[this->get_token().text];
   FnPtr fnptr = std::get<FnPtr>(funct._value);
   if (fnptr->get_args().size() != value.size()) {
@@ -285,24 +285,24 @@ void Array::assign(Value& arr, const Value& index, const Value& val) {
   }
 }
 
-Value Array::access(const Value& arr, const Value& index) {
+Value Array::access(Value arr, const Value& index) {
+  auto& vec = std::get<std::shared_ptr<std::vector<Value>>>(arr._value);
   if (index.type != ValueType::DOUBLE) {
     throw IndexNotNumber();
   } else if (std::fmod(std::get<double>(index._value), 1) != 0) {
     throw IndexNotInt();
   } else if (std::get<double>(index._value) < 0 ||
-      std::get<double>(index._value) >= 
-      std::get<std::shared_ptr<std::vector<Value>>>(arr._value)->size()) {
+      std::get<double>(index._value) >= vec->size()) {
     throw IndexOutOfBounds();
   }
   else {
-    return (*(std::get<std::shared_ptr<std::vector<Value>>>(arr._value)))
-    [(int)std::get<double>(index._value)];
+    return (*vec)[(int)std::get<double>(index._value)];
   }
 }
 
 Array::Array() {
-  this->symbol = std::shared_ptr<AST>();
+  this->identifier = std::shared_ptr<AST>();
+  this->scope = nullptr;
   this->acc_index = std::shared_ptr<AST>();
   this->literals = std::vector<std::shared_ptr<AST>>();
 }
@@ -315,33 +315,20 @@ void Array::add_literal(std::shared_ptr<AST> literal) {
   this->literals.push_back(literal);
 }
 
+void Array::set_identifier(std::shared_ptr<AST> identifier) {
+  this->identifier = identifier;
+}
+
 void Array::set_acc_index(std::shared_ptr<AST> index) {
   this->acc_index = index;
 }
 
-void Array::set_identifier(std::shared_ptr<AST> ident) {
-  this->symbol = ident;
-}
-
-Value Array::access(Value index, std::map<std::string, Value> &scope) {
-  if (index.type != ValueType::DOUBLE) {
-    throw IndexNotNumber();
-  } else if (std::fmod(std::get<double>(index._value), 1) != 0) {
-    throw IndexNotInt();
-  } else if (std::get<double>(index._value) < 0 ||
-      std::get<double>(index._value) >= this->literals.size()) {
-    throw IndexOutOfBounds();
-  }
-  else {
-    return (this->literals)[(int)std::get<double>(index._value)]->eval(scope);
-  }
-}
-
 const Token &Array::get_token() const {
-  return this->symbol->get_token();
+  // No use
+  return this->acc_index->get_token();
 }
 
-Value Array::eval(std::map<std::string, Value> &scope) const {
+Value Array::eval(std::map<std::string, Value> &scope) {
   auto old_map = scope;
   try {
     return this->__eval(scope);
@@ -352,7 +339,8 @@ Value Array::eval(std::map<std::string, Value> &scope) const {
   }
 }
 
-Value Array::__eval(std::map<std::string, Value> &scope) const {
+Value Array::__eval(std::map<std::string, Value> &scope) {
+  this->scope = &scope;
   auto val = std::make_shared<std::vector<Value>>();
   for (auto node: this->literals) {
     val->push_back(node->__eval(scope));
@@ -361,6 +349,9 @@ Value Array::__eval(std::map<std::string, Value> &scope) const {
 }
 
 void Array::get_infix(std::ostream &oss) const {
+  if (this->identifier) {
+    oss << Array::access((*scope)[this->identifier->get_token().text], this->acc_index->eval((*scope)));
+  }
   oss << '[';
   for (auto node = this->literals.begin(); node < this->literals.end(); node++) {
     node->get()->get_infix(oss);

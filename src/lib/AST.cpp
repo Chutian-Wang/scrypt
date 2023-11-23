@@ -50,13 +50,6 @@ std::vector<std::shared_ptr<AST>> AST::parse_call(
 
 std::shared_ptr<AST> parse_index(std::vector<Token>::const_iterator &head) {
   head++; // consume "["
-  /*
-  while (head->type != TokenType::RSBRACE && head->type != TokenType::END) {
-    arr->add_literal(AST::parse_infix(head, 0));
-    head++;
-    if (head->type == TokenType::COMMA) head++;
-  }
-  */
   auto arr = AST::parse_primary(head);
   head++;
   if (head->type != TokenType::RSBRACE) throw UnexpTokError(*head);
@@ -99,6 +92,8 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
       auto index = parse_index(head);
       std::shared_ptr<AST> new_lhs = std::make_shared<Array>();
       ((Array*) new_lhs.get())->set_identifier(lhs);
+      ((Array*) new_lhs.get())->set_acc_index(index);
+      continue;
     }
     std::shared_ptr<AST> op(new Operator(*head));
     std::shared_ptr<AST> rhs = parse_infix(++head, precedence);
