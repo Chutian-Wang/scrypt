@@ -49,7 +49,7 @@ std::vector<std::shared_ptr<AST>> AST::parse_call(
 }
 
 std::shared_ptr<AST> parse_index(std::vector<Token>::const_iterator &head) {
-  head++; // consume "["
+  head++;  // consume "["
   auto arr = AST::parse_primary(head);
   head++;
   if (head->type != TokenType::RSBRACE) throw UnexpTokError(*head);
@@ -57,7 +57,7 @@ std::shared_ptr<AST> parse_index(std::vector<Token>::const_iterator &head) {
 }
 
 std::shared_ptr<AST> parse_arr(std::vector<Token>::const_iterator &head) {
-  head++; // consume "["
+  head++;  // consume "["
   auto arr = std::make_shared<Array>();
   while (head->type != TokenType::RSBRACE && head->type != TokenType::END) {
     arr->add_literal(AST::parse_infix(head, 0));
@@ -91,8 +91,8 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
       // parse arr index
       auto index = parse_index(head);
       std::shared_ptr<AST> new_lhs = std::make_shared<Array>();
-      ((Array*) new_lhs.get())->set_identifier(lhs);
-      ((Array*) new_lhs.get())->set_acc_index(index);
+      ((Array *)new_lhs.get())->set_identifier(lhs);
+      ((Array *)new_lhs.get())->set_acc_index(index);
       continue;
     }
     std::shared_ptr<AST> op(new Operator(*head));

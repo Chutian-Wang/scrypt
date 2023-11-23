@@ -15,7 +15,8 @@ Value::Value(bool boolean) : type(ValueType::BOOL), _value(boolean) {}
 
 Value::Value(std::nullptr_t n) : type(ValueType::null), _value(n) {}
 
-Value::Value(std::shared_ptr<std::vector<Value>> arr_val) : type(ValueType::ARRAY), _value(arr_val) {}
+Value::Value(std::shared_ptr<std::vector<Value>> arr_val)
+    : type(ValueType::ARRAY), _value(arr_val) {}
 
 Value::Value(std::shared_ptr<Function> funct)
     : type(ValueType::FUNCTION), _value(funct) {}
@@ -127,12 +128,14 @@ Value operator==(const Value& lhs, const Value& rhs) {
         std::get<std::shared_ptr<std::vector<Value>>>(rhs._value)->size()) {
       return Value(false);
     }
-    int size = std::get<std::shared_ptr<std::vector<Value>>>(rhs._value)->size();
+    int size =
+        std::get<std::shared_ptr<std::vector<Value>>>(rhs._value)->size();
     for (int i = 0; i < size; i++) {
-      if (std::get<bool> (
-        (std::get<std::shared_ptr<std::vector<Value>>>(lhs._value)->at(i) !=
-         std::get<std::shared_ptr<std::vector<Value>>>(rhs._value)->at(i))._value
-        )) {
+      if (std::get<bool>(
+              (std::get<std::shared_ptr<std::vector<Value>>>(lhs._value)
+                   ->at(i) !=
+               std::get<std::shared_ptr<std::vector<Value>>>(rhs._value)->at(i))
+                  ._value)) {
         return Value(false);
       }
     }
@@ -222,7 +225,8 @@ std::ostream& operator<<(std::ostream& os, const Value& value) {
   }
   if (value.type == ValueType::ARRAY) {
     os << "[";
-    const auto& vec = *(std::get<std::shared_ptr<std::vector<Value>>>(value._value));
+    const auto& vec =
+        *(std::get<std::shared_ptr<std::vector<Value>>>(value._value));
     for (auto element = vec.begin(); element < vec.end(); element++) {
       os << (*element);
       if (element != vec.end() - 1) os << ", ";

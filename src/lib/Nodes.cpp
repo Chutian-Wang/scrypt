@@ -35,9 +35,7 @@ Value Constant::eval(std::map<std::string, Value> &scope) {
   return this->__eval(scope);
 }
 
-Value Constant::__eval(std::map<std::string, Value> &) {
-  return this->val;
-}
+Value Constant::__eval(std::map<std::string, Value> &) { return this->val; }
 
 // Deserted due to depreciation of S expression evaluation
 // bool Constant::is_legal() const { return true; }
@@ -269,33 +267,32 @@ const std::vector<std::shared_ptr<AST>> &FunctionCall::get_value() const {
 
 // Array implememtations ---------------------------------------
 
-void Array::assign(Value& arr, const Value& index, const Value& val) {
+void Array::assign(Value &arr, const Value &index, const Value &val) {
   if (index.type != ValueType::DOUBLE) {
     throw IndexNotNumber();
   } else if (std::fmod(std::get<double>(index._value), 1) != 0) {
     throw IndexNotInt();
   } else if (std::get<double>(index._value) < 0 ||
-      std::get<double>(index._value) >= 
-      std::get<std::shared_ptr<std::vector<Value>>>(arr._value)->size()) {
+             std::get<double>(index._value) >=
+                 std::get<std::shared_ptr<std::vector<Value>>>(arr._value)
+                     ->size()) {
     throw IndexOutOfBounds();
-  }
-  else {
-    (*(std::get<std::shared_ptr<std::vector<Value>>>(arr._value)))
-    [(int)std::get<double>(index._value)] = val;
+  } else {
+    (*(std::get<std::shared_ptr<std::vector<Value>>>(
+        arr._value)))[(int)std::get<double>(index._value)] = val;
   }
 }
 
-Value Array::access(Value arr, const Value& index) {
-  auto& vec = std::get<std::shared_ptr<std::vector<Value>>>(arr._value);
+Value Array::access(Value arr, const Value &index) {
+  auto &vec = std::get<std::shared_ptr<std::vector<Value>>>(arr._value);
   if (index.type != ValueType::DOUBLE) {
     throw IndexNotNumber();
   } else if (std::fmod(std::get<double>(index._value), 1) != 0) {
     throw IndexNotInt();
   } else if (std::get<double>(index._value) < 0 ||
-      std::get<double>(index._value) >= vec->size()) {
+             std::get<double>(index._value) >= vec->size()) {
     throw IndexOutOfBounds();
-  }
-  else {
+  } else {
     return (*vec)[(int)std::get<double>(index._value)];
   }
 }
@@ -342,7 +339,7 @@ Value Array::eval(std::map<std::string, Value> &scope) {
 Value Array::__eval(std::map<std::string, Value> &scope) {
   this->scope = &scope;
   auto val = std::make_shared<std::vector<Value>>();
-  for (auto node: this->literals) {
+  for (auto node : this->literals) {
     val->push_back(node->__eval(scope));
   }
   return Value(val);
@@ -350,10 +347,12 @@ Value Array::__eval(std::map<std::string, Value> &scope) {
 
 void Array::get_infix(std::ostream &oss) const {
   if (this->identifier) {
-    oss << Array::access((*scope)[this->identifier->get_token().text], this->acc_index->eval((*scope)));
+    oss << Array::access((*scope)[this->identifier->get_token().text],
+                         this->acc_index->eval((*scope)));
   }
   oss << '[';
-  for (auto node = this->literals.begin(); node < this->literals.end(); node++) {
+  for (auto node = this->literals.begin(); node < this->literals.end();
+       node++) {
     node->get()->get_infix(oss);
     if (node != this->literals.end() - 1) oss << ", ";
   }

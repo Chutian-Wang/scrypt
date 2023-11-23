@@ -121,42 +121,42 @@ class IncorrentArg : public ScryptRuntimeError {
   virtual const char *what() const noexcept;
 };
 
-class IndexNotNumber: public ScryptRuntimeError {
-  public:
+class IndexNotNumber : public ScryptRuntimeError {
+ public:
   IndexNotNumber();
-  virtual ~IndexNotNumber() {};
+  virtual ~IndexNotNumber(){};
   // what() is static, no need to write destructor
   virtual const char *what() const noexcept;
 };
 
-class IndexNotInt: public ScryptRuntimeError {
-  public:
+class IndexNotInt : public ScryptRuntimeError {
+ public:
   IndexNotInt();
-  virtual ~IndexNotInt() {};
+  virtual ~IndexNotInt(){};
   // what() is static, no need to write destructor
   virtual const char *what() const noexcept;
 };
 
-class NotArray: public ScryptRuntimeError {
-  public:
+class NotArray : public ScryptRuntimeError {
+ public:
   NotArray();
-  virtual ~NotArray() {};
+  virtual ~NotArray(){};
   // what() is static, no need to write destructor
   virtual const char *what() const noexcept;
 };
 
-class IndexOutOfBounds: public ScryptRuntimeError {
-  public:
+class IndexOutOfBounds : public ScryptRuntimeError {
+ public:
   IndexOutOfBounds();
-  virtual ~IndexOutOfBounds() {};
+  virtual ~IndexOutOfBounds(){};
   // what() is static, no need to write destructor
   virtual const char *what() const noexcept;
 };
 
-class Underflow: public ScryptRuntimeError {
-  public:
+class Underflow : public ScryptRuntimeError {
+ public:
   Underflow();
-  virtual ~Underflow() {};
+  virtual ~Underflow(){};
   // what() is static, no need to write destructor
   virtual const char *what() const noexcept;
 };

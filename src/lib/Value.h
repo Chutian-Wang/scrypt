@@ -13,13 +13,9 @@ enum struct ValueType { BOOL, DOUBLE, FUNCTION, ARRAY, null };
 struct Value {
  public:
   ValueType type;
-  std::variant<
-    double,
-    bool,
-    std::nullptr_t,
-    std::shared_ptr<Function>,
-    std::shared_ptr<std::vector<Value>>
-    > _value;
+  std::variant<double, bool, std::nullptr_t, std::shared_ptr<Function>,
+               std::shared_ptr<std::vector<Value>>>
+      _value;
 
   Value();
   Value(double num);
