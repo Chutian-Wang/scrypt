@@ -89,7 +89,6 @@ class FunctionCall : public AST {
 class Array : public AST {
  private:
   std::shared_ptr<AST> identifier;
-  std::map<std::string, Value> *scope;
   std::shared_ptr<AST> acc_index;
   std::vector<std::shared_ptr<AST>> literals;
 

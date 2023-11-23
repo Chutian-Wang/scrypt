@@ -299,7 +299,6 @@ Value Array::access(Value arr, const Value &index) {
 
 Array::Array() {
   this->identifier = std::shared_ptr<AST>();
-  this->scope = nullptr;
   this->acc_index = std::shared_ptr<AST>();
   this->literals = std::vector<std::shared_ptr<AST>>();
 }
@@ -337,7 +336,6 @@ Value Array::eval(std::map<std::string, Value> &scope) {
 }
 
 Value Array::__eval(std::map<std::string, Value> &scope) {
-  this->scope = &scope;
   auto val = std::make_shared<std::vector<Value>>();
   for (auto node : this->literals) {
     val->push_back(node->__eval(scope));
@@ -346,17 +344,19 @@ Value Array::__eval(std::map<std::string, Value> &scope) {
 }
 
 void Array::get_infix(std::ostream &oss) const {
-  if (this->identifier) {
-    oss << Array::access((*scope)[this->identifier->get_token().text],
-                         this->acc_index->eval((*scope)));
+  if (this->acc_index) {
+    oss << this->identifier->get_token().text << '[';
+    this->acc_index->get_infix(oss);
+    oss << ']';
+  } else {
+    oss << '[';
+    for (auto node = this->literals.begin(); node < this->literals.end();
+         node++) {
+      node->get()->get_infix(oss);
+      if (node != this->literals.end() - 1) oss << ", ";
+    }
+    oss << ']';
   }
-  oss << '[';
-  for (auto node = this->literals.begin(); node < this->literals.end();
-       node++) {
-    node->get()->get_infix(oss);
-    if (node != this->literals.end() - 1) oss << ", ";
-  }
-  oss << ']';
 }
 
 // Deserted due to depreciation of S expression evaluation

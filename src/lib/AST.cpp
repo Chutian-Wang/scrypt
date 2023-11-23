@@ -93,6 +93,7 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
       std::shared_ptr<AST> new_lhs = std::make_shared<Array>();
       ((Array *)new_lhs.get())->set_identifier(lhs);
       ((Array *)new_lhs.get())->set_acc_index(index);
+      lhs = new_lhs;
       continue;
     }
     std::shared_ptr<AST> op(new Operator(*head));
