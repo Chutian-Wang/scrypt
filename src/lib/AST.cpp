@@ -89,10 +89,12 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
     }
     if (head->text == "[") {
       // parse arr index
+      Token tok = *head;
       auto index = parse_index(head);
       std::shared_ptr<AST> new_lhs = std::make_shared<Array>();
       ((Array *)new_lhs.get())->set_identifier(lhs);
       ((Array *)new_lhs.get())->set_acc_index(index);
+      ((Array *)new_lhs.get())->set_token(tok);
       lhs = new_lhs;
       continue;
     }

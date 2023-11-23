@@ -88,12 +88,12 @@ class FunctionCall : public AST {
 
 class Array : public AST {
  private:
+  Token tok;
   std::shared_ptr<AST> identifier;
   std::shared_ptr<AST> acc_index;
   std::vector<std::shared_ptr<AST>> literals;
 
  public:
-  static void assign(Value &arr, const Value &index, const Value &val);
   static Value access(Value arr, const Value &index);
 
   static Value len(Array array);
@@ -106,6 +106,8 @@ class Array : public AST {
   void add_literal(std::shared_ptr<AST> literal);
   void set_identifier(std::shared_ptr<AST> identifier);
   void set_acc_index(std::shared_ptr<AST> index);
+  void set_token(const Token &tok);
+  void assign(const Value &val, std::map<std::string, Value> &scope);
 
   virtual const Token &get_token() const;
   virtual Value eval(std::map<std::string, Value> &scope);

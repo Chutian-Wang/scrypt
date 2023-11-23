@@ -114,15 +114,22 @@ Value Operator::__eval(std::map<std::string, Value> &scope) {
     }
     return ret;
   } else if (str == "=") {
-    if ((this->operands[0]->get_token()).type != TokenType::IDENTIFIER) {
+    if ((this->operands[0]->get_token()).type != TokenType::IDENTIFIER &&
+        (this->operands[0]->get_token()).type != TokenType::LSBRACE) { // Array
       throw InvalidAssignee();
     }
     // Get rhs value
     Value ret = (*((this->operands).end() - 1))->__eval(scope);
     // Assign to lhs'
-    for (auto node = ((this->operands).end() - 2);
+    if ((this->operands[0]->get_token()).type == TokenType::LSBRACE) {
+      Array* arr = (Array*)this->operands[0].get();
+      arr->assign(ret, scope);
+    }
+    else {
+      for (auto node = ((this->operands).end() - 2);
          node >= ((this->operands).begin()); node--) {
-      ((Identifier *)(node->get()))->assign(ret, scope);
+        ((Identifier *)(node->get()))->assign(ret, scope);
+      }
     }
     // Return rhs
     return ret;
@@ -267,22 +274,6 @@ const std::vector<std::shared_ptr<AST>> &FunctionCall::get_value() const {
 
 // Array implememtations ---------------------------------------
 
-void Array::assign(Value &arr, const Value &index, const Value &val) {
-  if (index.type != ValueType::DOUBLE) {
-    throw IndexNotNumber();
-  } else if (std::fmod(std::get<double>(index._value), 1) != 0) {
-    throw IndexNotInt();
-  } else if (std::get<double>(index._value) < 0 ||
-             std::get<double>(index._value) >=
-                 std::get<std::shared_ptr<std::vector<Value>>>(arr._value)
-                     ->size()) {
-    throw IndexOutOfBounds();
-  } else {
-    (*(std::get<std::shared_ptr<std::vector<Value>>>(
-        arr._value)))[(int)std::get<double>(index._value)] = val;
-  }
-}
-
 Value Array::access(Value arr, const Value &index) {
   auto &vec = std::get<std::shared_ptr<std::vector<Value>>>(arr._value);
   if (index.type != ValueType::DOUBLE) {
@@ -298,6 +289,7 @@ Value Array::access(Value arr, const Value &index) {
 }
 
 Array::Array() {
+  this->tok = Token();
   this->identifier = std::shared_ptr<AST>();
   this->acc_index = std::shared_ptr<AST>();
   this->literals = std::vector<std::shared_ptr<AST>>();
@@ -320,8 +312,26 @@ void Array::set_acc_index(std::shared_ptr<AST> index) {
 }
 
 const Token &Array::get_token() const {
-  // No use
-  return this->acc_index->get_token();
+  return this->tok;
+}
+
+void Array::set_token(const Token &tok) {
+  this->tok = tok;
+}
+
+void Array::assign(const Value &val, std::map<std::string, Value> &scope) {
+  auto index = this->acc_index->eval(scope);
+  auto vec = std::get<std::shared_ptr<std::vector<Value>>>(scope[this->identifier->get_token().text]._value);
+  if (index.type != ValueType::DOUBLE) {
+    throw IndexNotNumber();
+  } else if (std::fmod(std::get<double>(index._value), 1) != 0) {
+    throw IndexNotInt();
+  } else if (std::get<double>(index._value) < 0 ||
+             std::get<double>(index._value) >= vec->size()) {
+    throw IndexOutOfBounds();
+  } else {
+    (*vec)[(int)std::get<double>(index._value)] = val;
+  }
 }
 
 Value Array::eval(std::map<std::string, Value> &scope) {
@@ -337,10 +347,14 @@ Value Array::eval(std::map<std::string, Value> &scope) {
 
 Value Array::__eval(std::map<std::string, Value> &scope) {
   auto val = std::make_shared<std::vector<Value>>();
-  for (auto node : this->literals) {
-    val->push_back(node->__eval(scope));
+  if (this->acc_index) {
+    return Array::access(scope[this->identifier->get_token().text], this->acc_index->__eval(scope));
+  } else {
+    for (auto node : this->literals) {
+      val->push_back(node->__eval(scope));
+    }
+    return Value(val);
   }
-  return Value(val);
 }
 
 void Array::get_infix(std::ostream &oss) const {
