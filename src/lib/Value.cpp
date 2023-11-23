@@ -19,8 +19,8 @@ Value::Value(std::shared_ptr<Function> funct)
     : type(ValueType::FUNCTION), _value(funct) {}
 
 Value& Value::operator+=(const Value& rhs) {
-  if (rhs.type == ValueType::NONE){}
-  else if (this->type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
+  if (rhs.type == ValueType::NONE) {
+  } else if (this->type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
     throw InvalidOperand();
   }
   _value = std::get<double>(_value) + std::get<double>(rhs._value);
@@ -28,8 +28,8 @@ Value& Value::operator+=(const Value& rhs) {
 }
 
 Value& Value::operator-=(const Value& rhs) {
-  if (rhs.type == ValueType::NONE){}
-  else if (this->type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
+  if (rhs.type == ValueType::NONE) {
+  } else if (this->type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
     throw InvalidOperand();
   }
   _value = std::get<double>(_value) - std::get<double>(rhs._value);
@@ -37,8 +37,8 @@ Value& Value::operator-=(const Value& rhs) {
 }
 
 Value& Value::operator*=(const Value& rhs) {
-  if (rhs.type == ValueType::NONE){}
-  else if (this->type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
+  if (rhs.type == ValueType::NONE) {
+  } else if (this->type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
     throw InvalidOperand();
   }
   _value = std::get<double>(_value) * std::get<double>(rhs._value);
@@ -46,8 +46,8 @@ Value& Value::operator*=(const Value& rhs) {
 }
 
 Value& Value::operator/=(const Value& rhs) {
-  if (rhs.type == ValueType::NONE){}
-  else if (this->type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
+  if (rhs.type == ValueType::NONE) {
+  } else if (this->type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
     throw InvalidOperand();
   }
   if (std::get<double>(rhs._value) == 0.) {
@@ -58,8 +58,8 @@ Value& Value::operator/=(const Value& rhs) {
 }
 
 Value& Value::operator%=(const Value& rhs) {
-  if (rhs.type == ValueType::NONE){}
-  else if (this->type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
+  if (rhs.type == ValueType::NONE) {
+  } else if (this->type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
     throw InvalidOperand();
   }
   if (std::get<double>(rhs._value) == 0.) {
@@ -120,9 +120,11 @@ Value operator==(const Value& lhs, const Value& rhs) {
   } else if (lhs.type == ValueType::DOUBLE) {
     return Value(std::get<double>(lhs._value) == std::get<double>(rhs._value));
   } else if (lhs.type == ValueType::null) {
-    return Value(std::get<std::nullptr_t>(lhs._value) == std::get<std::nullptr_t>(rhs._value));
+    return Value(std::get<std::nullptr_t>(lhs._value) ==
+                 std::get<std::nullptr_t>(rhs._value));
   } else if (lhs.type == ValueType::FUNCTION) {
-    return Value(std::get<std::shared_ptr<Function>>(lhs._value) == std::get<std::shared_ptr<Function>>(rhs._value));
+    return Value(std::get<std::shared_ptr<Function>>(lhs._value) ==
+                 std::get<std::shared_ptr<Function>>(rhs._value));
   }
 
   return Value(false);
@@ -138,65 +140,67 @@ Value operator!=(const Value& lhs, const Value& rhs) {
   } else if (lhs.type == ValueType::DOUBLE) {
     return Value(std::get<double>(lhs._value) != std::get<double>(rhs._value));
   } else if (lhs.type == ValueType::null) {
-    return Value(std::get<std::nullptr_t>(lhs._value) != std::get<std::nullptr_t>(rhs._value));
+    return Value(std::get<std::nullptr_t>(lhs._value) !=
+                 std::get<std::nullptr_t>(rhs._value));
   } else if (lhs.type == ValueType::FUNCTION) {
-    return Value(std::get<std::shared_ptr<Function>>(lhs._value) != std::get<std::shared_ptr<Function>>(rhs._value));
+    return Value(std::get<std::shared_ptr<Function>>(lhs._value) !=
+                 std::get<std::shared_ptr<Function>>(rhs._value));
   }
 
   return Value(true);
 }
 
 Value operator<(const Value& lhs, const Value& rhs) {
-  if (lhs.type == ValueType::NONE && rhs.type == ValueType::NONE){}
-  else if (lhs.type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
+  if (lhs.type == ValueType::NONE && rhs.type == ValueType::NONE) {
+  } else if (lhs.type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
     throw InvalidOperand();
   }
   return Value(std::get<double>(lhs._value) < std::get<double>(rhs._value));
 }
 
 Value operator<=(const Value& lhs, const Value& rhs) {
-  if (lhs.type == ValueType::NONE && rhs.type == ValueType::NONE){}
-  else if (lhs.type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
+  if (lhs.type == ValueType::NONE && rhs.type == ValueType::NONE) {
+  } else if (lhs.type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
     throw InvalidOperand();
   }
   return Value(std::get<double>(lhs._value) <= std::get<double>(rhs._value));
 }
 
 Value operator>(const Value& lhs, const Value& rhs) {
-  if (lhs.type == ValueType::NONE && rhs.type == ValueType::NONE){}
-  else if (lhs.type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
+  if (lhs.type == ValueType::NONE && rhs.type == ValueType::NONE) {
+  } else if (lhs.type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
     throw InvalidOperand();
   }
   return Value(std::get<double>(lhs._value) > std::get<double>(rhs._value));
 }
 
 Value operator>=(const Value& lhs, const Value& rhs) {
-  if (lhs.type == ValueType::NONE && rhs.type == ValueType::NONE){}
-  else if (lhs.type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
+  if (lhs.type == ValueType::NONE && rhs.type == ValueType::NONE) {
+  } else if (lhs.type != ValueType::DOUBLE || rhs.type != ValueType::DOUBLE) {
     throw InvalidOperand();
   }
   return Value(std::get<double>(lhs._value) >= std::get<double>(rhs._value));
 }
 
 Value operator&(const Value& lhs, const Value& rhs) {
-  if (lhs.type == ValueType::NONE && rhs.type == ValueType::NONE){}
-  else if (lhs.type != ValueType::BOOL || rhs.type != ValueType::BOOL) {
+  if (lhs.type == ValueType::NONE && rhs.type == ValueType::NONE) {
+  } else if (lhs.type != ValueType::BOOL || rhs.type != ValueType::BOOL) {
     throw InvalidOperand();
   }
   return Value(std::get<bool>(lhs._value) && std::get<bool>(rhs._value));
 }
 
 Value operator^(const Value& lhs, const Value& rhs) {
-  if (lhs.type == ValueType::NONE && rhs.type == ValueType::NONE){}
-  else if (lhs.type != ValueType::BOOL || rhs.type != ValueType::BOOL) {
+  if (lhs.type == ValueType::NONE && rhs.type == ValueType::NONE) {
+  } else if (lhs.type != ValueType::BOOL || rhs.type != ValueType::BOOL) {
     throw InvalidOperand();
   }
   return Value(std::get<bool>(lhs._value) != std::get<bool>(rhs._value));
 }
 
 Value operator|(const Value& lhs, const Value& rhs) {
-  if (lhs.type == ValueType::NONE && rhs.type == ValueType::NONE){}
-  else if (lhs.type != ValueType::BOOL || rhs.type != ValueType::BOOL) {
+  if (lhs.type == ValueType::NONE && rhs.type == ValueType::NONE) {
+  } else if (lhs.type != ValueType::BOOL || rhs.type != ValueType::BOOL) {
     throw InvalidOperand();
   }
   return Value(std::get<bool>(lhs._value) || std::get<bool>(rhs._value));

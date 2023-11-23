@@ -31,9 +31,13 @@ Constant::~Constant() {}
 
 const Token &Constant::get_token() const { return this->tok; }
 
-Value Constant::eval(std::map<std::string, Value>& scope) const { return this->__eval(scope); }
+Value Constant::eval(std::map<std::string, Value> &scope) const {
+  return this->__eval(scope);
+}
 
-Value Constant::__eval(std::map<std::string, Value>&) const { return this->val; }
+Value Constant::__eval(std::map<std::string, Value> &) const {
+  return this->val;
+}
 
 // Deserted due to depreciation of S expression evaluation
 // bool Constant::is_legal() const { return true; }
@@ -64,7 +68,7 @@ void Operator::add_operand(std::shared_ptr<AST> node) {
 
 const Token &Operator::get_token() const { return this->tok; }
 
-Value Operator::eval(std::map<std::string, Value>& scope) const {
+Value Operator::eval(std::map<std::string, Value> &scope) const {
   auto old_map = scope;
   try {
     return this->__eval(scope);
@@ -75,7 +79,7 @@ Value Operator::eval(std::map<std::string, Value>& scope) const {
   }
 }
 
-Value Operator::__eval(std::map<std::string, Value>& scope) const {
+Value Operator::__eval(std::map<std::string, Value> &scope) const {
   std::string str = (this->tok).text;
 
   if (str == "+") {
@@ -171,10 +175,11 @@ Identifier::~Identifier() {
 
 const Token &Identifier::get_token() const { return this->tok; }
 
-Value Identifier::eval(std::map<std::string, Value>& scope) const { 
-    return this->__eval(scope); }
+Value Identifier::eval(std::map<std::string, Value> &scope) const {
+  return this->__eval(scope);
+}
 
-Value Identifier::__eval(std::map<std::string, Value>& scope) const {
+Value Identifier::__eval(std::map<std::string, Value> &scope) const {
   if (this->assigned(scope)) {
     return scope.at(this->tok.text);
   } else {
@@ -185,9 +190,11 @@ Value Identifier::__eval(std::map<std::string, Value>& scope) const {
 // Deserted due to depreciation of S expression evaluation
 // bool Identifier::is_legal() const { return this->assigned(); }
 
-void Identifier::assign(Value x, std::map<std::string, Value>& scope) { scope[this->tok.text] = x; }
+void Identifier::assign(Value x, std::map<std::string, Value> &scope) {
+  scope[this->tok.text] = x;
+}
 
-bool Identifier::assigned(std::map<std::string, Value>& scope) const {
+bool Identifier::assigned(std::map<std::string, Value> &scope) const {
   return !(scope.find(this->tok.text) == scope.end());
 }
 
@@ -206,35 +213,38 @@ FunctionCall::~FunctionCall() {
 
 const Token &FunctionCall::get_token() const { return lhs->get_token(); }
 
-Value FunctionCall::eval(std::map<std::string, Value>& scope) const { 
-    auto funct = lhs->__eval(scope);
-    if (funct.type != ValueType::FUNCTION){
-        throw NotAFunction();
-    }
-    return this->__eval(scope); }
-
-Value FunctionCall::__eval(std::map<std::string, Value>& scope) const { 
-    Value funct = scope[this->get_token().text];
-    FnPtr fnptr = std::get<FnPtr>(funct._value);
-    if (fnptr->get_args().size() != value.size()){
-        throw IncorrentArg();
-    }
-    std::map<std::string, Value> new_scope = fnptr->get_scope();
-    std::vector<Value> arg_eval = arg_val(scope);
-    for (size_t i = 0; i < arg_eval.size(); ++i){
-        std::string arg = fnptr->get_args()[i];
-        new_scope[arg] = arg_eval[i];
-    }
-    Value result = fnptr->run_code(new_scope);
-    return result;
+Value FunctionCall::eval(std::map<std::string, Value> &scope) const {
+  auto funct = lhs->__eval(scope);
+  if (funct.type != ValueType::FUNCTION) {
+    throw NotAFunction();
+  }
+  return this->__eval(scope);
 }
 
-const std::vector<Value> FunctionCall::arg_val(std::map<std::string, Value>& scope) const {
-    std::vector<Value> arg_eval;
-    for (auto val : this->value){
-        arg_eval.push_back(val->eval(scope));
-    }
-    return arg_eval;
+Value FunctionCall::__eval(std::map<std::string, Value> &scope) const {
+  Value funct = scope[this->get_token().text];
+  FnPtr fnptr = std::get<FnPtr>(funct._value);
+  if (fnptr->get_args().size() != value.size()) {
+    throw IncorrentArg();
+  }
+  std::map<std::string, Value> new_scope = fnptr->get_scope();
+  std::vector<Value> arg_eval = arg_val(scope);
+  for (size_t i = 0; i < arg_eval.size(); ++i) {
+    std::string arg = fnptr->get_args()[i];
+    new_scope[arg] = arg_eval[i];
+  }
+  Value result = fnptr->run_code(new_scope);
+  return result;
+}
+
+const std::vector<Value> FunctionCall::arg_val(
+    std::map<std::string, Value> &scope) const {
+  // evaluate arguments
+  std::vector<Value> arg_eval;
+  for (auto val : this->value) {
+    arg_eval.push_back(val->eval(scope));
+  }
+  return arg_eval;
 }
 
 void FunctionCall::get_infix(std::ostream &oss) const {

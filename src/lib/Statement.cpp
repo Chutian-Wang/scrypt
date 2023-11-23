@@ -10,9 +10,9 @@
 
 #include "AST.h"
 #include "Errors.h"
+#include "Function.h"
 #include "Nodes.h"
 #include "Value.h"
-#include "Function.h"
 
 Block::Block() { this->statements = std::vector<std::unique_ptr<Statement>>(); }
 
@@ -169,7 +169,9 @@ Expression::~Expression() {
   // Auto garbage collection
 }
 
-void Expression::run(std::map<std::string, Value>& scope) { this->expr->eval(scope); }
+void Expression::run(std::map<std::string, Value>& scope) {
+  this->expr->eval(scope);
+}
 
 void Expression::print(std::ostream& os, int depth) const {
   for (int i = 0; i < depth; i++) {
@@ -179,8 +181,9 @@ void Expression::print(std::ostream& os, int depth) const {
   os << ';' << '\n';
 }
 
-Value Expression::eval(std::map<std::string, Value>& scope) { 
-    return this->expr->eval(scope); }
+Value Expression::eval(std::map<std::string, Value>& scope) {
+  return this->expr->eval(scope);
+}
 
 void Expression::get_infix(std::ostream& os) { this->expr->get_infix(os); }
 
@@ -304,7 +307,8 @@ PrintStatement::~PrintStatement() {
 }
 
 void PrintStatement::run(std::map<std::string, Value>& scope) {
-    this->os << this->printee->eval(scope) << '\n'; }
+  this->os << this->printee->eval(scope) << '\n';
+}
 
 void PrintStatement::print(std::ostream& os, int depth) const {
   for (int i = 0; i < depth; i++) {
@@ -337,16 +341,19 @@ void FunctStatement::set_function(std::unique_ptr<Block>& block) {
 }
 
 void FunctStatement::run(std::map<std::string, Value>& scope) {
-    std::vector<std::string> args;
-    for (auto arg:this->arguments){
-        std::string name = arg->get_token().text;
-        args.push_back(name);
-        scope[name] = Value();
-    }
-    std::string fname = this->name->get_token().text;
-    std::shared_ptr<Function> definition = std::make_shared<Function>(fname, args, scope, this->function_block.get());
-    Value funct(definition);
-    scope[fname] = funct;
+  std::vector<std::string> args;
+  for (auto arg : this->arguments) {
+    // put function parameters in the map
+    std::string name = arg->get_token().text;
+    args.push_back(name);
+    scope[name] = Value();
+  }
+  std::string fname = this->name->get_token().text;
+  std::shared_ptr<Function> definition = std::make_shared<Function>(
+      fname, args, scope, this->function_block.get());
+  Value funct(definition);
+  // put function name in map
+  scope[fname] = funct;
 }
 
 void FunctStatement::print(std::ostream& os, int depth) const {
@@ -384,14 +391,14 @@ ReturnStatement::~ReturnStatement() {
   // Auto garbage collection
 }
 
-void ReturnStatement::run(std::map<std::string, Value>& scope) { 
-    if (this->ret == nullptr){
-        throw Value(nullptr);
-    }
-    else{
-        throw this->ret->eval(scope);
-    }
-    }
+void ReturnStatement::run(std::map<std::string, Value>& scope) {
+  if (this->ret == nullptr) {
+    // handles return;
+    throw Value(nullptr);
+  } else {
+    throw this->ret->eval(scope);
+  }
+}
 
 void ReturnStatement::print(std::ostream& os, int depth) const {
   for (int i = 0; i < depth; i++) {

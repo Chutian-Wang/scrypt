@@ -42,14 +42,14 @@ class AST {
    * This function will revert identifiers to their previous
    * values if evaluation fails
    */
-  virtual Value eval(std::map<std::string, Value>& scope) const = 0;
+  virtual Value eval(std::map<std::string, Value> &scope) const = 0;
 
   /**
    * Internal function to evaluate the subtree:
    * This function will NOT revert identifiers to their previous
    * values if evaluation fails
    */
-  virtual Value __eval(std::map<std::string, Value>& scope) const = 0;
+  virtual Value __eval(std::map<std::string, Value> &scope) const = 0;
 
   /**
    * This function pushes the subtree's infix form into oss

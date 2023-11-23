@@ -17,11 +17,11 @@ int main() {
     std::map<std::string, Value> symbols{};
     std::unique_ptr<Block> program = Block::parse_block(tokens);
     program->run(symbols);
-  } catch(Value& value) {
+  } catch (Value& value) {
     std::cout << "Runtime error: unexpected return.\n";
     return 3;
-  } catch (const ScryptError &err) {
+  } catch (const ScryptError& err) {
     return ScryptError::handle(std::cout, err);
-  } 
+  }
   return 0;
 }

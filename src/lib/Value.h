@@ -2,9 +2,9 @@
 #define VALUE_H
 #include <functional>
 #include <iostream>
+#include <memory>
 #include <variant>
 #include <vector>
-#include <memory>
 
 class Function;
 
@@ -13,9 +13,7 @@ enum struct ValueType { BOOL, DOUBLE, NONE, FUNCTION, null };
 struct Value {
  public:
   ValueType type;
-  std::variant<double, bool, std::nullptr_t,
-               std::shared_ptr<Function> >
-      _value;
+  std::variant<double, bool, std::nullptr_t, std::shared_ptr<Function> > _value;
 
   Value();
   Value(double num);
