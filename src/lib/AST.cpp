@@ -17,12 +17,62 @@
 **                    Infix Scrypt Parser                   **
 *************************************************************/
 
+/**
+ * This function consumes the target Token if head == target
+ * o.w. throws an unexpected token error
+ */
 void AST::consume(std::vector<Token>::const_iterator &head, TokenType target) {
   if (head->type == target) {
     head++;
   } else {
     throw UnexpTokError(*head);
   }
+}
+
+/**
+ * This function handels function call parsing.
+ */
+std::vector<std::shared_ptr<AST>> AST::parse_call(
+    std::vector<Token>::const_iterator &head, TokenType end) {
+  // head-> arguments[0]
+  std::vector<std::shared_ptr<AST>> arguments;
+  while (head->type != end) {
+    auto argument = AST::parse_infix(head, 0);
+    arguments.push_back(std::move(argument));
+    head++;
+    if (head->type == TokenType::COMMA) {
+      head++;
+    }
+  }
+  // head -> )
+  return arguments;
+}
+
+std::shared_ptr<AST> parse_index(std::vector<Token>::const_iterator &head) {
+  head++; // consume "["
+  /*
+  while (head->type != TokenType::RSBRACE && head->type != TokenType::END) {
+    arr->add_literal(AST::parse_infix(head, 0));
+    head++;
+    if (head->type == TokenType::COMMA) head++;
+  }
+  */
+  auto arr = AST::parse_primary(head);
+  head++;
+  if (head->type != TokenType::RSBRACE) throw UnexpTokError(*head);
+  return arr;
+}
+
+std::shared_ptr<AST> parse_arr(std::vector<Token>::const_iterator &head) {
+  head++; // consume "["
+  auto arr = std::make_shared<Array>();
+  while (head->type != TokenType::RSBRACE && head->type != TokenType::END) {
+    arr->add_literal(AST::parse_infix(head, 0));
+    head++;
+    if (head->type == TokenType::COMMA) head++;
+  }
+  if (head->type != TokenType::RSBRACE) throw UnexpTokError(*head);
+  return arr;
 }
 
 std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
@@ -44,7 +94,12 @@ std::shared_ptr<AST> AST::parse_infix(std::vector<Token>::const_iterator &head,
       lhs = new_lhs;
       continue;
     }
-
+    if (head->text == "[") {
+      // parse arr index
+      auto index = parse_index(head);
+      std::shared_ptr<AST> new_lhs = std::make_shared<Array>();
+      ((Array*) new_lhs.get())->set_identifier(lhs);
+    }
     std::shared_ptr<AST> op(new Operator(*head));
     std::shared_ptr<AST> rhs = parse_infix(++head, precedence);
 
@@ -64,29 +119,17 @@ std::shared_ptr<AST> AST::parse_primary(
   } else if (head->type == TokenType::IDENTIFIER) {
     return std::shared_ptr<AST>(new Identifier(*head));
   } else if (head->type == TokenType::LPAREN) {
-    head++;  // consume (
+    head++;  // consume "(""
     std::shared_ptr<AST> node = parse_infix(head, 0);
-    head++;  // consume )
+    head++;  // put head at ")"
     return node;
+  } else if (head->type == TokenType::LSBRACE) {
+    // parse array literal
+    std::shared_ptr<AST> arr = parse_arr(head);
+    return arr;
   } else {
     throw UnexpTokError(*head);
   }
-}
-
-std::vector<std::shared_ptr<AST>> AST::parse_call(
-    std::vector<Token>::const_iterator &head, TokenType end) {
-  // head-> arguments[0]
-  std::vector<std::shared_ptr<AST>> arguments;
-  while (head->type != end) {
-    auto argument = AST::parse_infix(head, 0);
-    arguments.push_back(std::move(argument));
-    head++;
-    if (head->type == TokenType::COMMA) {
-      head++;
-    }
-  }
-  // head -> )
-  return arguments;
 }
 
 // std::shared_ptr<AST> AST::parse_infix(const std::vector<Token> &tokens) {

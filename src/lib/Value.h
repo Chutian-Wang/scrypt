@@ -8,17 +8,24 @@
 
 class Function;
 
-enum struct ValueType { BOOL, DOUBLE, NONE, FUNCTION, null };
+enum struct ValueType { BOOL, DOUBLE, FUNCTION, ARRAY, null };
 
 struct Value {
  public:
   ValueType type;
-  std::variant<double, bool, std::nullptr_t, std::shared_ptr<Function> > _value;
+  std::variant<
+    double,
+    bool,
+    std::nullptr_t,
+    std::shared_ptr<Function>,
+    std::shared_ptr<std::vector<Value>>
+    > _value;
 
   Value();
   Value(double num);
   Value(bool boolean);
   Value(std::nullptr_t n);
+  Value(std::shared_ptr<std::vector<Value>> arr_val);
   Value(std::shared_ptr<Function> funct);
 
   Value& operator+=(const Value& rhs);

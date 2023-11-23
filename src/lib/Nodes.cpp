@@ -200,7 +200,7 @@ bool Identifier::assigned(std::map<std::string, Value> &scope) const {
 
 void Identifier::get_infix(std::ostream &oss) const { oss << this->tok.text; }
 
-// FunctionCall implememtations ----------------------------------
+// FunctionCall implememtations --------------------------------
 FunctionCall::FunctionCall(std::shared_ptr<AST> node,
                            std::vector<std::shared_ptr<AST>> value) {
   this->lhs = node;
@@ -265,6 +265,108 @@ void FunctionCall::get_infix(std::ostream &oss) const {
 
 const std::vector<std::shared_ptr<AST>> &FunctionCall::get_value() const {
   return value;
+}
+
+// Array implememtations ---------------------------------------
+
+void Array::assign(Value& arr, const Value& index, const Value& val) {
+  if (index.type != ValueType::DOUBLE) {
+    throw IndexNotNumber();
+  } else if (std::fmod(std::get<double>(index._value), 1) != 0) {
+    throw IndexNotInt();
+  } else if (std::get<double>(index._value) < 0 ||
+      std::get<double>(index._value) >= 
+      std::get<std::shared_ptr<std::vector<Value>>>(arr._value)->size()) {
+    throw IndexOutOfBounds();
+  }
+  else {
+    (*(std::get<std::shared_ptr<std::vector<Value>>>(arr._value)))
+    [(int)std::get<double>(index._value)] = val;
+  }
+}
+
+Value Array::access(const Value& arr, const Value& index) {
+  if (index.type != ValueType::DOUBLE) {
+    throw IndexNotNumber();
+  } else if (std::fmod(std::get<double>(index._value), 1) != 0) {
+    throw IndexNotInt();
+  } else if (std::get<double>(index._value) < 0 ||
+      std::get<double>(index._value) >= 
+      std::get<std::shared_ptr<std::vector<Value>>>(arr._value)->size()) {
+    throw IndexOutOfBounds();
+  }
+  else {
+    return (*(std::get<std::shared_ptr<std::vector<Value>>>(arr._value)))
+    [(int)std::get<double>(index._value)];
+  }
+}
+
+Array::Array() {
+  this->symbol = std::shared_ptr<AST>();
+  this->acc_index = std::shared_ptr<AST>();
+  this->literals = std::vector<std::shared_ptr<AST>>();
+}
+
+Array::~Array() {
+  // Auto garbage colleciton
+}
+
+void Array::add_literal(std::shared_ptr<AST> literal) {
+  this->literals.push_back(literal);
+}
+
+void Array::set_acc_index(std::shared_ptr<AST> index) {
+  this->acc_index = index;
+}
+
+void Array::set_identifier(std::shared_ptr<AST> ident) {
+  this->symbol = ident;
+}
+
+Value Array::access(Value index, std::map<std::string, Value> &scope) {
+  if (index.type != ValueType::DOUBLE) {
+    throw IndexNotNumber();
+  } else if (std::fmod(std::get<double>(index._value), 1) != 0) {
+    throw IndexNotInt();
+  } else if (std::get<double>(index._value) < 0 ||
+      std::get<double>(index._value) >= this->literals.size()) {
+    throw IndexOutOfBounds();
+  }
+  else {
+    return (this->literals)[(int)std::get<double>(index._value)]->eval(scope);
+  }
+}
+
+const Token &Array::get_token() const {
+  return this->symbol->get_token();
+}
+
+Value Array::eval(std::map<std::string, Value> &scope) const {
+  auto old_map = scope;
+  try {
+    return this->__eval(scope);
+  } catch (const ScryptRuntimeError &err) {
+    // Restore variables
+    scope = old_map;
+    throw;
+  }
+}
+
+Value Array::__eval(std::map<std::string, Value> &scope) const {
+  auto val = std::make_shared<std::vector<Value>>();
+  for (auto node: this->literals) {
+    val->push_back(node->__eval(scope));
+  }
+  return Value(val);
+}
+
+void Array::get_infix(std::ostream &oss) const {
+  oss << '[';
+  for (auto node = this->literals.begin(); node < this->literals.end(); node++) {
+    node->get()->get_infix(oss);
+    if (node != this->literals.end() - 1) oss << ", ";
+  }
+  oss << ']';
 }
 
 // Deserted due to depreciation of S expression evaluation
