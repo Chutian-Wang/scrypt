@@ -107,12 +107,3 @@ IncorrentArg::IncorrentArg() {
 const char *IncorrentArg::what() const noexcept {
   return "Runtime error: incorrect argument count.";
 }
-
-UnexpectedReturn::UnexpectedReturn() {
-  this->exit_code = UNEXPECT_RETURN;
-  this->msg = nullptr;
-}
-
-const char *UnexpectedReturn::what() const noexcept {
-  return "Runtime error: unexpected return.";
-}

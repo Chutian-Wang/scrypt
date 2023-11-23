@@ -24,6 +24,7 @@ std::vector<std::string> Function::get_args(){
 }
 
 Value Function::run_code(std::map<std::string, Value> scope){
+    // handles unexpect return
     try {
         code->run(scope);
         return Value(nullptr);
