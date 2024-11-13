@@ -31,13 +31,11 @@ Constant::~Constant() {}
 
 const Token &Constant::get_token() const { return this->tok; }
 
-Value Constant::eval(std::map<std::string, Value> &scope) const {
+Value Constant::eval(std::map<std::string, Value> &scope) {
   return this->__eval(scope);
 }
 
-Value Constant::__eval(std::map<std::string, Value> &) const {
-  return this->val;
-}
+Value Constant::__eval(std::map<std::string, Value> &) { return this->val; }
 
 // Deserted due to depreciation of S expression evaluation
 // bool Constant::is_legal() const { return true; }
@@ -68,7 +66,7 @@ void Operator::add_operand(std::shared_ptr<AST> node) {
 
 const Token &Operator::get_token() const { return this->tok; }
 
-Value Operator::eval(std::map<std::string, Value> &scope) const {
+Value Operator::eval(std::map<std::string, Value> &scope) {
   auto old_map = scope;
   try {
     return this->__eval(scope);
@@ -79,7 +77,7 @@ Value Operator::eval(std::map<std::string, Value> &scope) const {
   }
 }
 
-Value Operator::__eval(std::map<std::string, Value> &scope) const {
+Value Operator::__eval(std::map<std::string, Value> &scope) {
   std::string str = (this->tok).text;
 
   if (str == "+") {
@@ -116,15 +114,22 @@ Value Operator::__eval(std::map<std::string, Value> &scope) const {
     }
     return ret;
   } else if (str == "=") {
-    if ((this->operands[0]->get_token()).type != TokenType::IDENTIFIER) {
+    if ((this->operands[0]->get_token()).type != TokenType::IDENTIFIER &&
+        (this->operands[0]->get_token()).type != TokenType::LSBRACE) { // Array
       throw InvalidAssignee();
     }
     // Get rhs value
     Value ret = (*((this->operands).end() - 1))->__eval(scope);
     // Assign to lhs'
-    for (auto node = ((this->operands).end() - 2);
+    if ((this->operands[0]->get_token()).type == TokenType::LSBRACE) {
+      Array* arr = (Array*)this->operands[0].get();
+      arr->assign(ret, scope);
+    }
+    else {
+      for (auto node = ((this->operands).end() - 2);
          node >= ((this->operands).begin()); node--) {
-      ((Identifier *)(node->get()))->assign(ret, scope);
+        ((Identifier *)(node->get()))->assign(ret, scope);
+      }
     }
     // Return rhs
     return ret;
@@ -175,11 +180,11 @@ Identifier::~Identifier() {
 
 const Token &Identifier::get_token() const { return this->tok; }
 
-Value Identifier::eval(std::map<std::string, Value> &scope) const {
+Value Identifier::eval(std::map<std::string, Value> &scope) {
   return this->__eval(scope);
 }
 
-Value Identifier::__eval(std::map<std::string, Value> &scope) const {
+Value Identifier::__eval(std::map<std::string, Value> &scope) {
   if (this->assigned(scope)) {
     return scope.at(this->tok.text);
   } else {
@@ -200,7 +205,7 @@ bool Identifier::assigned(std::map<std::string, Value> &scope) const {
 
 void Identifier::get_infix(std::ostream &oss) const { oss << this->tok.text; }
 
-// FunctionCall implememtations ----------------------------------
+// FunctionCall implememtations --------------------------------
 FunctionCall::FunctionCall(std::shared_ptr<AST> node,
                            std::vector<std::shared_ptr<AST>> value) {
   this->lhs = node;
@@ -213,7 +218,7 @@ FunctionCall::~FunctionCall() {
 
 const Token &FunctionCall::get_token() const { return lhs->get_token(); }
 
-Value FunctionCall::eval(std::map<std::string, Value> &scope) const {
+Value FunctionCall::eval(std::map<std::string, Value> &scope) {
   auto funct = lhs->__eval(scope);
   if (funct.type != ValueType::FUNCTION) {
     throw NotAFunction();
@@ -221,7 +226,7 @@ Value FunctionCall::eval(std::map<std::string, Value> &scope) const {
   return this->__eval(scope);
 }
 
-Value FunctionCall::__eval(std::map<std::string, Value> &scope) const {
+Value FunctionCall::__eval(std::map<std::string, Value> &scope) {
   Value funct = scope[this->get_token().text];
   FnPtr fnptr = std::get<FnPtr>(funct._value);
   if (fnptr->get_args().size() != value.size()) {
@@ -265,6 +270,107 @@ void FunctionCall::get_infix(std::ostream &oss) const {
 
 const std::vector<std::shared_ptr<AST>> &FunctionCall::get_value() const {
   return value;
+}
+
+// Array implememtations ---------------------------------------
+
+Value Array::access(Value arr, const Value &index) {
+  auto &vec = std::get<std::shared_ptr<std::vector<Value>>>(arr._value);
+  if (index.type != ValueType::DOUBLE) {
+    throw IndexNotNumber();
+  } else if (std::fmod(std::get<double>(index._value), 1) != 0) {
+    throw IndexNotInt();
+  } else if (std::get<double>(index._value) < 0 ||
+             std::get<double>(index._value) >= vec->size()) {
+    throw IndexOutOfBounds();
+  } else {
+    return (*vec)[(int)std::get<double>(index._value)];
+  }
+}
+
+Array::Array() {
+  this->tok = Token();
+  this->identifier = std::shared_ptr<AST>();
+  this->acc_index = std::shared_ptr<AST>();
+  this->literals = std::vector<std::shared_ptr<AST>>();
+}
+
+Array::~Array() {
+  // Auto garbage colleciton
+}
+
+void Array::add_literal(std::shared_ptr<AST> literal) {
+  this->literals.push_back(literal);
+}
+
+void Array::set_identifier(std::shared_ptr<AST> identifier) {
+  this->identifier = identifier;
+}
+
+void Array::set_acc_index(std::shared_ptr<AST> index) {
+  this->acc_index = index;
+}
+
+const Token &Array::get_token() const {
+  return this->tok;
+}
+
+void Array::set_token(const Token &tok) {
+  this->tok = tok;
+}
+
+void Array::assign(const Value &val, std::map<std::string, Value> &scope) {
+  auto index = this->acc_index->eval(scope);
+  auto vec = std::get<std::shared_ptr<std::vector<Value>>>(scope[this->identifier->get_token().text]._value);
+  if (index.type != ValueType::DOUBLE) {
+    throw IndexNotNumber();
+  } else if (std::fmod(std::get<double>(index._value), 1) != 0) {
+    throw IndexNotInt();
+  } else if (std::get<double>(index._value) < 0 ||
+             std::get<double>(index._value) >= vec->size()) {
+    throw IndexOutOfBounds();
+  } else {
+    (*vec)[(int)std::get<double>(index._value)] = val;
+  }
+}
+
+Value Array::eval(std::map<std::string, Value> &scope) {
+  auto old_map = scope;
+  try {
+    return this->__eval(scope);
+  } catch (const ScryptRuntimeError &err) {
+    // Restore variables
+    scope = old_map;
+    throw;
+  }
+}
+
+Value Array::__eval(std::map<std::string, Value> &scope) {
+  auto val = std::make_shared<std::vector<Value>>();
+  if (this->acc_index) {
+    return Array::access(scope[this->identifier->get_token().text], this->acc_index->__eval(scope));
+  } else {
+    for (auto node : this->literals) {
+      val->push_back(node->__eval(scope));
+    }
+    return Value(val);
+  }
+}
+
+void Array::get_infix(std::ostream &oss) const {
+  if (this->acc_index) {
+    oss << this->identifier->get_token().text << '[';
+    this->acc_index->get_infix(oss);
+    oss << ']';
+  } else {
+    oss << '[';
+    for (auto node = this->literals.begin(); node < this->literals.end();
+         node++) {
+      node->get()->get_infix(oss);
+      if (node != this->literals.end() - 1) oss << ", ";
+    }
+    oss << ']';
+  }
 }
 
 // Deserted due to depreciation of S expression evaluation

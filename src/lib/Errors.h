@@ -21,8 +21,13 @@
 #define INVALID_COND SCRYPT_RUNTIME
 #define INVALID_OPRAND SCRYPT_RUNTIME
 #define INVALID_ASSIGNEE SCRYPT_RUNTIME
-#define NOT_A_FUNCTION SCRYPT_RUNTIME
+#define NOT_FUNCTION SCRYPT_RUNTIME
 #define INCORRECT_ARG SCRYPT_RUNTIME
+#define NOT_NUMBER SCRYPT_RUNTIME
+#define NOT_INT SCRYPT_RUNTIME
+#define NOT_ARRAY SCRYPT_RUNTIME
+#define INDEX_OUT_OF_BOUNDS SCRYPT_RUNTIME
+#define ARR_UNDERFLOW SCRYPT_RUNTIME
 
 /**
  * Children of this custom Error class should be thrown
@@ -112,6 +117,46 @@ class IncorrentArg : public ScryptRuntimeError {
  public:
   IncorrentArg();
   virtual ~IncorrentArg(){};
+  // what() is static, no need to write destructor
+  virtual const char *what() const noexcept;
+};
+
+class IndexNotNumber : public ScryptRuntimeError {
+ public:
+  IndexNotNumber();
+  virtual ~IndexNotNumber(){};
+  // what() is static, no need to write destructor
+  virtual const char *what() const noexcept;
+};
+
+class IndexNotInt : public ScryptRuntimeError {
+ public:
+  IndexNotInt();
+  virtual ~IndexNotInt(){};
+  // what() is static, no need to write destructor
+  virtual const char *what() const noexcept;
+};
+
+class NotArray : public ScryptRuntimeError {
+ public:
+  NotArray();
+  virtual ~NotArray(){};
+  // what() is static, no need to write destructor
+  virtual const char *what() const noexcept;
+};
+
+class IndexOutOfBounds : public ScryptRuntimeError {
+ public:
+  IndexOutOfBounds();
+  virtual ~IndexOutOfBounds(){};
+  // what() is static, no need to write destructor
+  virtual const char *what() const noexcept;
+};
+
+class Underflow : public ScryptRuntimeError {
+ public:
+  Underflow();
+  virtual ~Underflow(){};
   // what() is static, no need to write destructor
   virtual const char *what() const noexcept;
 };

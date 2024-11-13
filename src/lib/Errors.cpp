@@ -91,7 +91,7 @@ const char *InvalidAssignee::what() const noexcept {
 }
 
 NotAFunction::NotAFunction() {
-  this->exit_code = NOT_A_FUNCTION;
+  this->exit_code = NOT_FUNCTION;
   this->msg = nullptr;
 }
 
@@ -106,4 +106,49 @@ IncorrentArg::IncorrentArg() {
 
 const char *IncorrentArg::what() const noexcept {
   return "Runtime error: incorrect argument count.";
+}
+
+IndexNotNumber::IndexNotNumber() {
+  this->exit_code = NOT_NUMBER;
+  this->msg = nullptr;
+}
+
+const char *IndexNotNumber::what() const noexcept {
+  return "Runtime error: index is not a number.";
+}
+
+IndexNotInt::IndexNotInt() {
+  this->exit_code = NOT_INT;
+  this->msg = nullptr;
+}
+
+const char *IndexNotInt::what() const noexcept {
+  return "Runtime error: index is not an integer.";
+}
+
+NotArray::NotArray() {
+  this->exit_code = NOT_ARRAY;
+  this->msg = nullptr;
+}
+
+const char *NotArray::what() const noexcept {
+  return "Runtime error: not an array.";
+}
+
+IndexOutOfBounds::IndexOutOfBounds() {
+  this->exit_code = INDEX_OUT_OF_BOUNDS;
+  this->msg = nullptr;
+}
+
+const char *IndexOutOfBounds::what() const noexcept {
+  return "Runtime error: index out of bounds.";
+}
+
+Underflow::Underflow() {
+  this->exit_code = ARR_UNDERFLOW;
+  this->msg = nullptr;
+}
+
+const char *Underflow::what() const noexcept {
+  return "Runtime error: underflow.";
 }
